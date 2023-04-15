@@ -30,6 +30,9 @@ fi
 # Create a CMakeLists.txt file in the "../modules/cfg/" folder with the package name
 if [ ! -d "$SCRIPT_DIR/../modules/cfg" ]; then
   mkdir "$SCRIPT_DIR/../modules/cfg"
+else
+  echo "Config for the $repo_name already exists"
+  exit 1
 fi
 if [ ! -f "$SCRIPT_DIR/../modules/cfg/$repo_name/$repo_name.cmake" ]; then
   mkdir -p "$SCRIPT_DIR/../modules/cfg/$repo_name"
