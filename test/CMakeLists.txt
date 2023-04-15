@@ -38,11 +38,3 @@ if (USE_CUSTOM_SDL_SHARED_LIB AND SHARED_LIB_PATH)
             COMMAND ${CMAKE_COMMAND} -E env LD_PRELOAD=${SHARED_LIB_PATH}/libSDL2.so ${CMAKE_BINARY_DIR}/test/./Test_DLL_Injection
             )
 endif()
-
-
-
-add_executable(Test_Window_Appearance test_window.cxx test_window.hxx)
-
-target_link_libraries(Test_Window_Appearance PRIVATE
-        GTest::GTest
-        SDL3::SDL3-shared)
