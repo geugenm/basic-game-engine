@@ -12,6 +12,7 @@ include(cmake/configure_compiler.cmake)
 include(cmake/code_quality.cmake)
 
 include(cmake/check_platform.cmake)
+include(cmake/packages.cmake)
 
 add_subdirectory(src)
 
