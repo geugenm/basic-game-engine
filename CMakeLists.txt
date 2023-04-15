@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(Template-Cpp-Project VERSION 1.0.0 LANGUAGES CXX C)
+project(Basic_Game_Engine VERSION 1.0.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 
@@ -10,7 +10,6 @@ endif()
 
 include(cmake/configure_compiler.cmake)
 include(cmake/code_quality.cmake)
-
 include(cmake/check_platform.cmake)
 
 add_subdirectory(src)
