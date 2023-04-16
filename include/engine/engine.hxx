@@ -29,10 +29,10 @@ public:
 
 private:
     explicit Engine() {
-        EngineFactory engineFactory;
-        auto presenter = engineFactory.createPresenter();
-        auto model = engineFactory.createModel();
-        auto view = engineFactory.createView();
+        std::unique_ptr<EngineFactory> engineFactory(new EngineFactory());
+        auto presenter = engineFactory->createPresenter();
+        auto model = engineFactory->createModel();
+        auto view = engineFactory->createView();
 
         presenter_ = std::move(presenter);
         presenter_->setView(view);
