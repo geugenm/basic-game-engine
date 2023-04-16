@@ -26,6 +26,6 @@ private:
 };
 
 
-std::shared_ptr<IPresenter> createPresenter() {
-    return std::make_shared<SDLPresenter>();
+IPresenter* createPresenter() {
+    return new SDLPresenter;
 }

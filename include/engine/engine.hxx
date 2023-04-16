@@ -30,9 +30,17 @@ public:
 
 private:
     explicit Engine() {
-        auto presenter = createPresenter();
-        auto model = createModel();
-        auto view = createView();
+        std::shared_ptr<IView> view(createView(), [](IView* ptr) {
+            delete ptr;
+        });
+
+        std::shared_ptr<IModel> model(createModel(), [](IModel* ptr) {
+            delete ptr;
+        });
+
+        std::shared_ptr<IPresenter> presenter(createPresenter(), [](IPresenter* ptr) {
+            delete ptr;
+        });
 
         presenter_ = std::move(presenter);
         presenter_->setView(view);

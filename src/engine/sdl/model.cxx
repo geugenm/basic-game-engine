@@ -11,6 +11,6 @@ public:
     void render() override {}
 };
 
-std::shared_ptr<IModel> createModel() {
-    return std::make_shared<SDLModel>();
+IModel* createModel() {
+    return new SDLModel;
 }

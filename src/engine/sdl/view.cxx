@@ -61,6 +61,6 @@ private:
     SDL_Renderer* renderer_;
 };
 
-std::shared_ptr<IView> createView() {
-    return std::make_shared<SDLView>();
+IView* createView() {
+    return new SDLView;
 }
