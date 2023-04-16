@@ -1,9 +1,5 @@
 #pragma once
 
-namespace Game {
-
-}
-
 class IModel {
 public:
     virtual ~IModel() {}

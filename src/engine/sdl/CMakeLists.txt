@@ -10,5 +10,5 @@ target_link_libraries(lib.SDLView PRIVATE SDL3::SDL3 int.Include)
 add_library(lib.SDLPresenter SHARED presenter.cxx)
 target_link_libraries(lib.SDLPresenter PRIVATE SDL3::SDL3 int.Include)
 
-add_library(lib.SDLReload SHARED reload.cxx)
+add_library(lib.SDLReload SHARED misc/reload_attached_library.cxx)
 target_link_libraries(lib.SDLReload PRIVATE SDL3::SDL3 int.Include)
