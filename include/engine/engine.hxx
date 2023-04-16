@@ -24,16 +24,24 @@ public:
         presenter_ = presenter;
     }
 
-    void setView(const std::shared_ptr<IView>& view) {
-        presenter_->setView(view);
-    }
+private:
+    explicit GameEngine() {
+        std::shared_ptr<IPresenter> presenter(create_presenter(), [](IPresenter* ptr) {
+            delete ptr;
+        });
 
-    void setModel(const std::shared_ptr<IModel>& model) {
+        std::shared_ptr<IView> view(create_view(), [](IView* ptr) {
+            delete ptr;
+        });
+
+        std::shared_ptr<IModel> model(create_model(), [](IModel* ptr) {
+            delete ptr;
+        });
+
+        presenter_ = std::move(presenter);
+        presenter_->setView(view);
         presenter_->setModel(model);
     }
-
-private:
-    explicit GameEngine() : presenter_() {}
 
     std::shared_ptr<IPresenter> presenter_;
 };

@@ -6,10 +6,7 @@
 
 class SDLView : public IView {
 public:
-    explicit SDLView() {
-        auto currentInstance = std::make_shared<SDLView>(*this);
-        Game::GameEngine::getInstance()->setView(currentInstance);
-    }
+    explicit SDLView() {}
 
     ~SDLView() override {
         SDL_DestroyRenderer(renderer_);

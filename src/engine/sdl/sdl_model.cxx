@@ -3,10 +3,7 @@
 
 class SDLModel : public IModel {
 public:
-    explicit SDLModel() {
-        auto currentInstance = std::make_shared<SDLModel>(*this);
-        Game::GameEngine::getInstance()->setModel(currentInstance);
-    }
+    explicit SDLModel() {}
 
     void initialize() override {}
 
