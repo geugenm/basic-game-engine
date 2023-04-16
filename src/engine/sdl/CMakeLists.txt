@@ -1,23 +1,12 @@
-add_library(int.Include INTERFACE)
-target_include_directories(int.Include INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
+cmake_minimum_required(VERSION 3.25)
 
-add_library(lib.SDLModel SHARED model.cxx)
-target_link_libraries(lib.SDLModel PRIVATE SDL3::SDL3-shared int.Include)
-set_target_properties(
-        lib.SDLModel PROPERTIES
-        ENABLE_EXPORTS 1
-)
+add_library(EngineIncludes INTERFACE)
+target_include_directories(EngineIncludes INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../include>
+        )
 
-add_library(lib.SDLView SHARED view.cxx)
-target_link_libraries(lib.SDLView PRIVATE SDL3::SDL3-shared int.Include)
-set_target_properties(
-        lib.SDLView PROPERTIES
+add_library(lib.SDLEngine SHARED model.cxx presenter.cxx view.cxx)
+target_link_libraries(lib.SDLEngine PRIVATE SDL3::SDL3-shared EngineIncludes)
+set_target_properties(lib.SDLEngine PROPERTIES
         ENABLE_EXPORTS 1
-)
-
-add_library(lib.SDLPresenter SHARED presenter.cxx)
-target_link_libraries(lib.SDLPresenter PRIVATE SDL3::SDL3-shared int.Include)
-set_target_properties(
-        lib.SDLPresenter PROPERTIES
-        ENABLE_EXPORTS 1
-)
+        )
