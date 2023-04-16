@@ -14,7 +14,10 @@ public:
     virtual void render() = 0;
 
     virtual void setModel(IModel * model) = 0;
+    virtual IModel * getModel() = 0;
+
     virtual void setView(IView * view) = 0;
+    virtual IView * getView() = 0;
 
 protected:
     IModel * model_;

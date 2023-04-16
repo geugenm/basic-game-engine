@@ -3,7 +3,7 @@
 #include <SDL3/SDL.h>
 #include <iostream>
 
-class SDLView : public IView {
+extern "C" class SDLView : public IView {
 public:
     explicit SDLView() {}
 

@@ -31,13 +31,8 @@ void reloadView(const std::string& libraryName) {
             std::string("Failed to find symbol createView in library: ") +
             SDL_GetError());
     }
-    auto engineFactoryCreateView =
-        reinterpret_cast<createViewFunc>(createViewPtr);
 
-    auto view =
-        std::shared_ptr<IView>(engineFactoryCreateView(), SDL_UnloadObject);
-
-    Game::Engine::getInstance()->getPresenter()->initialize();
-
-    Game::Engine::getInstance()->getPresenter()->setView(createView());
+   Game::Engine::getInstance().releasePresenter();
+   Game::Engine::getInstance().formPresenter();
+   Game::Engine::getInstance().getPresenter()->initialize();
 }

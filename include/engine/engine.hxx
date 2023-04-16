@@ -9,43 +9,55 @@ namespace Game {
 
 class Engine {
 public:
-    Engine(Engine const&) = delete;
-    Engine& operator=(Engine const&) = delete;
+    Engine(const Engine&) = delete;
+    Engine& operator=(const Engine&) = delete;
 
-    static Engine* getInstance() {
-        static Engine instance{};
-        return &instance;
+    static Engine& getInstance() {
+        static Engine instance;
+        return instance;
     }
 
-    [[nodiscard]] IPresenter * getPresenter() const {
-        return presenter_;
+    [[nodiscard]] IPresenter* getPresenter() const {
+        if (!presenter_) {
+            throw std::runtime_error("Presenter not set.");
+        }
+        return presenter_.get();
     }
 
-    void setPresenter(const std::shared_ptr<IPresenter>& presenter) {
-        if (presenter == nullptr) {
+    void setPresenter(std::unique_ptr<IPresenter> presenter) {
+        if (!presenter) {
             throw std::invalid_argument("Presenter cannot be null.");
         }
-        presenter_ = presenter.get();
+        presenter_ = std::move(presenter);
     }
 
-private:
-    explicit Engine() {
-        presenter_ = createPresenter();
-        presenter_->setView(createView());
-        presenter_->setModel(createModel());
-    }
-
-    virtual ~Engine() {
-        if (presenter_ == nullptr) {
+    void releasePresenter() {
+        if (!presenter_) {
             return;
         }
 
         presenter_->setView(nullptr);
         presenter_->setModel(nullptr);
-        delete presenter_;
+        presenter_.reset();
     }
 
-    IPresenter * presenter_;
+    void formPresenter() {
+        releasePresenter();
+        presenter_ = std::unique_ptr<IPresenter>(createPresenter());
+        presenter_->setView(createView());
+        presenter_->setModel(createModel());
+    }
+
+private:
+    Engine() {
+        formPresenter();
+    }
+
+    virtual ~Engine() {
+        releasePresenter();
+    }
+
+    std::unique_ptr<IPresenter> presenter_;
 };
 
 } // namespace Game

@@ -1,6 +1,6 @@
 #include "engine/engine.hxx"
 
-class SDLModel : public IModel {
+extern "C" class SDLModel : public IModel {
 public:
     explicit SDLModel() {}
 
