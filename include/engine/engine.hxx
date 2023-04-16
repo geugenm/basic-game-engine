@@ -28,6 +28,14 @@ public:
         presenter_ = presenter;
     }
 
+    void setView(const std::shared_ptr<IView>& view) {
+        presenter_->setView(view);
+    }
+
+    void setModel(const std::shared_ptr<IModel>& model) {
+        presenter_->setModel(model);
+    }
+
 private:
     explicit GameEngine()
         : presenter_() {}

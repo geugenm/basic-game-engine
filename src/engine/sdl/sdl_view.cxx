@@ -1,11 +1,15 @@
 #include "engine/interface/view.hxx"
+#include "engine/engine.hxx"
 
 #include <SDL3/SDL.h>
 #include <iostream>
 
 class SDLView : public IView {
 public:
-    explicit SDLView() {}
+    explicit SDLView() {
+        auto currentInstance = std::make_shared<SDLView>(*this);
+        Game::GameEngine::getInstance()->setView(currentInstance);
+    }
 
     ~SDLView() override {
         SDL_DestroyRenderer(renderer_);

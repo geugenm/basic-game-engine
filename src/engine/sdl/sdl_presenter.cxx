@@ -1,7 +1,13 @@
 #include "engine/interface/presenter.hxx"
+#include "engine/engine.hxx"
 
 class SDLPresenter : public IPresenter {
 public:
+    explicit SDLPresenter() {
+        auto currentInstance = std::make_shared<SDLPresenter>(*this);
+        Game::GameEngine::getInstance()->setPresenter(currentInstance);
+    }
+
     void initialize() override {}
 
     void update() override {}
