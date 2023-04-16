@@ -14,3 +14,7 @@ public:
 
     void render() override {}
 };
+
+IModel * create_model() {
+    return new SDLModel();
+}

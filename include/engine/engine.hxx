@@ -33,8 +33,7 @@ public:
     }
 
 private:
-    explicit GameEngine()
-        : presenter_() {}
+    explicit GameEngine() : presenter_() {}
 
     std::shared_ptr<IPresenter> presenter_;
 };

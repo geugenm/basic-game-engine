@@ -28,3 +28,7 @@ private:
     std::shared_ptr<IModel> model_;
     std::shared_ptr<IView> view_;
 };
+
+IPresenter * create_presenter() {
+    return new SDLPresenter();
+}

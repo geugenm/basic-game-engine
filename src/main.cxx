@@ -1,7 +1,10 @@
 #include "engine/engine.hxx"
-#include "engine/interface/presenter.hxx"
 
 int main() {
+    create_presenter();
+    create_model();
+    create_view();
+
     Game::GameEngine::getInstance()->getPresenter()->initialize();
 
     while (true) {

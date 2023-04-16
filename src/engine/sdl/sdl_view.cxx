@@ -64,3 +64,7 @@ private:
     SDL_Window* window_;
     SDL_Renderer* renderer_;
 };
+
+IView * create_view() {
+    return new SDLView();
+}
