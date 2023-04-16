@@ -21,11 +21,3 @@ set_target_properties(
         lib.SDLPresenter PROPERTIES
         ENABLE_EXPORTS 1
 )
-
-
-add_library(lib.SDLReload SHARED misc/reload_attached_library.cxx)
-target_link_libraries(lib.SDLReload PRIVATE SDL3::SDL3-shared int.Include)
-set_target_properties(
-        lib.SDLReload PROPERTIES
-        ENABLE_EXPORTS 1
-)

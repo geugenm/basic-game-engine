@@ -19,5 +19,4 @@ target_link_libraries(main PRIVATE
         lib.SDLModel
         lib.SDLView
         lib.SDLPresenter
-        lib.SDLReload
         )
