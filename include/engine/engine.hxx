@@ -6,18 +6,14 @@ namespace Game {
 
 class GameEngine {
 public:
+    GameEngine(GameEngine const&) = delete;
+    GameEngine& operator=(GameEngine const&) = delete;
+
     ~GameEngine() {}
 
-    GameEngine(GameEngine& other) = delete;
-
-    void operator=(const GameEngine&) = delete;
-
     static GameEngine* getInstance() {
-        if (gameEngine_ == nullptr) {
-            gameEngine_ = std::unique_ptr<GameEngine>(new GameEngine());
-        }
-
-        return gameEngine_.get();
+        static GameEngine instance{};
+        return &instance;
     }
 
     [[nodiscard]] const std::shared_ptr<IPresenter>& getPresenter() const {
@@ -39,8 +35,6 @@ public:
 private:
     explicit GameEngine()
         : presenter_() {}
-
-    static std::unique_ptr<GameEngine> gameEngine_;
 
     std::shared_ptr<IPresenter> presenter_;
 };

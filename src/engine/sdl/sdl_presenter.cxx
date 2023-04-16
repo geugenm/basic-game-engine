@@ -8,11 +8,17 @@ public:
         Game::GameEngine::getInstance()->setPresenter(currentInstance);
     }
 
-    void initialize() override {}
+    void initialize() override {
+        view_->initialize();
+    }
 
-    void update() override {}
+    void update() override {
+        view_->update();
+    }
 
-    void render() override {}
+    void render() override {
+        view_->render();
+    }
 
     void setModel(std::shared_ptr<IModel> model) override { model_ = model; }
 
