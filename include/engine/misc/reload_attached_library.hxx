@@ -2,4 +2,4 @@
 
 #include "../engine.hxx"
 
-void reloadLibrary(Game::Engine& engine, const std::string& libraryName);
+extern "C" void reloadView(const std::string& libraryName);

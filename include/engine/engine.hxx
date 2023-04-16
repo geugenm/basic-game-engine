@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/interface/interface_factory.hxx"
+#include "engine/interface/create.hxx"
 #include "interface/presenter.hxx"
 
 #include <stdexcept>
@@ -30,10 +30,9 @@ public:
 
 private:
     explicit Engine() {
-        std::unique_ptr<InterfaceFactory> engineFactory(new InterfaceFactory());
-        auto presenter = engineFactory->createPresenter();
-        auto model = engineFactory->createModel();
-        auto view = engineFactory->createView();
+        auto presenter = createPresenter();
+        auto model = createModel();
+        auto view = createView();
 
         presenter_ = std::move(presenter);
         presenter_->setView(view);
