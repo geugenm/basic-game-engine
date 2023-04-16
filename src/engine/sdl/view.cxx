@@ -20,8 +20,8 @@ public:
             std::exit(EXIT_FAILURE);
         }
 
-        window_ =
-            SDL_CreateWindow("Hello SDL", kWindowWidth_, kWindowHeight_, 0);
+        window_ = SDL_CreateWindow(
+            kWindowTitle_.data(), kWindowWidth_, kWindowHeight_, 0);
         if (window_ == nullptr) {
             std::cerr << "Window creation failed: " << SDL_GetError()
                       << std::endl;
@@ -51,13 +51,12 @@ public:
         }
     }
 
-    void render() override {
-        SDL_RenderPresent(renderer_);
-    }
+    void render() override { SDL_RenderPresent(renderer_); }
 
 private:
-    constexpr static uint16_t kWindowWidth_ = 64;
-    constexpr static uint16_t kWindowHeight_ = 48;
+    static constexpr std::string_view kWindowTitle_{ "Hello SDL" };
+    static constexpr int kWindowWidth_ = 640;
+    static constexpr int kWindowHeight_ = 480;
 
     SDL_Window* window_;
     SDL_Renderer* renderer_;
