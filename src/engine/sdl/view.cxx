@@ -51,16 +51,18 @@ public:
         }
     }
 
-    void render() override { SDL_RenderPresent(renderer_); }
+    void render() override {
+        SDL_RenderPresent(renderer_);
+    }
 
 private:
-    constexpr static uint16_t kWindowWidth_ = 640;
-    constexpr static uint16_t kWindowHeight_ = 480;
+    constexpr static uint16_t kWindowWidth_ = 64;
+    constexpr static uint16_t kWindowHeight_ = 48;
 
     SDL_Window* window_;
     SDL_Renderer* renderer_;
 };
 
 IView* createView() {
-    return new SDLView;
+    return new SDLView();
 }

@@ -3,11 +3,14 @@
 
 int main() {
     Game::Engine::getInstance()->getPresenter()->initialize();
-
+    bool a = true;
     while (true) {
         Game::Engine::getInstance()->getPresenter()->update();
         Game::Engine::getInstance()->getPresenter()->render();
-        reloadView("1234.so");
+//        if (a) {
+//            reloadView("1234.so");
+//            a = false;
+//        }
     }
 
     return EXIT_SUCCESS;

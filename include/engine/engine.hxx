@@ -17,7 +17,7 @@ public:
         return &instance;
     }
 
-    [[nodiscard]] const std::shared_ptr<IPresenter>& getPresenter() const {
+    [[nodiscard]] IPresenter * getPresenter() const {
         return presenter_;
     }
 
@@ -25,26 +25,14 @@ public:
         if (presenter == nullptr) {
             throw std::invalid_argument("Presenter cannot be null.");
         }
-        presenter_ = presenter;
+        presenter_ = presenter.get();
     }
 
 private:
     explicit Engine() {
-        std::shared_ptr<IView> view(createView(), [](IView* ptr) {
-            delete ptr;
-        });
-
-        std::shared_ptr<IModel> model(createModel(), [](IModel* ptr) {
-            delete ptr;
-        });
-
-        std::shared_ptr<IPresenter> presenter(createPresenter(), [](IPresenter* ptr) {
-            delete ptr;
-        });
-
-        presenter_ = std::move(presenter);
-        presenter_->setView(view);
-        presenter_->setModel(model);
+        presenter_ = createPresenter();
+        presenter_->setView(createView());
+        presenter_->setModel(createModel());
     }
 
     virtual ~Engine() {
@@ -54,10 +42,10 @@ private:
 
         presenter_->setView(nullptr);
         presenter_->setModel(nullptr);
-        presenter_.reset();
+        delete presenter_;
     }
 
-    std::shared_ptr<IPresenter> presenter_;
+    IPresenter * presenter_;
 };
 
 } // namespace Game

@@ -12,5 +12,5 @@ public:
 };
 
 IModel* createModel() {
-    return new SDLModel;
+    return new SDLModel();
 }

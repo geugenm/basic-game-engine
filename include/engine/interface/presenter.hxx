@@ -13,6 +13,10 @@ public:
     virtual void update() = 0;
     virtual void render() = 0;
 
-    virtual void setModel(std::shared_ptr<IModel> model) = 0;
-    virtual void setView(std::shared_ptr<IView> view) = 0;
+    virtual void setModel(IModel * model) = 0;
+    virtual void setView(IView * view) = 0;
+
+protected:
+    IModel * model_;
+    IView * view_;
 };
