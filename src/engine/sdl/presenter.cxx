@@ -26,6 +26,6 @@ private:
 };
 
 
-std::shared_ptr<IPresenter> Game::EngineFactory::createPresenter() {
+std::shared_ptr<IPresenter> InterfaceFactory::createPresenter() {
     return std::make_shared<SDLPresenter>();
 }

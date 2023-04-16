@@ -1,7 +1,8 @@
 #pragma once
 
+#include "engine/interface/interface_factory.hxx"
 #include "interface/presenter.hxx"
-#include "engine_factory.hxx"
+
 #include <stdexcept>
 
 namespace Game {
@@ -29,7 +30,7 @@ public:
 
 private:
     explicit Engine() {
-        std::unique_ptr<EngineFactory> engineFactory(new EngineFactory());
+        std::unique_ptr<InterfaceFactory> engineFactory(new InterfaceFactory());
         auto presenter = engineFactory->createPresenter();
         auto model = engineFactory->createModel();
         auto view = engineFactory->createView();
@@ -39,7 +40,7 @@ private:
         presenter_->setModel(model);
     }
 
-    ~Engine() {
+    virtual ~Engine() {
         if (presenter_ == nullptr) {
             return;
         }

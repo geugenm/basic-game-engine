@@ -61,6 +61,6 @@ private:
     SDL_Renderer* renderer_;
 };
 
-std::shared_ptr<IView> Game::EngineFactory::createView() {
+std::shared_ptr<IView> InterfaceFactory::createView() {
     return std::make_shared<SDLView>();
 }

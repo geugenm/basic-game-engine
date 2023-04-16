@@ -11,6 +11,6 @@ public:
     void render() override {}
 };
 
-std::shared_ptr<IModel> Game::EngineFactory::createModel() {
+std::shared_ptr<IModel> InterfaceFactory::createModel() {
     return std::make_shared<SDLModel>();
 }
