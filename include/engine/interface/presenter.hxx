@@ -1,10 +1,10 @@
 #pragma once
 
-#include "model.hxx"
-#include "view.hxx"
-
 #include <chrono>
 #include <memory>
+
+#include "model.hxx"
+#include "view.hxx"
 
 class IPresenter {
 public:

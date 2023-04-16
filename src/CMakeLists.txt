@@ -14,3 +14,5 @@ target_link_libraries(main PRIVATE
 target_include_directories(main PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/../include/
         )
+
+target_compile_features(main PUBLIC cxx_std_23)
