@@ -5,8 +5,6 @@
 
 #include <stdexcept>
 
-namespace Game {
-
 class Engine {
 public:
     Engine(const Engine&) = delete;
@@ -17,7 +15,33 @@ public:
         return instance;
     }
 
-    [[nodiscard]] IPresenter* getPresenter() const {
+    void initialize() {
+        formPresenter();
+
+        presenter_->initialize();
+    }
+
+    void update() {
+        if (presenter_ == nullptr) {
+            formPresenter();
+        }
+
+        presenter_->update();
+    }
+
+    void render() {
+        if (presenter_ == nullptr) {
+            formPresenter();
+        }
+
+        presenter_->render();
+    }
+
+    void destroy() {
+        releasePresenter();
+    }
+
+    [[nodiscard]] const IPresenter* getPresenter() const {
         if (!presenter_) {
             throw std::runtime_error("Presenter not set.");
         }
@@ -31,6 +55,7 @@ public:
         presenter_ = std::move(presenter);
     }
 
+private:
     void releasePresenter() {
         if (!presenter_) {
             return;
@@ -48,7 +73,6 @@ public:
         presenter_->setModel(createModel());
     }
 
-private:
     Engine() {
         formPresenter();
     }
@@ -60,4 +84,9 @@ private:
     std::unique_ptr<IPresenter> presenter_;
 };
 
-} // namespace Game
+
+
+
+
+
+

@@ -6,15 +6,15 @@
 
 int main() {
     try {
-        auto& engine = Game::Engine::getInstance();
-        engine.getPresenter()->initialize();
+        auto& engine = Engine::getInstance();
+        engine.initialize();
 
         const auto period = std::chrono::seconds(2);
         auto nextFrameTime = std::chrono::steady_clock::now() + period;
 
         while (true) {
-            engine.getPresenter()->update();
-            engine.getPresenter()->render();
+            engine.update();
+            engine.render();
 
             const auto now = std::chrono::steady_clock::now();
             if (now >= nextFrameTime) {
