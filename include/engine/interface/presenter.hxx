@@ -16,5 +16,3 @@ public:
     virtual void setModel(std::shared_ptr<IModel> model) = 0;
     virtual void setView(std::shared_ptr<IView> view) = 0;
 };
-
-extern "C" IPresenter * create_presenter();

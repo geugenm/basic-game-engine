@@ -1,4 +1,4 @@
-#include "engine/interface/presenter.hxx"
+#include "engine/engine.hxx"
 
 class SDLPresenter : public IPresenter {
 public:
@@ -25,6 +25,7 @@ private:
     std::shared_ptr<IView> view_;
 };
 
-IPresenter * create_presenter() {
-    return new SDLPresenter();
+
+std::shared_ptr<IPresenter> Game::EngineFactory::createPresenter() {
+    return std::make_shared<SDLPresenter>();
 }

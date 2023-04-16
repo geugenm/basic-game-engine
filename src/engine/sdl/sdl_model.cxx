@@ -1,4 +1,3 @@
-#include "engine/interface/model.hxx"
 #include "engine/engine.hxx"
 
 class SDLModel : public IModel {
@@ -12,6 +11,6 @@ public:
     void render() override {}
 };
 
-IModel * create_model() {
-    return new SDLModel();
+std::shared_ptr<IModel> Game::EngineFactory::createModel() {
+    return std::make_shared<SDLModel>();
 }

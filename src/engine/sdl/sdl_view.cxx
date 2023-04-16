@@ -1,4 +1,3 @@
-#include "engine/interface/view.hxx"
 #include "engine/engine.hxx"
 
 #include <SDL3/SDL.h>
@@ -62,6 +61,6 @@ private:
     SDL_Renderer* renderer_;
 };
 
-IView * create_view() {
-    return new SDLView();
+std::shared_ptr<IView> Game::EngineFactory::createView() {
+    return std::make_shared<SDLView>();
 }
