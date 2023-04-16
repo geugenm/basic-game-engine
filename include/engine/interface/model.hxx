@@ -2,7 +2,7 @@
 
 class IModel {
 public:
-    virtual ~IModel() {}
+    virtual ~IModel() = default;
 
     virtual void initialize() = 0;
 

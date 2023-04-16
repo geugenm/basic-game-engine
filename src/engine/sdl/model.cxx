@@ -2,7 +2,7 @@
 
 extern "C" class SDLModel : public IModel {
 public:
-    explicit SDLModel() {}
+    explicit SDLModel() = default;
 
     void initialize() override {}
 

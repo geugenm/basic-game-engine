@@ -5,7 +5,7 @@
 
 extern "C" class SDLView : public IView {
 public:
-    explicit SDLView() {}
+    explicit SDLView() = default;
 
     ~SDLView() override {
         SDL_DestroyRenderer(renderer_);

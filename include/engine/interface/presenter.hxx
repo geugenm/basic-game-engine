@@ -7,7 +7,7 @@
 
 class IPresenter {
 public:
-    virtual ~IPresenter() {}
+    virtual ~IPresenter() = default;
     virtual void initialize() = 0;
 
     virtual void update() = 0;

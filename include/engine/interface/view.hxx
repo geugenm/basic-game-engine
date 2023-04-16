@@ -2,7 +2,7 @@
 
 class IView {
 public:
-    virtual ~IView() {}
+    virtual ~IView() = default;
 
     virtual void initialize() = 0;
 
