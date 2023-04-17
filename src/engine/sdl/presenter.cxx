@@ -1,4 +1,5 @@
 #include "engine/engine.hxx"
+#include <iostream>
 
 class SDLPresenter final : public IPresenter {
 public:
@@ -16,7 +17,14 @@ public:
         view_->initialize();
     }
 
+    void handleEvent(const Event & event) override {
+        if (event == Event::LEFT_PRESSED) {
+            std::cout << "Left button pressed.";
+        }
+    }
+
     void update() override {
+        handleEvent(view_->getLastEvent());
         view_->update();
     }
 
