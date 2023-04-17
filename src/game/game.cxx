@@ -6,7 +6,6 @@
 class ExampleGame : public Application {
 public:
     explicit ExampleGame() {
-
     }
 
     ~ExampleGame() override {
@@ -18,7 +17,6 @@ public:
     }
 
     void update() override {
-        std::cout << "NOTHING!!!";
         Engine::getInstance()->update();
     }
 

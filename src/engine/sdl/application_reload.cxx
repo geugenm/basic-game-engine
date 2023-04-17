@@ -5,63 +5,51 @@
 #include <iostream>
 
 Application* reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
-    if (oldGame != nullptr) {
-        SDL_UnloadObject(oldHandle);
-    }
-
-    const std::filesystem::path tempLibraryPath =
-        "/home/geugenm/CLionProjects/basic-game-engine/build/debug/src/game/"
-        "5678.so";
-    if (std::filesystem::exists(tempLibraryPath)) {
-        if (remove(tempLibraryPath) != 0) {
-            const std::filesystem::path currentPath =
-                std::filesystem::current_path();
-            std::cerr << "Error: can't remove: " << tempLibraryPath
-                      << ", current path:" << currentPath << std::endl;
-            return nullptr;
-        }
-    }
-
-    const std::filesystem::path newLibraryPath =
-        "/home/geugenm/CLionProjects/basic-game-engine/build/debug/src/game/"
-        "1234.so";
     try {
+        if (oldGame != nullptr) {
+            SDL_UnloadObject(oldHandle);
+        }
+
+        const std::filesystem::path tempLibraryPath = "game/5678.so";
+        if (std::filesystem::exists(tempLibraryPath)) {
+            if (remove(tempLibraryPath) != 0) {
+                const std::filesystem::path currentPath = std::filesystem::current_path();
+                throw std::runtime_error("Error: can't remove file: " + tempLibraryPath.string() + ", current path: " + currentPath.string());
+            }
+        }
+
+        const std::filesystem::path newLibraryPath = "game/1234.so";
         copy(newLibraryPath, tempLibraryPath);
-    } catch (const std::exception& exception) {
-        std::cerr << "Error: can't copy" << newLibraryPath << " to "
-                  << tempLibraryPath;
+
+        void* gameHandle = SDL_LoadObject(tempLibraryPath.c_str());
+
+        if (gameHandle == nullptr) {
+            throw std::runtime_error("Error: failed to load dynamic library: " + tempLibraryPath.string() + ", " + SDL_GetError());
+        }
+
+        oldHandle = gameHandle;
+
+        SDL_FunctionPointer createGameFuncPtr =
+            SDL_LoadFunction(gameHandle, "createApplication");
+
+        if (createGameFuncPtr == nullptr) {
+            throw std::runtime_error("Error: failed to load function 'createApplication' from dynamic library: " + tempLibraryPath.string() + ", " + SDL_GetError());
+        }
+
+        using create_game_ptr = decltype(&createApplication);
+
+        auto createGameFunc = reinterpret_cast<create_game_ptr>(createGameFuncPtr);
+
+        Application* newGame = createGameFunc();
+
+        if (newGame == nullptr) {
+            throw std::runtime_error("Error: function 'createApplication' returned null pointer");
+        }
+
+        oldGame = newGame;
+        return newGame;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
         return nullptr;
     }
-
-    void* gameHandle = SDL_LoadObject(tempLibraryPath.c_str());
-
-    if (gameHandle == nullptr) {
-        std::cerr << "Error: failed to load: [" << tempLibraryPath << "] "
-                  << SDL_GetError() << std::endl;
-        return nullptr;
-    }
-
-    oldHandle = gameHandle;
-
-    SDL_FunctionPointer createGameFuncPtr =
-        SDL_LoadFunction(gameHandle, "createApplication");
-
-    if (createGameFuncPtr == nullptr) {
-        std::cerr << "error: no function [create_game] in " << tempLibraryPath
-                  << " " << SDL_GetError() << std::endl;
-        return nullptr;
-    }
-
-    using create_game_ptr = decltype(&createApplication);
-
-    auto createGameFunc = reinterpret_cast<create_game_ptr>(createGameFuncPtr);
-
-    Application* newGame = createGameFunc();
-
-    if (newGame == nullptr) {
-        std::cerr << "error: func [create_game] returned: nullptr" << std::endl;
-        return nullptr;
-    }
-
-    return newGame;
 }
