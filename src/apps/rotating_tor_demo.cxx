@@ -3,12 +3,12 @@
 
 #include <iostream>
 
-class ExampleGame : public Application {
+class RotatingTorDemo : public Application {
 public:
-    explicit ExampleGame() {
+    explicit RotatingTorDemo() {
     }
 
-    ~ExampleGame() override {
+    ~RotatingTorDemo() override {
 
     }
 
@@ -26,12 +26,10 @@ public:
 };
 
 Application* createApplication() {
-    if (Engine::getInstance() != nullptr) {
-        return new ExampleGame();
-    }
-    return nullptr;
+    return new RotatingTorDemo;
 }
 
 void destroyApplication(Application* application) {
     delete application;
 }
+

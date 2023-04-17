@@ -4,10 +4,10 @@
 #include <filesystem>
 #include <iostream>
 
-Application* reloadApplicationLibrary(const Application* oldGame, void*& oldHandle) {
+Application* reloadApplicationLibrary(const Application* currentApplication, void*& currentHandle) {
     try {
-        if (oldGame != nullptr) {
-            SDL_UnloadObject(oldHandle);
+        if (currentApplication != nullptr) {
+            SDL_UnloadObject(currentHandle);
         }
 
         const std::filesystem::path tempLibraryPath = "apps/5678.so";
@@ -27,7 +27,7 @@ Application* reloadApplicationLibrary(const Application* oldGame, void*& oldHand
             throw std::runtime_error("Error: failed to load dynamic library: " + tempLibraryPath.string() + ", " + SDL_GetError());
         }
 
-        oldHandle = gameHandle;
+        currentHandle = gameHandle;
 
         SDL_FunctionPointer createGameFuncPtr =
             SDL_LoadFunction(gameHandle, "createApplication");
