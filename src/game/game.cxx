@@ -1,8 +1,9 @@
-#include "apps/game.h"
+#include "apps/application.h"
 #include "engine/engine.hxx"
+
 #include <iostream>
 
-class ExampleGame : public Game {
+class ExampleGame : public Application {
 public:
     explicit ExampleGame() {
 
@@ -17,7 +18,7 @@ public:
     }
 
     void update() override {
-        std::cout << "wow!";
+        std::cout << "amazing!!";
         Engine::getInstance()->update();
     }
 
@@ -26,13 +27,13 @@ public:
     }
 };
 
-Game * createGame() {
+Application* createApplication() {
     if (Engine::getInstance() != nullptr) {
         return new ExampleGame();
     }
     return nullptr;
 }
 
-void destroyGame(Game * game) {
+void destroyApplication(Application* game) {
     delete game;
 }
