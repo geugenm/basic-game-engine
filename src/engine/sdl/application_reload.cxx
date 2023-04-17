@@ -11,7 +11,7 @@ Application* reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
 
     const std::filesystem::path tempLibraryPath =
         "/home/geugenm/CLionProjects/basic-game-engine/build/debug/src/game/"
-        "liblib.ExampleGame.so";
+        "5678.so";
     if (std::filesystem::exists(tempLibraryPath)) {
         if (remove(tempLibraryPath) != 0) {
             const std::filesystem::path currentPath =

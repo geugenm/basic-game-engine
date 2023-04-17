@@ -18,7 +18,7 @@ public:
     }
 
     void update() override {
-        std::cout << "amazing!!!";
+        std::cout << "NOTHING!!!";
         Engine::getInstance()->update();
     }
 
