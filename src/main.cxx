@@ -21,7 +21,10 @@ int main() {
             if (now >= nextFrameTime) {
                 std::cout << "Passed 2 seconds!" << std::endl;
                 nextFrameTime += period;
-                reloadApplicationLibrary(game, gameLibraryHandle);
+                Application * possibleGame = reloadApplicationLibrary(game, gameLibraryHandle);
+                if (possibleGame) {
+                    game = possibleGame;
+                }
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));

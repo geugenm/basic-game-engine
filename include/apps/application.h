@@ -10,6 +10,6 @@ struct Application {
 
 extern "C" Application* createApplication();
 extern "C" void destroyApplication(Application* game);
-extern "C" void reloadApplicationLibrary(Application* oldGame, void *& oldHandle);
+extern "C" Application* reloadApplicationLibrary(Application* oldGame, void *& oldHandle);
 
 #endif // BASIC_GAME_ENGINE_APPLICATION_H

@@ -4,27 +4,33 @@
 #include <filesystem>
 #include <iostream>
 
-void reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
+Application* reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
     if (oldGame != nullptr) {
         SDL_UnloadObject(oldHandle);
     }
 
-    const std::filesystem::path tempLibraryPath = "game/liblib.ExampleGame.so";
+    const std::filesystem::path tempLibraryPath =
+        "/home/geugenm/CLionProjects/basic-game-engine/build/debug/src/game/"
+        "liblib.ExampleGame.so";
     if (std::filesystem::exists(tempLibraryPath)) {
         if (remove(tempLibraryPath) != 0) {
-            const std::filesystem::path currentPath = std::filesystem::current_path();
+            const std::filesystem::path currentPath =
+                std::filesystem::current_path();
             std::cerr << "Error: can't remove: " << tempLibraryPath
                       << ", current path:" << currentPath << std::endl;
-            return;
+            return nullptr;
         }
     }
 
-    const std::filesystem::path newLibraryPath = "game/1234.so";
+    const std::filesystem::path newLibraryPath =
+        "/home/geugenm/CLionProjects/basic-game-engine/build/debug/src/game/"
+        "1234.so";
     try {
         copy(newLibraryPath, tempLibraryPath);
     } catch (const std::exception& exception) {
         std::cerr << "Error: can't copy" << newLibraryPath << " to "
                   << tempLibraryPath;
+        return nullptr;
     }
 
     void* gameHandle = SDL_LoadObject(tempLibraryPath.c_str());
@@ -32,7 +38,7 @@ void reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
     if (gameHandle == nullptr) {
         std::cerr << "Error: failed to load: [" << tempLibraryPath << "] "
                   << SDL_GetError() << std::endl;
-        return;
+        return nullptr;
     }
 
     oldHandle = gameHandle;
@@ -43,10 +49,8 @@ void reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
     if (createGameFuncPtr == nullptr) {
         std::cerr << "error: no function [create_game] in " << tempLibraryPath
                   << " " << SDL_GetError() << std::endl;
-        return;
+        return nullptr;
     }
-
-    destroyApplication(oldGame);
 
     using create_game_ptr = decltype(&createApplication);
 
@@ -56,8 +60,8 @@ void reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
 
     if (newGame == nullptr) {
         std::cerr << "error: func [create_game] returned: nullptr" << std::endl;
-        return;
+        return nullptr;
     }
 
-    oldGame = newGame;
+    return newGame;
 }
