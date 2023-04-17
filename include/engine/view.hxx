@@ -1,8 +1,0 @@
-//
-// Created by geugenm on 4/15/23.
-//
-
-#ifndef BASIC_GAME_ENGINE_GAME_VIEW_HXX
-#define BASIC_GAME_ENGINE_GAME_VIEW_HXX
-
-#endif // BASIC_GAME_ENGINE_GAME_VIEW_HXX
