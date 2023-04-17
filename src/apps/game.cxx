@@ -5,9 +5,7 @@
 
 class ExampleGame : public Application {
 public:
-    explicit ExampleGame() {
-        Engine::getInstance()->initialize();
-    }
+    explicit ExampleGame() {}
 
     ~ExampleGame() override {
 
