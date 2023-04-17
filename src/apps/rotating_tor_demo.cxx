@@ -12,10 +12,7 @@ class RotatingTorDemo : public Application {
 public:
     explicit RotatingTorDemo() {
         initialize();
-        for (uint i = 0; i < 300; i++) {
-            render();
-            std::this_thread::sleep_for(std::chrono::milliseconds(frameDelayMs_));
-        }
+        render();
     }
 
     ~RotatingTorDemo() override {}
@@ -23,7 +20,7 @@ public:
     void initialize() override {
         radius_ = 10;
         thickness_ = 3;
-        frameDelayMs_ = 1000;
+        frameDelayMs_ = 100;
     }
 
     void update() override {}

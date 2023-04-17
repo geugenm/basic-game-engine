@@ -26,6 +26,8 @@ public:
             formPresenter();
         }
 
+        presenter_->handleEvent();
+
         presenter_->update();
     }
 
@@ -61,8 +63,7 @@ private:
             return;
         }
 
-        presenter_->setView(nullptr);
-        presenter_->setModel(nullptr);
+        presenter_->destroy();
         presenter_.reset();
     }
 

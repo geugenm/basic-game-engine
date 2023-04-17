@@ -9,6 +9,8 @@ public:
     void update() override {}
 
     void render() override {}
+
+    void destroy() override {}
 };
 
 IModel* createModel() {
