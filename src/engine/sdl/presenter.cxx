@@ -17,14 +17,13 @@ public:
         view_->initialize();
     }
 
-    void handleEvent(const Event & event) override {
-        if (event == Event::LEFT_PRESSED) {
+    void handleEvent() override {
+        if (view_->getLastEvent() == Event::LEFT_PRESSED) {
             std::cout << "Left button pressed.";
         }
     }
 
     void update() override {
-        handleEvent(view_->getLastEvent());
         view_->update();
     }
 

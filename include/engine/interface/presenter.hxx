@@ -14,7 +14,7 @@ public:
     virtual void render() = 0;
     virtual void destroy() = 0;
 
-    virtual void handleEvent(const Event & event) = 0;
+    virtual void handleEvent() = 0;
 
     virtual void setModel(IModel * model) = 0;
     virtual IModel * getModel() = 0;

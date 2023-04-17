@@ -26,6 +26,8 @@ public:
             formPresenter();
         }
 
+        presenter_->handleEvent();
+
         presenter_->update();
     }
 
