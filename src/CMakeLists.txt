@@ -8,7 +8,7 @@ include(${CPM_PACKAGES_DIR}/sdl.cmake)
 add_executable(main main.cxx)
 
 add_subdirectory(engine)
-add_subdirectory(game)
+add_subdirectory(apps)
 
 target_include_directories(main PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/../include/

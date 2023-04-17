@@ -4,13 +4,13 @@
 #include <filesystem>
 #include <iostream>
 
-Application* reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
+Application* reloadApplicationLibrary(const Application* oldGame, void*& oldHandle) {
     try {
         if (oldGame != nullptr) {
             SDL_UnloadObject(oldHandle);
         }
 
-        const std::filesystem::path tempLibraryPath = "game/5678.so";
+        const std::filesystem::path tempLibraryPath = "apps/5678.so";
         if (std::filesystem::exists(tempLibraryPath)) {
             if (remove(tempLibraryPath) != 0) {
                 const std::filesystem::path currentPath = std::filesystem::current_path();
@@ -18,7 +18,7 @@ Application* reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
             }
         }
 
-        const std::filesystem::path newLibraryPath = "game/1234.so";
+        const std::filesystem::path newLibraryPath = "apps/1234.so";
         copy(newLibraryPath, tempLibraryPath);
 
         void* gameHandle = SDL_LoadObject(tempLibraryPath.c_str());
@@ -46,8 +46,8 @@ Application* reloadApplicationLibrary(Application* oldGame, void*& oldHandle) {
             throw std::runtime_error("Error: function 'createApplication' returned null pointer");
         }
 
-        oldGame = newGame;
         return newGame;
+
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return nullptr;
