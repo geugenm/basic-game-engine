@@ -10,9 +10,9 @@ public:
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
 
-    static Engine& getInstance() {
+    static Engine* getInstance() {
         static Engine instance;
-        return instance;
+        return &instance;
     }
 
     void initialize() {

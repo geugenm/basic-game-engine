@@ -1,20 +1,19 @@
-#include "engine/engine.hxx"
-
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include "apps/game.h"
 
 int main() {
+    Game * game = createGame();
     try {
-        auto& engine = Engine::getInstance();
-        engine.initialize();
+        game->initialize();
 
         const auto period = std::chrono::seconds(2);
         auto nextFrameTime = std::chrono::steady_clock::now() + period;
 
         while (true) {
-            engine.update();
-            engine.render();
+            game->update();
+            game->render();
 
             const auto now = std::chrono::steady_clock::now();
             if (now >= nextFrameTime) {

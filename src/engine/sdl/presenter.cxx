@@ -1,6 +1,6 @@
 #include "engine/engine.hxx"
 
-extern "C" class SDLPresenter final : public IPresenter {
+class SDLPresenter final : public IPresenter {
 public:
     explicit SDLPresenter() {
         model_ = createModel();

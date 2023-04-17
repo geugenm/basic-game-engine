@@ -2,6 +2,6 @@
 
 #include "engine/interface/presenter.hxx"
 
-extern "C" IModel* createModel();
-extern "C" IPresenter* createPresenter();
-extern "C" IView* createView();
+IModel* createModel();
+IPresenter* createPresenter();
+IView* createView();
