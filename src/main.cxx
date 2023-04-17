@@ -56,7 +56,8 @@ int main() {
             game->render();
         }
         else {
-            std::cout << "Game is null, retrying...";
+            game = createApplication();
+            game->initialize();
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(16));

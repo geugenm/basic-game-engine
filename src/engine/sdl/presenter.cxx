@@ -32,6 +32,11 @@ public:
         view_->render();
     }
 
+    void destroy() override {
+        model_->destroy();
+        view_->destroy();
+    }
+
     void setModel(IModel* model) override {
         model_ = model;
     }

@@ -46,6 +46,11 @@ public:
 
     }
 
+    void destroy() override {
+        renderer_ = nullptr;
+        window_ = nullptr;
+    }
+
     Event getLastEvent() override {
         SDL_Event event_;
 
