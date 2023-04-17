@@ -46,6 +46,7 @@ int main() {
         if (now >= nextFrameTime) {
             std::cout << "10 seconds have passed!" << std::endl;
 
+            destroyApplication(game);
             game = reloadApplicationLibrary(game, gameLibraryHandle);
             nextFrameTime += framePeriod;
         }
@@ -53,6 +54,9 @@ int main() {
         if (game != nullptr) {
             game->update();
             game->render();
+        }
+        else {
+            std::cout << "Game is null, retrying...";
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(16));

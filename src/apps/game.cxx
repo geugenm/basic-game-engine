@@ -34,5 +34,6 @@ Application* createApplication() {
 }
 
 void destroyApplication(Application* application) {
+    Engine::getInstance()->destroy();
     delete application;
 }

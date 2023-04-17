@@ -1,9 +1,9 @@
 #include "apps/application.h"
 #include "engine/engine.hxx"
 
-#include <iostream>
-#include <cmath>
 #include <chrono>
+#include <cmath>
+#include <iostream>
 #include <thread>
 
 const double PI = 3.14159265358979323846;
@@ -11,47 +11,49 @@ const double PI = 3.14159265358979323846;
 class RotatingTorDemo : public Application {
 public:
     explicit RotatingTorDemo() {
-        const int torus_radius = 10;
-        const int torus_thickness = 3;
-        const int frame_delay_ms = 100;
-
-        while (true)
-        {
-            for (int i = 0; i < 360; i++) {
-                std::cout << "\033[2J\033[H"; // clear the terminal
-                for (int j = -torus_radius; j <= torus_radius; j++) {
-                    for (int k = -torus_radius; k <= torus_radius; k++) {
-                        double torus_eq =
-                            std::pow(std::sqrt(j * j + k * k) - torus_radius,
-                                     2) +
-                            std::pow(0 - i, 2);
-                        if (std::abs(std::sqrt(torus_eq) - torus_thickness) <
-                            0.5) {
-                            std::cout << "*";
-                        } else {
-                            std::cout << " ";
-                        }
-                    }
-                    std::cout << std::endl;
-                }
-                std::this_thread::sleep_for(std::chrono::milliseconds(frame_delay_ms));
-            }
+        initialize();
+        for (uint i = 0; i < 300; i++) {
+            render();
+            std::this_thread::sleep_for(std::chrono::milliseconds(frameDelayMs_));
         }
-
     }
 
-    ~RotatingTorDemo() override {
-
-    }
+    ~RotatingTorDemo() override {}
 
     void initialize() override {
+        radius_ = 10;
+        thickness_ = 3;
+        frameDelayMs_ = 1000;
     }
 
-    void update() override {
-    }
+    void update() override {}
 
     void render() const override {
-    }
+        for (int i = 0; i < 360; i++) {
+            std::cout << "\033[2J\033[H"; // clear the terminal
+            for (int j = -radius_; j <= radius_; j++) {
+                for (int k = -radius_; k <= radius_; k++) {
+                    double torus_eq =
+                        std::pow(std::sqrt(j * j + k * k) - radius_,
+                                 2) +
+                        std::pow(0 - i, 2);
+                    if (std::abs(std::sqrt(torus_eq) - thickness_) <
+                        0.5) {
+                        std::cout << "*";
+                    } else {
+                        std::cout << " ";
+                    }
+                }
+                std::cout << std::endl;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(frameDelayMs_));
+            std::cout.flush();
+        }    }
+
+private:
+    int radius_;
+    int thickness_;
+    int frameDelayMs_;
 };
 
 Application* createApplication() {
@@ -61,4 +63,3 @@ Application* createApplication() {
 void destroyApplication(Application* application) {
     delete application;
 }
-
