@@ -1,4 +1,5 @@
 #include "engine/engine.hxx"
+
 #include <iostream>
 
 class SDLPresenter final : public IPresenter {
@@ -13,9 +14,7 @@ public:
         delete view_;
     }
 
-    void initialize() override {
-        view_->initialize();
-    }
+    void initialize() override { view_->initialize(); }
 
     void handleEvent() override {
         if (view_->getLastEvent() == Event::LEFT_PRESSED) {
@@ -23,34 +22,22 @@ public:
         }
     }
 
-    void update() override {
-        view_->update();
-    }
+    void update() override { view_->update(); }
 
-    void render() override {
-        view_->render();
-    }
+    void render() override { view_->render(); }
 
     void destroy() override {
         model_->destroy();
         view_->destroy();
     }
 
-    void setModel(IModel* model) override {
-        model_ = model;
-    }
+    void setModel(IModel* model) override { model_ = model; }
 
-    IModel * getModel() override {
-        return model_;
-    }
+    IModel* getModel() override { return model_; }
 
-    IView * getView() override {
-        return view_;
-    }
+    IView* getView() override { return view_; }
 
-    void setView(IView* view) override {
-        view_ = view;
-    }
+    void setView(IView* view) override { view_ = view; }
 };
 
 IPresenter* createPresenter() {

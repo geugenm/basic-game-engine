@@ -39,9 +39,7 @@ public:
         presenter_->render();
     }
 
-    void destroy() {
-        releasePresenter();
-    }
+    void destroy() { releasePresenter(); }
 
     [[nodiscard]] const IPresenter* getPresenter() const {
         if (!presenter_) {
@@ -74,20 +72,9 @@ private:
         presenter_->setModel(createModel());
     }
 
-    Engine() {
-        formPresenter();
-    }
+    Engine() { formPresenter(); }
 
-    virtual ~Engine() {
-        releasePresenter();
-    }
+    virtual ~Engine() { releasePresenter(); }
 
     std::unique_ptr<IPresenter> presenter_;
 };
-
-
-
-
-
-
-

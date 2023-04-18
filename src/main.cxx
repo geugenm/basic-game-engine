@@ -9,7 +9,6 @@
 #include <chrono>
 #include <cstdlib>
 #include <exception>
-
 #include <iostream>
 #include <thread>
 
@@ -54,8 +53,7 @@ int main() {
         if (game != nullptr) {
             game->update();
             game->render();
-        }
-        else {
+        } else {
             game = createApplication();
             game->initialize();
         }

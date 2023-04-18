@@ -42,9 +42,7 @@ public:
         }
     }
 
-    void update() override {
-
-    }
+    void update() override {}
 
     void destroy() override {
         renderer_ = nullptr;
