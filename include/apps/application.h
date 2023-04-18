@@ -11,6 +11,7 @@ struct Application {
 extern "C" Application* createApplication();
 extern "C" void destroyApplication(Application* application);
 
-Application* reloadApplicationLibrary(const Application* currentApplication, void *& currentHandle);
+Application* reloadApplicationLibrary(const Application* currentApplication,
+                                      void*& currentHandle);
 
 #endif // BASIC_GAME_ENGINE_APPLICATION_H

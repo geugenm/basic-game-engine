@@ -4,9 +4,9 @@ project(Basic_Game_Engine VERSION 1.0.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 
-if(NOT CMAKE_BUILD_TYPE)
+if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
-endif()
+endif ()
 
 include(cmake/configure_compiler.cmake)
 include(cmake/code_quality.cmake)

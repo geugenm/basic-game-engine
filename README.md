@@ -8,19 +8,20 @@
 
 ## Build & Deployment
 
-### Build the project 
+### Build the project
 
 ```bash
 cmake --preset=Release .
 cd build/release
 cmake --build . --config Release
 ```
-For more build configurations see [CMakePresets.json](https://github.com/geugenm/sdl-overview/blob/master/CMakePresets.json)
+
+For more build configurations
+see [CMakePresets.json](https://github.com/geugenm/sdl-overview/blob/master/CMakePresets.json)
 
 Also,
-you can use an automized [build.sh](https://github.com/geugenm/sdl-overview/blob/master/scripts/build.sh) 
+you can use an automized [build.sh](https://github.com/geugenm/sdl-overview/blob/master/scripts/build.sh)
 in `scripts` folder changing directory to `..` by default.
-
 
 ### Docker build on manjaro
 
@@ -31,11 +32,13 @@ docker build -t my-image -f docker/Dockerfile .
 ## Documentation
 
 All you need is to install doxygen and run these commands:
+
 ```bash
 doxygen docs/.doxygen
 cd scripts
 sh build_docs.sh
 ```
+
 It'll open your default app for viewing html files
 
 ## Contributing

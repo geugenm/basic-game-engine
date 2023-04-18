@@ -1,9 +1,9 @@
 #pragma once
 
-#include <memory>
-
 #include "model.hxx"
 #include "view.hxx"
+
+#include <memory>
 
 class IPresenter {
 public:
@@ -16,13 +16,13 @@ public:
 
     virtual void handleEvent() = 0;
 
-    virtual void setModel(IModel * model) = 0;
-    virtual IModel * getModel() = 0;
+    virtual void setModel(IModel* model) = 0;
+    virtual IModel* getModel() = 0;
 
-    virtual void setView(IView * view) = 0;
-    virtual IView * getView() = 0;
+    virtual void setView(IView* view) = 0;
+    virtual IView* getView() = 0;
 
 protected:
-    IModel * model_;
-    IView * view_;
+    IModel* model_;
+    IView* view_;
 };
