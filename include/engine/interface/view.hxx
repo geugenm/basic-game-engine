@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/events/events.hxx"
+#include "engine/events/events.h"
 
 class IView {
 public:
