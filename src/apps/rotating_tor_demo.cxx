@@ -59,6 +59,10 @@ Application* createApplication()
     return new RotatingTorDemo;
 }
 
+extern "C" void test() {
+    RotatingTorDemo * test = new RotatingTorDemo();
+}
+
 void destroyApplication(Application* application)
 {
     delete application;

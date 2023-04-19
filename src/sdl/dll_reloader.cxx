@@ -1,5 +1,4 @@
 #include "engine/hot-reload/dll_reloader.h"
-#include "apps/application.h"
 
 #include <SDL3/SDL.h>
 #include <filesystem>
@@ -22,10 +21,8 @@ public:
 
     void set_new_library_path(const char* path) override
     {
-        if (std::filesystem::exists(path) == false) {
-            std::cerr << "New library is not found";
-            return;
-        }
+        // TODO: fix the bug of creating temp dll
+        std::filesystem::copy_file(target_library_path_, path, std::filesystem::copy_options::overwrite_existing);
         new_library_path_ = path;
     }
 
