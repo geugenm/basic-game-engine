@@ -49,7 +49,7 @@ public:
         window_ = nullptr;
     }
 
-    Event getLastEvent() override {
+    Event get_last_event() override {
         SDL_Event event_;
 
         if (SDL_PollEvent(&event_) == 0) {

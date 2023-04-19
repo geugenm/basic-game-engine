@@ -4,6 +4,9 @@
 #include <filesystem>
 #include <iostream>
 
+class
+
+
 Application* reloadApplicationLibrary(const Application* currentApplication,
                                       void*& currentHandle) {
     try {

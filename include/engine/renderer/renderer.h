@@ -12,7 +12,7 @@ struct IRenderer {
     virtual void update() = 0;
     virtual void reset() = 0;
 
-    virtual Event getLastEvent() = 0;
+    virtual Event get_last_event() = 0;
 };
 
 extern "C" IRenderer* create_renderer();
