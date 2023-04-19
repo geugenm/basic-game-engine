@@ -7,13 +7,15 @@ class SDLRenderer : public IRenderer {
 public:
     explicit SDLRenderer() = default;
 
-    ~SDLRenderer() override {
+    ~SDLRenderer() override
+    {
         SDL_DestroyRenderer(renderer_);
         SDL_DestroyWindow(window_);
         SDL_Quit();
     }
 
-    void initialize() override {
+    void initialize() override
+    {
         if (SDL_Init(SDL_INIT_VIDEO) < 0) {
             std::cerr << "SDL initialization failed: " << SDL_GetError()
                       << std::endl;
@@ -31,8 +33,7 @@ public:
 
         renderer_ = SDL_CreateRenderer(window_,
             nullptr,
-            SDL_RENDERER_ACCELERATED |
-                SDL_RENDERER_PRESENTVSYNC);
+            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         if (renderer_ == nullptr) {
             std::cerr << "Renderer creation failed: " << SDL_GetError()
                       << std::endl;
@@ -42,14 +43,16 @@ public:
         }
     }
 
-    void update() override {}
+    void update() override { }
 
-    void reset() override {
+    void reset() override
+    {
         renderer_ = nullptr;
         window_ = nullptr;
     }
 
-    Event get_last_event() override {
+    Event get_last_event() override
+    {
         SDL_Event event_;
 
         if (SDL_PollEvent(&event_) == 0) {
@@ -133,7 +136,7 @@ public:
     void render() override { SDL_RenderPresent(renderer_); }
 
 private:
-    static constexpr std::string_view kWindowTitle_{ "Hello SDL" };
+    static constexpr std::string_view kWindowTitle_ { "Hello SDL" };
     static constexpr int kWindowWidth_ = 640;
     static constexpr int kWindowHeight_ = 480;
 
@@ -141,12 +144,12 @@ private:
     SDL_Renderer* renderer_;
 };
 
-IRenderer* create_renderer() {
+IRenderer* create_renderer()
+{
     return new SDLRenderer();
 }
 
-void destroy_renderer(SDLRenderer * renderer) {
+void destroy_renderer(SDLRenderer* renderer)
+{
     delete renderer;
 }
-
-

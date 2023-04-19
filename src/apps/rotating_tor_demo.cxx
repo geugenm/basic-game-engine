@@ -10,29 +10,30 @@ const double PI = 3.14159265358979323846;
 
 class RotatingTorDemo : public Application {
 public:
-    explicit RotatingTorDemo() {
+    explicit RotatingTorDemo()
+    {
         initialize();
         render();
     }
 
-    ~RotatingTorDemo() override {}
+    ~RotatingTorDemo() override { }
 
-    void initialize() override {
+    void initialize() override
+    {
         radius_ = 10;
         thickness_ = 3;
         frameDelayMs_ = 100;
     }
 
-    void update() override {}
+    void update() override { }
 
-    void render() const override {
+    void render() const override
+    {
         for (int i = 0; i < 360; i++) {
             std::cout << "\033[2J\033[H"; // clear the terminal
             for (int j = -radius_; j <= radius_; j++) {
                 for (int k = -radius_; k <= radius_; k++) {
-                    double torus_eq =
-                        std::pow(std::sqrt(j * j + k * k) - radius_, 2) +
-                        std::pow(0 - i, 2);
+                    double torus_eq = std::pow(std::sqrt(j * j + k * k) - radius_, 2) + std::pow(0 - i, 2);
                     if (std::abs(std::sqrt(torus_eq) - thickness_) < 0.5) {
                         std::cout << "*";
                     } else {
@@ -53,10 +54,12 @@ private:
     int frameDelayMs_;
 };
 
-Application* createApplication() {
+Application* createApplication()
+{
     return new RotatingTorDemo;
 }
 
-void destroyApplication(Application* application) {
+void destroyApplication(Application* application)
+{
     delete application;
 }

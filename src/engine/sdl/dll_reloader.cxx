@@ -6,9 +6,10 @@
 
 class
 
-
-Application* reloadApplicationLibrary(const Application* currentApplication,
-                                      void*& currentHandle) {
+    Application*
+    reloadApplicationLibrary(const Application* currentApplication,
+        void*& currentHandle)
+{
     try {
         if (currentApplication != nullptr) {
             SDL_UnloadObject(currentHandle);
@@ -17,11 +18,9 @@ Application* reloadApplicationLibrary(const Application* currentApplication,
         const std::filesystem::path tempLibraryPath = "apps/5678.so";
         if (std::filesystem::exists(tempLibraryPath)) {
             if (remove(tempLibraryPath) != 0) {
-                const std::filesystem::path currentPath =
-                    std::filesystem::current_path();
+                const std::filesystem::path currentPath = std::filesystem::current_path();
                 throw std::runtime_error(
-                    "Error: can't remove file: " + tempLibraryPath.string() +
-                    ", current path: " + currentPath.string());
+                    "Error: can't remove file: " + tempLibraryPath.string() + ", current path: " + currentPath.string());
             }
         }
 
@@ -31,27 +30,23 @@ Application* reloadApplicationLibrary(const Application* currentApplication,
         void* gameHandle = SDL_LoadObject(tempLibraryPath.c_str());
 
         if (gameHandle == nullptr) {
-            throw std::runtime_error("Error: failed to load dynamic library: " +
-                                     tempLibraryPath.string() + ", " +
-                                     SDL_GetError());
+            throw std::runtime_error("Error: failed to load dynamic library: " + tempLibraryPath.string() + ", " + SDL_GetError());
         }
 
         currentHandle = gameHandle;
 
-        SDL_FunctionPointer createGameFuncPtr =
-            SDL_LoadFunction(gameHandle, "createApplication");
+        SDL_FunctionPointer createGameFuncPtr = SDL_LoadFunction(gameHandle, "createApplication");
 
         if (createGameFuncPtr == nullptr) {
             throw std::runtime_error(
                 "Error: failed to load function 'createApplication' from "
-                "dynamic library: " +
-                tempLibraryPath.string() + ", " + SDL_GetError());
+                "dynamic library: "
+                + tempLibraryPath.string() + ", " + SDL_GetError());
         }
 
         using create_game_ptr = decltype(&createApplication);
 
-        auto createGameFunc =
-            reinterpret_cast<create_game_ptr>(createGameFuncPtr);
+        auto createGameFunc = reinterpret_cast<create_game_ptr>(createGameFuncPtr);
 
         Application* newGame = createGameFunc();
 

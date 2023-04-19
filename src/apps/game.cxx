@@ -5,9 +5,9 @@
 
 class ExampleGame : public Application {
 public:
-    explicit ExampleGame() {}
+    explicit ExampleGame() { }
 
-    ~ExampleGame() override {}
+    ~ExampleGame() override { }
 
     void initialize() override { Engine::get_instance()->initialize(); }
 
@@ -16,14 +16,16 @@ public:
     void render() const override { Engine::get_instance()->render(); }
 };
 
-Application* createApplication() {
+Application* createApplication()
+{
     if (Engine::get_instance() != nullptr) {
         return new ExampleGame();
     }
     return nullptr;
 }
 
-void destroyApplication(Application* application) {
+void destroyApplication(Application* application)
+{
     Engine::get_instance()->destroy();
     delete application;
 }

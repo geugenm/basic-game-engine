@@ -17,7 +17,8 @@
  *
  * @return Exit status of the application.
  */
-int main() {
+int main()
+{
     Application* game = createApplication();
 
     if (!game) {
@@ -36,7 +37,7 @@ int main() {
 
     const auto framePeriod = std::chrono::seconds(10);
     auto nextFrameTime = std::chrono::steady_clock::now() + framePeriod;
-    void* gameLibraryHandle{};
+    void* gameLibraryHandle {};
 
     bool isRunning = true;
 

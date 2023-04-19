@@ -16,6 +16,6 @@ struct IRenderer {
 };
 
 extern "C" IRenderer* create_renderer();
-extern "C" void destroy_renderer(IRenderer * renderer);
+extern "C" void destroy_renderer(IRenderer* renderer);
 
 #endif // BASIC_GAME_ENGINE_RENDERER_H

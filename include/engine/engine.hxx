@@ -63,9 +63,15 @@ private:
         renderer_ = std::unique_ptr<IRenderer>(create_renderer());
     }
 
-    Engine() { form_renderer(); }
+    Engine()
+    {
+        form_renderer();
+    }
 
-    virtual ~Engine() { release_renderer(); }
+    virtual ~Engine()
+    {
+        release_renderer();
+    }
 
     std::unique_ptr<IRenderer> renderer_;
 };
