@@ -5,6 +5,7 @@
  */
 
 #include "apps/application.h"
+#include "engine/hot-reload/dll_reloader.h"
 
 #include <chrono>
 #include <cstdlib>
@@ -17,7 +18,8 @@
  *
  * @return Exit status of the application.
  */
-int main() {
+int main()
+{
     Application* game = createApplication();
 
     if (!game) {
@@ -34,9 +36,9 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    const auto framePeriod = std::chrono::seconds(10);
+    const auto framePeriod = std::chrono::seconds(3);
     auto nextFrameTime = std::chrono::steady_clock::now() + framePeriod;
-    void* gameLibraryHandle{};
+    void* gameLibraryHandle {};
 
     bool isRunning = true;
 
@@ -45,8 +47,13 @@ int main() {
         if (now >= nextFrameTime) {
             std::cout << "10 seconds have passed!" << std::endl;
 
-            destroyApplication(game);
-            game = reloadApplicationLibrary(game, gameLibraryHandle);
+            //destroyApplication(game);
+
+            IDLLReloader * reloader = create_dll_reloader();
+            reloader->set_new_library_path("apps/5678.so");
+            reloader->set_target_library_path("apps/1234.so");
+            reloader->call_external_method_by_name("test");
+
             nextFrameTime += framePeriod;
         }
 
