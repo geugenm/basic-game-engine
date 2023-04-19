@@ -7,7 +7,7 @@ include(${CPM_PACKAGES_DIR}/sdl.cmake)
 
 add_executable(main main.cxx)
 
-add_subdirectory(engine)
+add_subdirectory(sdl)
 add_subdirectory(apps)
 
 target_include_directories(main PRIVATE
