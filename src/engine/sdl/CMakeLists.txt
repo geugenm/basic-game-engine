@@ -5,5 +5,5 @@ target_include_directories(EngineIncludes INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../include>
         )
 
-add_library(lib.SDLEngine SHARED model.cxx presenter.cxx view.cxx application_reload.cxx)
+add_library(lib.SDLEngine SHARED renderer.cxx application_reload.cxx)
 target_link_libraries(lib.SDLEngine PRIVATE SDL3::SDL3-shared EngineIncludes)

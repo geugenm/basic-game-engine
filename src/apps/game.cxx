@@ -9,21 +9,21 @@ public:
 
     ~ExampleGame() override {}
 
-    void initialize() override { Engine::getInstance()->initialize(); }
+    void initialize() override { Engine::get_instance()->initialize(); }
 
-    void update() override { Engine::getInstance()->update(); }
+    void update() override { Engine::get_instance()->update(); }
 
-    void render() const override { Engine::getInstance()->render(); }
+    void render() const override { Engine::get_instance()->render(); }
 };
 
 Application* createApplication() {
-    if (Engine::getInstance() != nullptr) {
+    if (Engine::get_instance() != nullptr) {
         return new ExampleGame();
     }
     return nullptr;
 }
 
 void destroyApplication(Application* application) {
-    Engine::getInstance()->destroy();
+    Engine::get_instance()->destroy();
     delete application;
 }

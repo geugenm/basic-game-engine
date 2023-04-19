@@ -1,8 +1,8 @@
 #pragma once
 
-#include "engine/interface/create_interfaces.hxx"
-#include "interface/presenter.hxx"
+#include "renderer/renderer.h"
 
+#include <memory>
 #include <stdexcept>
 
 class Engine {
@@ -10,71 +10,62 @@ public:
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
 
-    static Engine* getInstance() {
+    static Engine* get_instance()
+    {
         static Engine instance;
         return &instance;
     }
 
-    void initialize() {
-        formPresenter();
-
-        presenter_->initialize();
+    void initialize()
+    {
+        renderer_->initialize();
     }
 
-    void update() {
-        if (presenter_ == nullptr) {
-            formPresenter();
-        }
-
-        presenter_->handleEvent();
-
-        presenter_->update();
+    void update()
+    {
+        renderer_->update();
     }
 
-    void render() {
-        if (presenter_ == nullptr) {
-            formPresenter();
-        }
-
-        presenter_->render();
+    void render()
+    {
+        renderer_->render();
     }
 
-    void destroy() { releasePresenter(); }
+    void destroy() { release_renderer(); }
 
-    [[nodiscard]] const IPresenter* getPresenter() const {
-        if (!presenter_) {
-            throw std::runtime_error("Presenter not set.");
-        }
-        return presenter_.get();
+    [[nodiscard]] const IRenderer* getPresenter() const
+    {
+        return renderer_.get();
     }
 
-    void setPresenter(std::unique_ptr<IPresenter> presenter) {
-        if (!presenter) {
+    void setPresenter(std::unique_ptr<IRenderer> presenter)
+    {
+        if (presenter == nullptr) {
             throw std::invalid_argument("Presenter cannot be null.");
         }
-        presenter_ = std::move(presenter);
+        renderer_ = std::move(presenter);
     }
 
 private:
-    void releasePresenter() {
-        if (!presenter_) {
+    void release_renderer()
+    {
+        if (renderer_ == nullptr) {
             return;
         }
 
-        presenter_->destroy();
-        presenter_.reset();
+        renderer_->reset();
+        renderer_.reset();
     }
 
-    void formPresenter() {
-        releasePresenter();
-        presenter_ = std::unique_ptr<IPresenter>(createPresenter());
-        presenter_->setView(createView());
-        presenter_->setModel(createModel());
+    void form_renderer()
+    {
+        release_renderer();
+        renderer_ = std::unique_ptr<IRenderer>(create_renderer());
     }
 
-    Engine() { formPresenter(); }
+    Engine() { form_renderer(); }
 
-    virtual ~Engine() { releasePresenter(); }
+    virtual ~Engine() { release_renderer(); }
 
-    std::unique_ptr<IPresenter> presenter_;
+    std::unique_ptr<IRenderer> renderer_;
 };

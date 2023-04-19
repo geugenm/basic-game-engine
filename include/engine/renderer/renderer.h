@@ -3,8 +3,8 @@
 
 #include "../events/events.h"
 
-struct Renderer {
-    ~Renderer() = default;
+struct IRenderer {
+    virtual ~IRenderer() = default;
     virtual void initialize() = 0;
 
     virtual void render() = 0;
@@ -15,7 +15,7 @@ struct Renderer {
     virtual Event getLastEvent() = 0;
 };
 
-extern "C" Renderer * create_renderer();
-extern "C" void destroy_renderer();
+extern "C" IRenderer* create_renderer();
+extern "C" void destroy_renderer(IRenderer * renderer);
 
 #endif // BASIC_GAME_ENGINE_RENDERER_H

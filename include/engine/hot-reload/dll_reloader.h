@@ -1,8 +1,8 @@
 #ifndef BASIC_GAME_ENGINE_RELOADER_H
 #define BASIC_GAME_ENGINE_RELOADER_H
 
-struct DLLReloader {
-    virtual ~DLLReloader() = default;
+struct IDLLReloader {
+    virtual ~IDLLReloader() = default;
 
     virtual void set_target_library_path(const char* path) = 0;
 
@@ -17,9 +17,7 @@ struct DLLReloader {
     virtual void reset() = 0;
 };
 
-
-extern "C" DLLReloader * create_dll_reloader();
+extern "C" IDLLReloader* create_dll_reloader();
 extern "C" void destroy_dll_reloader();
-
 
 #endif // BASIC_GAME_ENGINE_RELOADER_H
