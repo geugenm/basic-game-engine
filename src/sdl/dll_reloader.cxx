@@ -13,16 +13,17 @@ public:
     void set_target_library_path(const char* path) override
     {
         if (std::filesystem::exists(path) == false) {
-            std::cerr << "Target library is not found";
-            return;
+            throw std::invalid_argument("Target library does not exist: " + target_library_path_.string());
         }
         target_library_path_ = path;
     }
 
     void set_new_library_path(const char* path) override
     {
-        // TODO: fix the bug of creating temp dll
-        std::filesystem::copy_file(target_library_path_, path, std::filesystem::copy_options::overwrite_existing);
+        if (std::filesystem::exists(path) == false) {
+            throw std::invalid_argument("Target library does not exist: " + target_library_path_.string());
+        }
+
         new_library_path_ = path;
     }
 
