@@ -7,7 +7,7 @@
 
 class SDLUI : public AbstractUI {
 public:
-    explicit SDLUI() = default;
+    explicit SDLUI();
 
     ~SDLUI() override;
 
@@ -15,11 +15,11 @@ public:
 
     void update() override;
 
+    void render() override;
+
     void reset() override;
 
     Event get_last_event() override;
-
-    void render() override;
 
 private:
     static constexpr std::string_view kWindowTitle_ { "Hello SDL" };

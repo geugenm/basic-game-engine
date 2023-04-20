@@ -17,6 +17,7 @@ target_include_directories(engine-includes INTERFACE
 add_executable(main main.cxx)
 
 add_subdirectory(sdl)
+add_subdirectory(imgui)
 add_subdirectory(apps)
 
 target_include_directories(main PRIVATE
@@ -26,6 +27,6 @@ target_include_directories(main PRIVATE
 target_compile_features(main PRIVATE cxx_std_23)
 
 target_link_libraries(main PRIVATE
-        sdl-engine
+        imgui-engine
         example-game
         )

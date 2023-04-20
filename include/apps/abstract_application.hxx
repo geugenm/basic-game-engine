@@ -4,8 +4,8 @@ class AbstractApplication {
 public:
     virtual ~AbstractApplication() = default;
 
-    virtual void initialize() = 0;
-    virtual void update() = 0;
+    virtual void initialize()   = 0;
+    virtual void update()       = 0;
     virtual void render() const = 0;
 };
 

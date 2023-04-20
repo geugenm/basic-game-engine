@@ -8,6 +8,11 @@ void destroy_renderer(SDLUI* renderer) {
     delete renderer;
 }
 
+SDLUI::SDLUI() {
+    window_   = nullptr;
+    renderer_ = nullptr;
+}
+
 SDLUI::~SDLUI() {
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);

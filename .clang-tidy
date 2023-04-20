@@ -13,7 +13,7 @@ HeaderFilter: ''
 
 AnalyzeTemporaryDtors: true
 
-FormatStyle: google
+FormatStyle: webkit
 
 AllowShortLoopsOnASingleLine: false
 IndentWidth: 4
