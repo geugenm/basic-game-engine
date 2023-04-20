@@ -1,9 +1,9 @@
-#include "apps/application.h"
+#include "apps/mvp/mvp_application.hxx"
 #include "engine.hxx"
 
 #include <iostream>
 
-class ExampleGame : public Application {
+class ExampleGame : public AbstractApplication {
 public:
     explicit ExampleGame() { }
 
@@ -16,7 +16,7 @@ public:
     void render() const override { Engine::get_instance()->render(); }
 };
 
-Application* createApplication()
+AbstractApplication* create_application()
 {
     if (Engine::get_instance() != nullptr) {
         return new ExampleGame();
@@ -24,7 +24,7 @@ Application* createApplication()
     return nullptr;
 }
 
-void destroyApplication(Application* application)
+void destroy_application(AbstractApplication* application)
 {
     Engine::get_instance()->destroy();
     delete application;

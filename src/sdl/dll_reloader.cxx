@@ -1,4 +1,4 @@
-#include "runtime_loader/dll_reloader.h"
+#include "runtime_loader/dll_reloader.hxx"
 
 #include <SDL3/SDL.h>
 #include <filesystem>
@@ -52,7 +52,7 @@ public:
 
         if (createGameFuncPtr == nullptr) {
             throw std::runtime_error(
-                "Error: failed to load function 'createApplication' from "
+                "Error: failed to load function 'create_application' from "
                 "dynamic library: "
                 + new_library_path_.string() + ", " + SDL_GetError());
         }

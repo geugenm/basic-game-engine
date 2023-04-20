@@ -4,8 +4,8 @@
  * @brief Entry point for the game application.
  */
 
-#include "apps/application.h"
-#include "runtime_loader/dll_reloader.h"
+#include "apps/mvp/mvp_application.hxx"
+#include "runtime_loader/dll_reloader.hxx"
 
 #include <chrono>
 #include <cstdlib>
@@ -20,7 +20,7 @@
  */
 int main()
 {
-    Application* game = createApplication();
+    AbstractApplication* game = create_application();
 
     if (!game) {
         std::cerr << "Failed to create application instance." << std::endl;
@@ -32,7 +32,7 @@ int main()
     } catch (const std::exception& ex) {
         std::cerr << "Failed to initialize application: " << ex.what()
                   << std::endl;
-        destroyApplication(game);
+        destroy_application(game);
         return EXIT_FAILURE;
     }
 
@@ -46,14 +46,6 @@ int main()
         const auto now = std::chrono::steady_clock::now();
         if (now >= nextFrameTime) {
             std::cout << "10 seconds have passed!" << std::endl;
-
-            //destroyApplication(game);
-
-            IDLLReloader * reloader = create_dll_reloader();
-            reloader->set_new_library_path("apps/5678.so");
-            reloader->set_target_library_path("apps/1234.so");
-            reloader->call_external_method_by_name("test");
-
             nextFrameTime += framePeriod;
         }
 
@@ -61,7 +53,7 @@ int main()
             game->update();
             game->render();
         } else {
-            game = createApplication();
+            game = create_application();
             game->initialize();
         }
 
@@ -69,12 +61,12 @@ int main()
 
         if (!std::cout.good()) {
             std::cerr << "Standard output stream is invalid." << std::endl;
-            destroyApplication(game);
+            destroy_application(game);
             return EXIT_FAILURE;
         }
     }
 
-    destroyApplication(game);
+    destroy_application(game);
 
     return EXIT_SUCCESS;
 }

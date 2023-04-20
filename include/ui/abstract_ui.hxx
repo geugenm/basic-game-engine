@@ -1,7 +1,6 @@
-#ifndef BASIC_GAME_ENGINE_RENDERER_H
-#define BASIC_GAME_ENGINE_RENDERER_H
+#pragma once
 
-#include "../events/events.h"
+#include "events/events.hxx"
 
 struct AbstractUI {
     virtual ~AbstractUI() = default;
@@ -17,5 +16,3 @@ struct AbstractUI {
 
 extern "C" AbstractUI* create_renderer();
 extern "C" void destroy_renderer(AbstractUI* renderer);
-
-#endif // BASIC_GAME_ENGINE_RENDERER_H

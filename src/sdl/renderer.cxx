@@ -1,4 +1,4 @@
-#include "ui/abstract_ui.h"
+#include "ui/abstract_ui.hxx"
 
 #include <SDL3/SDL.h>
 #include <iostream>

@@ -1,5 +1,4 @@
-#include "apps/application.h"
-#include "engine.hxx"
+#include "apps/abstract_application.hxx"
 
 #include <chrono>
 #include <cmath>
@@ -8,13 +7,9 @@
 
 const double PI = 3.14159265358979323846;
 
-class RotatingTorDemo : public Application {
+class RotatingTorDemo : public AbstractApplication {
 public:
-    explicit RotatingTorDemo()
-    {
-        initialize();
-        render();
-    }
+    explicit RotatingTorDemo() { }
 
     ~RotatingTorDemo() override { }
 
@@ -54,16 +49,12 @@ private:
     int frameDelayMs_;
 };
 
-Application* createApplication()
+AbstractApplication* create_application()
 {
     return new RotatingTorDemo;
 }
 
-extern "C" void test() {
-    RotatingTorDemo * test = new RotatingTorDemo();
-}
-
-void destroyApplication(Application* application)
+void destroy_application(AbstractApplication* application)
 {
     delete application;
 }
