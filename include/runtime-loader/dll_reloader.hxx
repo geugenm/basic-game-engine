@@ -16,4 +16,4 @@ public:
 };
 
 extern "C" IDLLReloader* create_dll_reloader();
-extern "C" void destroy_dll_reloader(IDLLReloader * reloader);
+extern "C" void          destroy_dll_reloader(IDLLReloader* reloader);

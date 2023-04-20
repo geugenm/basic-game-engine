@@ -45,7 +45,7 @@ void SDLUI::reset() {
     window_   = nullptr;
 }
 
-void SDLUI::update() {}
+void SDLUI::update() { }
 
 Event SDLUI::get_last_event() {
     SDL_Event event_;

@@ -2,6 +2,4 @@
 
 #include ""
 
-class ImGuiUI : public {
-
-};
+class ImGuiUI : public { };
