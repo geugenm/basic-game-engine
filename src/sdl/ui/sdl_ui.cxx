@@ -1,13 +1,13 @@
 #include "ui/abstract_ui.hxx"
 
-#include <SDL3/SDL.h>
+#include "SDL3/SDL.h"
 #include <iostream>
 
-class SDLRenderer : public AbstractUI {
+class SDLUI : public AbstractUI {
 public:
-    explicit SDLRenderer() = default;
+    explicit SDLUI() = default;
 
-    ~SDLRenderer() override
+    ~SDLUI() override
     {
         SDL_DestroyRenderer(renderer_);
         SDL_DestroyWindow(window_);
@@ -146,10 +146,10 @@ private:
 
 AbstractUI* create_renderer()
 {
-    return new SDLRenderer();
+    return new SDLUI();
 }
 
-void destroy_renderer(SDLRenderer* renderer)
+void destroy_renderer(SDLUI* renderer)
 {
     delete renderer;
 }

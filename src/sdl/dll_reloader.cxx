@@ -1,4 +1,4 @@
-#include "runtime_loader/dll_reloader.hxx"
+#include "runtime-loader/dll_reloader.hxx"
 
 #include <SDL3/SDL.h>
 #include <filesystem>

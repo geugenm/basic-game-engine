@@ -5,7 +5,6 @@
  */
 
 #include "apps/mvp/mvp_application.hxx"
-#include "runtime_loader/dll_reloader.hxx"
 
 #include <chrono>
 #include <cstdlib>
