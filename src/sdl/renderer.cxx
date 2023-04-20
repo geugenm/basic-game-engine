@@ -1,9 +1,9 @@
-#include "engine/renderer/renderer.h"
+#include "ui/abstract_ui.h"
 
 #include <SDL3/SDL.h>
 #include <iostream>
 
-class SDLRenderer : public IRenderer {
+class SDLRenderer : public AbstractUI {
 public:
     explicit SDLRenderer() = default;
 
@@ -144,7 +144,7 @@ private:
     SDL_Renderer* renderer_;
 };
 
-IRenderer* create_renderer()
+AbstractUI* create_renderer()
 {
     return new SDLRenderer();
 }

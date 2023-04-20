@@ -1,9 +1,9 @@
 #pragma once
 
-#include "renderer/renderer.h"
+#include "ui/abstract_ui.h"
 
-#include <memory>
-#include <stdexcept>
+#include "../../../../../usr/include/c++/12.2.1/memory"
+#include "../../../../../usr/include/c++/12.2.1/stdexcept"
 
 class Engine {
 public:
@@ -33,12 +33,12 @@ public:
 
     void destroy() { release_renderer(); }
 
-    [[nodiscard]] const IRenderer* getPresenter() const
+    [[nodiscard]] const AbstractUI* getPresenter() const
     {
         return renderer_.get();
     }
 
-    void setPresenter(std::unique_ptr<IRenderer> presenter)
+    void setPresenter(std::unique_ptr<AbstractUI> presenter)
     {
         if (presenter == nullptr) {
             throw std::invalid_argument("Presenter cannot be null.");
@@ -60,7 +60,7 @@ private:
     void form_renderer()
     {
         release_renderer();
-        renderer_ = std::unique_ptr<IRenderer>(create_renderer());
+        renderer_ = std::unique_ptr<AbstractUI>(create_renderer());
     }
 
     Engine()
@@ -73,5 +73,5 @@ private:
         release_renderer();
     }
 
-    std::unique_ptr<IRenderer> renderer_;
+    std::unique_ptr<AbstractUI> renderer_;
 };

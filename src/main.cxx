@@ -5,7 +5,7 @@
  */
 
 #include "apps/application.h"
-#include "engine/hot-reload/dll_reloader.h"
+#include "runtime_loader/dll_reloader.h"
 
 #include <chrono>
 #include <cstdlib>
