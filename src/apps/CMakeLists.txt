@@ -6,7 +6,7 @@ target_include_directories(app-includes INTERFACE
         )
 
 add_library(example-game SHARED game.cxx)
-target_link_libraries(example-game PRIVATE app-includes glog)
+target_link_libraries(example-game PRIVATE app-includes Boost::asio imgui glog)
 set_target_properties(example-game PROPERTIES
         ENABLE_EXPORTS 1
         )
