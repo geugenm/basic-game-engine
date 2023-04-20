@@ -1,24 +1,20 @@
 #include "sdl_ui.hxx"
 
-
-AbstractUI* create_renderer()
-{
+AbstractUI* create_renderer() {
     return new SDLUI();
 }
 
-void destroy_renderer(SDLUI* renderer)
-{
+void destroy_renderer(SDLUI* renderer) {
     delete renderer;
 }
 
-SDLUI::~SDLUI()
-{
+SDLUI::~SDLUI() {
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     SDL_Quit();
 }
-void SDLUI::initialize()
-{
+
+void SDLUI::initialize() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "SDL initialization failed: " << SDL_GetError()
                   << std::endl;
@@ -26,17 +22,15 @@ void SDLUI::initialize()
     }
 
     window_ = SDL_CreateWindow(
-            kWindowTitle_.data(), kWindowWidth_, kWindowHeight_, 0);
+        kWindowTitle_.data(), kWindowWidth_, kWindowHeight_, 0);
     if (window_ == nullptr) {
-        std::cerr << "Window creation failed: " << SDL_GetError()
-                  << std::endl;
+        std::cerr << "Window creation failed: " << SDL_GetError() << std::endl;
         SDL_Quit();
         std::exit(EXIT_FAILURE);
     }
 
-    renderer_ = SDL_CreateRenderer(window_,
-                                   nullptr,
-                                   SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer_ = SDL_CreateRenderer(
+        window_, nullptr, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer_ == nullptr) {
         std::cerr << "Renderer creation failed: " << SDL_GetError()
                   << std::endl;
@@ -45,14 +39,15 @@ void SDLUI::initialize()
         std::exit(EXIT_FAILURE);
     }
 }
-void SDLUI::reset()
-{
+
+void SDLUI::reset() {
     renderer_ = nullptr;
-    window_ = nullptr;
+    window_   = nullptr;
 }
-void SDLUI::update() { }
-Event SDLUI::get_last_event()
-{
+
+void SDLUI::update() {}
+
+Event SDLUI::get_last_event() {
     SDL_Event event_;
 
     if (SDL_PollEvent(&event_) == 0) {
@@ -132,4 +127,7 @@ Event SDLUI::get_last_event()
 
     return Event::NOTHING_HAPPENED;
 }
-void SDLUI::render() { SDL_RenderPresent(renderer_); }
+
+void SDLUI::render() {
+    SDL_RenderPresent(renderer_);
+}
