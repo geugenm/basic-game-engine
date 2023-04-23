@@ -4,7 +4,7 @@
 
 class File {
 public:
-    File(const std::filesystem::path & file_path) {
+    explicit File(const std::filesystem::path & file_path) {
         set_path(file_path);
     }
 

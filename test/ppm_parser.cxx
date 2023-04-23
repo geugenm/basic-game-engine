@@ -1,4 +1,4 @@
-#include "textures/texture_file.hxx"
+#include "textures/ppm_parser.hxx"
 #include <gtest/gtest.h>
 
 class TextureFileTest : public testing::Test {
@@ -26,44 +26,44 @@ protected:
 };
 
 TEST_F(TextureFileTest, LoadFile) {
-    TextureFile texture_file("test_files/test_texture.ppm");
+    PpmParser texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
     EXPECT_EQ(texture_file.get_width(), 2);
     EXPECT_EQ(texture_file.get_height(), 2);
 
-    std::vector<Color> expected_pixels = { Color(255, 0, 0),
-                                           Color(0, 255, 0),
-                                           Color(0, 0, 255),
-                                           Color(255, 255, 255) };
+    std::vector<ColorRGB> expected_pixels = { ColorRGB(255, 0, 0),
+                                              ColorRGB(0, 255, 0),
+                                              ColorRGB(0, 0, 255),
+                                              ColorRGB(255, 255, 255) };
     EXPECT_EQ(texture_file.get_pixels(), expected_pixels);
 }
 
 TEST_F(TextureFileTest, GetPixel) {
-    TextureFile texture_file("test_files/test_texture.ppm");
+    PpmParser texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
-    EXPECT_EQ(texture_file.get_pixel(0, 0), Color(255, 0, 0));
-    EXPECT_EQ(texture_file.get_pixel(1, 0), Color(0, 255, 0));
-    EXPECT_EQ(texture_file.get_pixel(0, 1), Color(0, 0, 255));
-    EXPECT_EQ(texture_file.get_pixel(1, 1), Color(255, 255, 255));
+    EXPECT_EQ(texture_file.get_pixel(0, 0), ColorRGB(255, 0, 0));
+    EXPECT_EQ(texture_file.get_pixel(1, 0), ColorRGB(0, 255, 0));
+    EXPECT_EQ(texture_file.get_pixel(0, 1), ColorRGB(0, 0, 255));
+    EXPECT_EQ(texture_file.get_pixel(1, 1), ColorRGB(255, 255, 255));
 
     EXPECT_THROW(texture_file.get_pixel(2, 2), std::out_of_range);
 }
 
 TEST_F(TextureFileTest, SetPixel) {
-    TextureFile texture_file("test_files/test_texture.ppm");
+    PpmParser texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
-    texture_file.set_pixel(0, 0, Color(0, 255, 0));
-    EXPECT_EQ(texture_file.get_pixel(0, 0), Color(0, 255, 0));
+    texture_file.set_pixel(0, 0, ColorRGB(0, 255, 0));
+    EXPECT_EQ(texture_file.get_pixel(0, 0), ColorRGB(0, 255, 0));
 
-    EXPECT_THROW(texture_file.set_pixel(2, 2, Color(255, 255, 255)),
+    EXPECT_THROW(texture_file.set_pixel(2, 2, ColorRGB(255, 255, 255)),
                  std::out_of_range);
 }
 
 TEST_F(TextureFileTest, SetDimensions) {
-    TextureFile texture_file("test_files/test_texture.ppm");
+    PpmParser texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
     texture_file.set_dimensions(1, 1);

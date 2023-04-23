@@ -1,15 +1,15 @@
 #pragma once
 
 #include "abstract_file.hxx"
-#include "color.hxx"
+#include "color_rgb.hxx"
 
 #include <fstream>
 #include <regex>
 #include <vector>
 
-class TextureFile : public File {
+class PpmParser : public File {
 public:
-    explicit TextureFile(const std::filesystem::path& file_path)
+    explicit PpmParser(const std::filesystem::path& file_path)
         : File(file_path) {
         set_path(file_path);
     }
@@ -32,7 +32,7 @@ public:
         pixels_.resize(width_ * height_);
 
         in_file.read(reinterpret_cast<char*>(pixels_.data()),
-                     static_cast<long>(pixels_.size() * sizeof(Color)));
+                     static_cast<long>(pixels_.size() * sizeof(ColorRGB)));
 
         if (in_file.bad()) {
             throw std::runtime_error("Failed to read image data.");
@@ -54,7 +54,7 @@ public:
         out_file << "P6\n" << width_ << ' ' << height_ << '\n' << "255\n";
 
         const auto buffer_size =
-            static_cast<std::streamsize>(sizeof(Color) * pixels_.size());
+            static_cast<std::streamsize>(sizeof(ColorRGB) * pixels_.size());
         const char* written_data =
             reinterpret_cast<const char*>(pixels_.data());
         out_file.write(written_data, buffer_size);
@@ -67,7 +67,7 @@ public:
 
     void save_as(const std::filesystem::path& new_file_path) override { }
 
-    [[nodiscard]] Color get_pixel(const size_t& x, const size_t& y) const {
+    [[nodiscard]] ColorRGB get_pixel(const size_t& x, const size_t& y) const {
         if (x >= width_ || y >= height_) {
             throw std::out_of_range("Pixel position out of range.");
         }
@@ -78,7 +78,7 @@ public:
 
     [[nodiscard]] size_t get_height() const { return height_; }
 
-    void set_pixel(const size_t& x, const size_t& y, const Color& color) {
+    void set_pixel(const size_t& x, const size_t& y, const ColorRGB& color) {
         if (x >= width_ || y >= height_) {
             throw std::out_of_range("Pixel position out of range.");
         }
@@ -95,7 +95,7 @@ public:
         height_ = height;
     }
 
-    void set_pixels(const std::vector<Color>& pixels) {
+    void set_pixels(const std::vector<ColorRGB>& pixels) {
         if (pixels.size() != width_ * height_) {
             throw std::invalid_argument(
                 "Error: The number of pixels doesn't match the dimensions.");
@@ -104,10 +104,10 @@ public:
         pixels_ = pixels;
     }
 
-    [[nodiscard]] std::vector<Color> get_pixels() const { return pixels_; }
+    [[nodiscard]] std::vector<ColorRGB> get_pixels() const { return pixels_; }
 
 private:
-    std::vector<Color> pixels_;
+    std::vector<ColorRGB> pixels_;
 
     std::size_t width_  = 0;
     std::size_t height_ = 0;

@@ -8,34 +8,34 @@
 
 #pragma pack(push, 1)
 
-struct Color {
+struct ColorRGB {
     std::uint8_t red;
     std::uint8_t green;
     std::uint8_t blue;
 
-    Color() = default;
+    ColorRGB() = default;
 
-    Color(std::uint8_t r, std::uint8_t g, std::uint8_t b)
+    ColorRGB(std::uint8_t r, std::uint8_t g, std::uint8_t b)
         : red(r), green(g), blue(b)
     {}
 
-    Color(const Color&) = default;
+    ColorRGB(const ColorRGB&) = default;
 
-    Color(Color&&) = default;
+    ColorRGB(ColorRGB&&) = default;
 
-    Color& operator=(const Color&) = default;
+    ColorRGB& operator=(const ColorRGB&) = default;
 
-    Color& operator=(Color&&) = default;
+    ColorRGB& operator=(ColorRGB&&) = default;
 
-    bool operator==(const Color& other) const {
+    bool operator==(const ColorRGB& other) const {
         return red == other.red && green == other.green && blue == other.blue;
     }
 
-    bool operator!=(const Color& other) const {
+    bool operator!=(const ColorRGB& other) const {
         return !(*this == other);
     }
 
-    Color operator+(const Color& other) const {
+    ColorRGB operator+(const ColorRGB& other) const {
         return {
             static_cast<std::uint8_t>(std::min(
                 static_cast<int>(red) + static_cast<int>(other.red), 255)),
@@ -46,7 +46,7 @@ struct Color {
         };
     }
 
-    Color operator-(const Color& other) const {
+    ColorRGB operator-(const ColorRGB& other) const {
         return {
             static_cast<std::uint8_t>(std::max(
                 static_cast<int>(red) - static_cast<int>(other.red), 0)),
@@ -57,7 +57,7 @@ struct Color {
         };
     }
 
-    Color operator*(float scalar) const {
+    ColorRGB operator*(float scalar) const {
         return {
             static_cast<std::uint8_t>(std::max(
                 std::min(static_cast<int>(std::round(red * scalar)), 255), 0)),

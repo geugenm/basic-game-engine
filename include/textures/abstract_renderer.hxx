@@ -1,6 +1,6 @@
 #pragma once
 
-#include "color.hxx"
+#include "color_rgb.hxx"
 #include "position.hxx"
 
 #include <memory>
