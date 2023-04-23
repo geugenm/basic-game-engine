@@ -16,9 +16,8 @@ struct Color {
     Color() = default;
 
     Color(std::uint8_t r, std::uint8_t g, std::uint8_t b)
-        : red(r)
-        , green(g)
-        , blue(b) { }
+        : red(r), green(g), blue(b)
+    {}
 
     Color(const Color&) = default;
 
@@ -32,7 +31,9 @@ struct Color {
         return red == other.red && green == other.green && blue == other.blue;
     }
 
-    bool operator!=(const Color& other) const { return !(*this == other); }
+    bool operator!=(const Color& other) const {
+        return !(*this == other);
+    }
 
     Color operator+(const Color& other) const {
         return {
@@ -41,7 +42,8 @@ struct Color {
             static_cast<std::uint8_t>(std::min(
                 static_cast<int>(green) + static_cast<int>(other.green), 255)),
             static_cast<std::uint8_t>(std::min(
-                static_cast<int>(blue) + static_cast<int>(other.blue), 255))};
+                static_cast<int>(blue) + static_cast<int>(other.blue), 255))
+        };
     }
 
     Color operator-(const Color& other) const {
@@ -51,7 +53,8 @@ struct Color {
             static_cast<std::uint8_t>(std::max(
                 static_cast<int>(green) - static_cast<int>(other.green), 0)),
             static_cast<std::uint8_t>(std::max(
-                static_cast<int>(blue) - static_cast<int>(other.blue), 0))};
+                static_cast<int>(blue) - static_cast<int>(other.blue), 0))
+        };
     }
 
     Color operator*(float scalar) const {
@@ -62,8 +65,9 @@ struct Color {
                 std::min(static_cast<int>(std::round(green * scalar)), 255),
                 0)),
             static_cast<std::uint8_t>(std::max(
-                std::min(static_cast<int>(std::round(blue * scalar)), 255),
-                0))};
+                std::min(static_cast<int>(std::round(blue * scalar)), 255), 0))
+        };
     }
 };
+
 #pragma pack(pop)
