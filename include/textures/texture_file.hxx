@@ -15,44 +15,27 @@ public:
     }
 
     void load() override {
-        // Open the input file stream and enable the fail bit exception
-        std::ifstream in_file(get_path(), std::ios_base::binary);
-        if (!in_file) {
-            throw std::runtime_error("Failed to open input file: " +
-                                     get_path().string());
-        }
+        std::ifstream in_file;
         in_file.exceptions(std::ios_base::failbit);
+        in_file.open(get_path(), std::ios_base::binary);
+        std::string header;
+        std::string color_format;
+        char        last_next_line = 0;
+        in_file >> header >> width_ >> height_ >> color_format >>
+            std::noskipws >> last_next_line;
 
-        // Read and parse the header of the PPM file
-        std::string magic_number;
-        int         width, height, max_color_value;
-        in_file >> magic_number >> width >> height >> max_color_value;
-        if (magic_number != "P6") {
-            throw std::runtime_error("Unsupported image format: " +
-                                     magic_number);
+        if (!iswspace(static_cast<wint_t>(last_next_line))) {
+            throw std::runtime_error("expected whitespace");
         }
-        if (width <= 0 || height <= 0 || max_color_value != 255) {
-            throw std::runtime_error("Invalid image metadata");
-        }
-
-        width_ = static_cast<size_t>(width);
-        height_ = static_cast<size_t>(height);
-
-        const std::streamsize expected_data_size =
-            width_ * height_ * sizeof(Color);
-        if (!in_file.seekg(0, std::ios::end) ||
-            in_file.tellg() - static_cast<std::streamoff>(expected_data_size) !=
-                static_cast<std::streamoff>(in_file.beg)) {
-            throw std::runtime_error("Invalid image data size");
-        }
-        in_file.seekg(0, std::ios::beg);
 
         pixels_.resize(width_ * height_);
-        in_file.read(reinterpret_cast<char*>(pixels_.data()),
-                     expected_data_size);
-        if (!in_file) {
-            throw std::runtime_error("Error reading image data");
+
+        if (pixels_.size() != width_ * height_) {
+            throw std::runtime_error("image size not match");
         }
+        auto buf_size =
+            static_cast<std::streamsize>(sizeof(Color) * pixels_.size());
+        in_file.read(reinterpret_cast<char*>(pixels_.data()), buf_size);
     }
 
     void save() override {
@@ -102,6 +85,10 @@ public:
     }
 
     void set_dimensions(size_t width, size_t height) {
+        if (width <= 0 || height <= 0) {
+            throw std::invalid_argument(
+                "Given 'height' or 'width' value is <= 0.");
+        }
         pixels_.resize(width * height);
         width_  = width;
         height_ = height;

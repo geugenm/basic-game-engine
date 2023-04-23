@@ -6,6 +6,8 @@
 #include <cmath>
 #include <cstdint>
 
+#pragma pack(push, 1)
+
 struct Color {
     std::uint8_t red;
     std::uint8_t green;
@@ -64,3 +66,4 @@ struct Color {
                 0))};
     }
 };
+#pragma pack(pop)
