@@ -75,6 +75,8 @@ TEST_F(TextureFileTest, SetDimensions) {
     EXPECT_THROW(texture_file.set_dimensions(0, 0), std::invalid_argument);
 }
 
+
+
 auto main(int argc, char** argv) -> int {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

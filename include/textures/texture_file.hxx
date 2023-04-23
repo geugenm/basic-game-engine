@@ -15,27 +15,28 @@ public:
     }
 
     void load() override {
-        std::ifstream in_file;
+        std::ifstream in_file(get_path(), std::ios_base::binary);
         in_file.exceptions(std::ios_base::failbit);
-        in_file.open(get_path(), std::ios_base::binary);
-        std::string header;
-        std::string color_format;
-        char        last_next_line = 0;
-        in_file >> header >> width_ >> height_ >> color_format >>
-            std::noskipws >> last_next_line;
 
-        if (!iswspace(static_cast<wint_t>(last_next_line))) {
-            throw std::runtime_error("expected whitespace");
+        std::string header, color_format;
+        int         width, height;
+
+        in_file >> header >> width >> height >> color_format;
+
+        if (in_file.get() != '\n') {
+            throw std::runtime_error("Expected newline after image metadata.");
         }
+
+        set_dimensions(static_cast<size_t>(width), static_cast<size_t>(height));
 
         pixels_.resize(width_ * height_);
 
-        if (pixels_.size() != width_ * height_) {
-            throw std::runtime_error("image size not match");
+        in_file.read(reinterpret_cast<char*>(pixels_.data()),
+                     static_cast<long>(pixels_.size() * sizeof(Color)));
+
+        if (in_file.bad()) {
+            throw std::runtime_error("Failed to read image data.");
         }
-        auto buf_size =
-            static_cast<std::streamsize>(sizeof(Color) * pixels_.size());
-        in_file.read(reinterpret_cast<char*>(pixels_.data()), buf_size);
     }
 
     void save() override {
