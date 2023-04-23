@@ -20,7 +20,8 @@ public:
     }
 
     virtual void load() = 0;
-    virtual void save(const std::filesystem::path & path) = 0;
+    virtual void save() = 0;
+    virtual void save_as(const std::filesystem::path & new_file_path) = 0;
 
 private:
     std::filesystem::path path_;
