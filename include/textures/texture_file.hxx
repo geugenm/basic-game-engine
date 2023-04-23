@@ -82,6 +82,42 @@ public:
         out_file.write(written_image_pixels, buffer_size);
     }
 
+    [[nodiscard]] Color get_pixel(const size_t & x, const size_t & y) const {
+        if (x >= width_ || y >= height_) {
+            throw std::out_of_range("Pixel position out of range.");
+        }
+        return pixels_[y * width_ + x];
+    }
+
+    [[nodiscard]] size_t get_width() const {
+        return width_;
+    }
+
+    [[nodiscard]] size_t get_height() const {
+        return height_;
+    }
+
+    void set_pixel(const size_t & x, const size_t & y, const Color& color) {
+        if (x >= width_ || y >= height_) {
+            throw std::out_of_range("Pixel position out of range.");
+        }
+        pixels_[y * width_ + x] = color;
+    }
+
+    void set_dimensions(size_t width, size_t height) {
+        pixels_.resize(width * height);
+        width_ = width;
+        height_ = height;
+    }
+
+    void set_pixels(const std::vector<Color>& pixels) {
+        if (pixels.size() != width_ * height_) {
+            throw std::invalid_argument("Error: The number of pixels doesn't match the dimensions.");
+        }
+
+        pixels_ = pixels;
+    }
+
 private:
     std::vector<Color> pixels_;
 

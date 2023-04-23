@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.25)
 include(${CMAKE_CURRENT_LIST_DIR}/../cmake/packages.cmake)
 
 include(${CPM_PACKAGES_DIR}/sdl.cmake)
-include(${CPM_PACKAGES_DIR}/imgui.cmake)
 
 include(${CPM_PACKAGES_DIR}/glog.cmake)
 include(${CPM_PACKAGES_DIR}/ccache.cmake)
@@ -16,7 +15,6 @@ target_include_directories(engine-includes INTERFACE
 add_executable(main main.cxx)
 
 add_subdirectory(sdl)
-add_subdirectory(imgui)
 add_subdirectory(apps)
 
 target_include_directories(main PRIVATE

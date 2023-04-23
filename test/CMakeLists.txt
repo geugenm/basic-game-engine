@@ -37,3 +37,9 @@ if (USE_CUSTOM_SDL_SHARED_LIB AND SHARED_LIB_PATH)
             COMMAND ${CMAKE_COMMAND} -E env LD_PRELOAD=${SHARED_LIB_PATH}/libSDL2.so ${CMAKE_BINARY_DIR}/test/./Test_DLL_Injection
             )
 endif ()
+
+
+
+add_executable(test-texture-file texture_file_test.cxx)
+
+target_link_libraries(test-texture-file PRIVATE GTest::GTest engine-includes)
