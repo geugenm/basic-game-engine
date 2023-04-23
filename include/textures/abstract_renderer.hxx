@@ -1,7 +1,7 @@
 #pragma once
 
 #include "color_rgb.hxx"
-#include "position.hxx"
+#include "position_2d.hxx"
 
 #include <memory>
 #include <vector>

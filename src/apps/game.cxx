@@ -1,8 +1,6 @@
 #include "apps/mvp/mvp_application.hxx"
 #include "engine.hxx"
 
-#include <iostream>
-
 class ExampleGame : public AbstractApplication {
 public:
     explicit ExampleGame() { }
