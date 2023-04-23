@@ -7,7 +7,6 @@ include(${CPM_PACKAGES_DIR}/imgui.cmake)
 
 include(${CPM_PACKAGES_DIR}/glog.cmake)
 include(${CPM_PACKAGES_DIR}/ccache.cmake)
-include(${CPM_PACKAGES_DIR}/boost.cmake)
 
 add_library(engine-includes INTERFACE)
 target_include_directories(engine-includes INTERFACE
@@ -27,6 +26,6 @@ target_include_directories(main PRIVATE
 target_compile_features(main PRIVATE cxx_std_23)
 
 target_link_libraries(main PRIVATE
-        imgui-engine
+        sdl-engine
         example-game
         )
