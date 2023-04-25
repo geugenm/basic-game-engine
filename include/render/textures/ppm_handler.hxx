@@ -1,7 +1,7 @@
 #pragma once
 
 #include "abstract_file.hxx"
-#include "render/color/color_rgb.hxx"
+#include "render/colors/color_rgb.hxx"
 
 #include <fstream>
 #include <regex>

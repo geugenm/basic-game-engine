@@ -1,4 +1,4 @@
-#include "textures/ppm_handler.hxx"
+#include "render/textures/ppm_handler.hxx"
 #include <gtest/gtest.h>
 
 class TextureFileTest : public testing::Test {
@@ -26,7 +26,7 @@ protected:
 };
 
 TEST_F(TextureFileTest, LoadFile) {
-    PpmParser texture_file("test_files/test_texture.ppm");
+    PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
     EXPECT_EQ(texture_file.get_width(), 2);
@@ -40,7 +40,7 @@ TEST_F(TextureFileTest, LoadFile) {
 }
 
 TEST_F(TextureFileTest, GetPixel) {
-    PpmParser texture_file("test_files/test_texture.ppm");
+    PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
     EXPECT_EQ(texture_file.get_pixel(0, 0), ColorRGB(255, 0, 0));
@@ -52,7 +52,7 @@ TEST_F(TextureFileTest, GetPixel) {
 }
 
 TEST_F(TextureFileTest, SetPixel) {
-    PpmParser texture_file("test_files/test_texture.ppm");
+    PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
     texture_file.set_pixel(0, 0, ColorRGB(0, 255, 0));
@@ -63,7 +63,7 @@ TEST_F(TextureFileTest, SetPixel) {
 }
 
 TEST_F(TextureFileTest, SetDimensions) {
-    PpmParser texture_file("test_files/test_texture.ppm");
+    PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
     texture_file.set_dimensions(1, 1);
