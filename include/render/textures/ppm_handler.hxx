@@ -1,15 +1,15 @@
 #pragma once
 
 #include "abstract_file.hxx"
-#include "color_rgb.hxx"
+#include "render/color/color_rgb.hxx"
 
 #include <fstream>
 #include <regex>
 #include <vector>
 
-class PpmParser : public File {
+class PpmHandler : public File {
 public:
-    explicit PpmParser(const std::filesystem::path& file_path)
+    explicit PpmHandler(const std::filesystem::path& file_path)
         : File(file_path) {
         set_path(file_path);
     }
