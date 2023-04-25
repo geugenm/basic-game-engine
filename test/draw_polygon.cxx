@@ -8,7 +8,7 @@ TEST(Polygon2DTest, DrawPolygonTest) {
     const Position2D start = Position2D::generate_random(200, 230);
     const Position2D end   = Position2D::generate_random(300, 1200);
 
-    Polygon2D polygon(start, end);
+    Polygon2D polygon(start, end, 6);
 
     Texture texture;
     texture.set_shape(BoundingBox(start, end));
