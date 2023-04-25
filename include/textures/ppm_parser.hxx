@@ -65,7 +65,12 @@ public:
         }
     }
 
-    void save_as(const std::filesystem::path& new_file_path) override { }
+    void save_as(const std::filesystem::path& new_file_path) override {
+        const std::filesystem::path saved_path = get_path();
+        set_path(new_file_path);
+        save();
+        set_path(saved_path);
+    }
 
     [[nodiscard]] ColorRGB get_pixel(const size_t& x, const size_t& y) const {
         if (x >= width_ || y >= height_) {
