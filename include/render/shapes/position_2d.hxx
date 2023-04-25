@@ -59,6 +59,12 @@ struct Position2D {
         return { distrib(gen), distrib(gen) };
     }
 
+    static Position2D generate_random(const Position2D& from, const Position2D& to) {
+        Position2D x_result = generate_random(from.x, to.x);
+        Position2D y_result = generate_random(from.y, to.y);
+        return {x_result.x, y_result.y};
+    }
+
     static double distance(const Position2D& p1, const Position2D& p2) {
         const auto dx = static_cast<double>(p2.x - p1.x);
         const auto dy = static_cast<double>(p2.y - p1.y);

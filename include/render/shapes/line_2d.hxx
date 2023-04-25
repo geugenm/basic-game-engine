@@ -66,16 +66,13 @@ public:
     }
 
     void draw_random() {
-        const auto texture_width  = static_cast<int32_t>(texture_->get_shape().width);
-        const auto texture_height = static_cast<int32_t>(texture_->get_shape().height);
-
         const Position2D start_container = start_;
         const Position2D end_container   = end_;
 
-        start_ = Position2D::generate_random(texture_width, texture_height);
-        end_   = Position2D::generate_random(texture_width, texture_height);
+        start_ = Position2D::generate_random(start_, end_);
+        end_   = Position2D::generate_random(start_, end_);
 
-        draw(ColorRGB { 255, 255, 255 });
+        draw(ColorRGB { 0, 255, 255 });
         start_ = start_container;
         end_   = end_container;
     }
