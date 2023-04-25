@@ -15,13 +15,13 @@
 TEST(SDLTest, SDLVersion)
 {
     SDL_version compiled_version = { 0, 0, 0 };
-    SDL_version linked_version = { 0, 0, 0 };
+    SDL_version linked_version   = { 0, 0, 0 };
 
     SDL_VERSION(&compiled_version)
     SDL_GetVersion(&linked_version);
 
     auto [compiled_major, compiled_minor, compiled_patch] = compiled_version;
-    auto [linked_major, linked_minor, linked_patch] = linked_version;
+    auto [linked_major, linked_minor, linked_patch]       = linked_version;
 
     std::ostringstream compiled_version_str, linked_version_str;
 
@@ -44,7 +44,7 @@ TEST(SDLTest, SDLVersion)
 TEST(SDLTest, SDLInitialization)
 {
     constexpr uint16_t kWindowHeight = 120;
-    constexpr uint16_t kWindowWidth = 120;
+    constexpr uint16_t kWindowWidth  = 120;
 
     ASSERT_EQ(SDL_Init(SDL_INIT_VIDEO), 0)
         << "SDL_Init Error: " << SDL_GetError();

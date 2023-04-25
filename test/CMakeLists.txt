@@ -39,7 +39,6 @@ if (USE_CUSTOM_SDL_SHARED_LIB AND SHARED_LIB_PATH)
 endif ()
 
 
-
 add_executable(test-texture-file ppm_parser.cxx)
 
 target_link_libraries(test-texture-file PRIVATE GTest::GTest engine-includes)

@@ -1,26 +1,32 @@
 #include "sdl_ui.hxx"
 
-AbstractUI* create_renderer() {
+AbstractUI* create_renderer()
+{
     return new SDLUI();
 }
 
-void destroy_renderer(SDLUI* renderer) {
+void destroy_renderer(SDLUI* renderer)
+{
     delete renderer;
 }
 
-SDLUI::SDLUI() {
+SDLUI::SDLUI()
+{
     window_   = nullptr;
     renderer_ = nullptr;
 }
 
-SDLUI::~SDLUI() {
+SDLUI::~SDLUI()
+{
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     SDL_Quit();
 }
 
-void SDLUI::initialize() {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+void SDLUI::initialize()
+{
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
         std::cerr << "SDL initialization failed: " << SDL_GetError()
                   << std::endl;
         std::exit(EXIT_FAILURE);
@@ -28,7 +34,8 @@ void SDLUI::initialize() {
 
     window_ = SDL_CreateWindow(
         kWindowTitle_.data(), kWindowWidth_, kWindowHeight_, 0);
-    if (window_ == nullptr) {
+    if (window_ == nullptr)
+    {
         std::cerr << "Window creation failed: " << SDL_GetError() << std::endl;
         SDL_Quit();
         std::exit(EXIT_FAILURE);
@@ -36,7 +43,8 @@ void SDLUI::initialize() {
 
     renderer_ = SDL_CreateRenderer(
         window_, nullptr, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (renderer_ == nullptr) {
+    if (renderer_ == nullptr)
+    {
         std::cerr << "Renderer creation failed: " << SDL_GetError()
                   << std::endl;
         SDL_DestroyWindow(window_);
@@ -45,26 +53,31 @@ void SDLUI::initialize() {
     }
 }
 
-void SDLUI::reset() {
+void SDLUI::reset()
+{
     renderer_ = nullptr;
     window_   = nullptr;
 }
 
 void SDLUI::update() { }
 
-Event SDLUI::get_last_event() {
+Event SDLUI::get_last_event()
+{
     SDL_Event event_;
 
-    if (SDL_PollEvent(&event_) == 0) {
+    if (SDL_PollEvent(&event_) == 0)
+    {
         return Event::NOTHING_HAPPENED;
     }
 
-    switch (event_.type) {
+    switch (event_.type)
+    {
         case SDL_EVENT_QUIT:
             return Event::WINDOW_CLOSE;
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            switch (event_.button.button) {
+            switch (event_.button.button)
+            {
                 case SDL_BUTTON_LEFT:
                     return Event::LEFT_PRESSED;
                 case SDL_BUTTON_RIGHT:
@@ -75,7 +88,8 @@ Event SDLUI::get_last_event() {
             }
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            switch (event_.button.button) {
+            switch (event_.button.button)
+            {
                 case SDL_BUTTON_LEFT:
                     return Event::LEFT_RELEASED;
                 case SDL_BUTTON_RIGHT:
@@ -86,7 +100,8 @@ Event SDLUI::get_last_event() {
             }
             break;
         case SDL_EVENT_KEY_DOWN:
-            switch (event_.key.keysym.sym) {
+            switch (event_.key.keysym.sym)
+            {
                 case SDLK_UP:
                     return Event::UP_PRESSED;
                 case SDLK_DOWN:
@@ -107,7 +122,8 @@ Event SDLUI::get_last_event() {
             }
             break;
         case SDL_EVENT_KEY_UP:
-            switch (event_.key.keysym.sym) {
+            switch (event_.key.keysym.sym)
+            {
                 case SDLK_UP:
                     return Event::UP_RELEASED;
                 case SDLK_DOWN:
@@ -133,6 +149,7 @@ Event SDLUI::get_last_event() {
     return Event::NOTHING_HAPPENED;
 }
 
-void SDLUI::render() {
+void SDLUI::render()
+{
     SDL_RenderPresent(renderer_);
 }

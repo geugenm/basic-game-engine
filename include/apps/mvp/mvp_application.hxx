@@ -3,9 +3,11 @@
 #include "../abstract_application.hxx"
 #include "application_presenter.hxx"
 
-class AbstractMVPApplication : public AbstractApplication {
+class AbstractMVPApplication : public AbstractApplication
+{
 public:
-    explicit AbstractMVPApplication() {
+    explicit AbstractMVPApplication()
+    {
         model_     = create_application_model();
         view_      = create_application_view();
         presenter_ = create_application_presenter(view_, model_);
