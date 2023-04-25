@@ -19,25 +19,23 @@ public:
 
     void load() override {
         std::ifstream in_file(get_path(), std::ios_base::binary);
-        in_file.exceptions(std::ios_base::failbit);
+        in_file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
         std::string header, color_format;
-        int         width, height;
+        int width, height;
 
         in_file >> header >> width >> height >> color_format;
+        in_file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        if (in_file.get() != '\n') {
-            throw std::runtime_error("Expected newline after image metadata.");
-        }
+        auto texture_shape = texture_->get_shape();
+        texture_shape.set_dimensions(width, height);
+        texture_->set_shape(texture_shape);
 
-        texture_->set_dimensions(static_cast<size_t>(width),
-                                 static_cast<size_t>(height));
-
-        auto file_read_amount = texture_->get_pixel_array();
+        std::vector<ColorRGB> file_read_amount(texture_shape.area());
         in_file.read(reinterpret_cast<char*>(file_read_amount.data()),
-                     static_cast<long>(texture_->get_pixel_array().size() * sizeof(ColorRGB)));
+                     file_read_amount.size() * sizeof(ColorRGB));
 
-        if (in_file.bad()) {
+        if (!in_file) {
             throw std::runtime_error("Failed to read image data.");
         }
 
@@ -56,10 +54,13 @@ public:
         }
         out_file.exceptions(std::ios_base::failbit);
 
-        out_file << "P6\n" << texture_->get_width() << ' ' << texture_->get_height() << '\n' << "255\n";
+        out_file << "P6\n"
+                 << texture_->get_shape().width << ' '
+                 << texture_->get_shape().height << '\n'
+                 << "255\n";
 
-        const auto buffer_size =
-            static_cast<std::streamsize>(sizeof(ColorRGB) * texture_->get_pixel_array().size());
+        const auto buffer_size = static_cast<std::streamsize>(
+            sizeof(ColorRGB) * texture_->get_pixel_array().size());
         const char* written_data =
             reinterpret_cast<const char*>(texture_->get_pixel_array().data());
         out_file.write(written_data, buffer_size);
@@ -77,7 +78,7 @@ public:
         set_path(saved_path);
     }
 
-    [[nodiscard]] const Texture &get_texture() const {
+    [[nodiscard]] const Texture& get_texture() const {
         return *texture_;
     }
 
@@ -86,6 +87,13 @@ public:
             throw std::invalid_argument("Texture pointer is null");
         }
         texture_ = std::move(texture);
+    }
+
+    void set_texture(Texture* texture) {
+        if (!texture) {
+            throw std::invalid_argument("Texture pointer is null");
+        }
+        texture_.reset(texture);
     }
 
 private:

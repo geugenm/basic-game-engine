@@ -1,11 +1,18 @@
 #include "render/textures/ppm_handler.hxx"
 #include <gtest/gtest.h>
 
+
 class TextureFileTest : public testing::Test {
 protected:
-    void SetUp() override {
+    static void SetUpTestSuite() {
         std::filesystem::create_directory("test_files");
+    }
 
+    static void TearDownTestSuite() {
+        std::filesystem::remove_all("test_files");
+    }
+
+    void SetUp() override {
         std::ofstream out_file("test_files/test_texture.ppm",
                                std::ios_base::binary);
         out_file << "P6\n"
@@ -21,48 +28,51 @@ protected:
                  << static_cast<char>(255); // white
         out_file.close();
     }
-
-    void TearDown() override {
-        std::filesystem::remove_all("test_files");
-    }
 };
 
 TEST_F(TextureFileTest, LoadFile) {
-    PpmHandler texture_file("test_files/test_texture.ppm");
+    auto texture_file = PpmHandler("test_files/test_texture.ppm");
+
     texture_file.load();
 
-    EXPECT_EQ(texture_file.get_texture().get_width(), 2);
-    EXPECT_EQ(texture_file.get_texture().get_height(), 2);
+    const auto texture = texture_file.get_texture();
 
-    std::vector<ColorRGB> expected_pixels = { ColorRGB(255, 0, 0),
+    EXPECT_EQ(texture.get_shape().width, 2);
+    EXPECT_EQ(texture.get_shape().height, 2);
+
+    const std::vector<ColorRGB> expected_pixels = { ColorRGB(255, 0, 0),
                                               ColorRGB(0, 255, 0),
                                               ColorRGB(0, 0, 255),
                                               ColorRGB(255, 255, 255) };
-    EXPECT_EQ(texture_file.get_texture().get_pixel_array(), expected_pixels);
+    EXPECT_EQ(texture.get_pixel_array(), expected_pixels);
 }
 
 TEST_F(TextureFileTest, GetPixel) {
-    PpmHandler texture_file("test_files/test_texture.ppm");
+    auto texture_file = PpmHandler("test_files/test_texture.ppm");
+
     texture_file.load();
 
-    EXPECT_EQ(texture_file.get_texture().get_pixel(0, 0), ColorRGB(255, 0, 0));
-    EXPECT_EQ(texture_file.get_texture().get_pixel(1, 0), ColorRGB(0, 255, 0));
-    EXPECT_EQ(texture_file.get_texture().get_pixel(0, 1), ColorRGB(0, 0, 255));
-    EXPECT_EQ(texture_file.get_texture().get_pixel(1, 1), ColorRGB(255, 255, 255));
+    const auto texture = texture_file.get_texture();
 
-    EXPECT_THROW(texture_file.get_texture().get_pixel(2, 2), std::out_of_range);
+    EXPECT_EQ(texture.get_pixel({0, 0}), ColorRGB(255, 0, 0));
+    EXPECT_EQ(texture.get_pixel({1, 0}), ColorRGB(0, 255, 0));
+    EXPECT_EQ(texture.get_pixel({0, 1}), ColorRGB(0, 0, 255));
+    EXPECT_EQ(texture.get_pixel({1, 1}), ColorRGB(255, 255, 255));
+
+    EXPECT_THROW(texture.get_pixel({2, 2}), std::out_of_range);
 }
 
 TEST_F(TextureFileTest, SetPixel) {
-    PpmHandler texture_file("test_files/test_texture.ppm");
+    auto texture_file = PpmHandler("test_files/test_texture.ppm");
+
     texture_file.load();
 
-    auto temp_texture_file = texture_file.get_texture();
+    auto temp_texture = texture_file.get_texture();
 
-    temp_texture_file.set_pixel(0, 0, ColorRGB(0, 255, 0));
-    EXPECT_EQ(temp_texture_file.get_pixel(0, 0), ColorRGB(0, 255, 0));
+    temp_texture.set_pixel({0, 0}, ColorRGB(0, 255, 0));
+    EXPECT_EQ(temp_texture.get_pixel({0, 0}), ColorRGB(0, 255, 0));
 
-    EXPECT_THROW(temp_texture_file.set_pixel(2, 2, ColorRGB(255, 255, 255)),
+    EXPECT_THROW(temp_texture.set_pixel({2, 2}, ColorRGB(255, 255, 255)),
                  std::out_of_range);
 }
 
@@ -70,13 +80,13 @@ TEST_F(TextureFileTest, SetDimensions) {
     PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
-    auto temp_texture_file = texture_file.get_texture();
+    auto texture_shape = texture_file.get_texture().get_shape();
 
-    temp_texture_file.set_dimensions(1, 1);
-    EXPECT_EQ(temp_texture_file.get_width(), 1);
-    EXPECT_EQ(temp_texture_file.get_height(), 1);
+    texture_shape.set_dimensions(1, 1);
+    EXPECT_EQ(texture_shape.width, 1);
+    EXPECT_EQ(texture_shape.height, 1);
 
-    EXPECT_THROW(temp_texture_file.set_dimensions(0, 0), std::invalid_argument);
+    EXPECT_THROW(texture_shape.set_dimensions(0, 0), std::invalid_argument);
 }
 
 auto main(int argc, char** argv) -> int {
