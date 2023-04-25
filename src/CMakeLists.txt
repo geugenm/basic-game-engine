@@ -7,11 +7,6 @@ include(${CPM_PACKAGES_DIR}/sdl.cmake)
 include(${CPM_PACKAGES_DIR}/glog.cmake)
 include(${CPM_PACKAGES_DIR}/ccache.cmake)
 
-add_library(engine-includes INTERFACE)
-target_include_directories(engine-includes INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-        )
-
 add_executable(main main.cxx)
 
 add_subdirectory(sdl)
