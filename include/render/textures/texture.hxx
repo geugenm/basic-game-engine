@@ -10,7 +10,7 @@ class Texture final {
 public:
     Texture() = default;
 
-    explicit Texture(const Canvas& shape, const std::vector<ColorRGB>& pixels)
+    explicit Texture(const BoundingBox& shape, const std::vector<ColorRGB>& pixels)
         : pixels_(pixels)
         , shape_(shape) { }
 
@@ -54,12 +54,12 @@ public:
         pixels_[position.y * shape_.width + position.x] = color;
     }
 
-    void set_shape(const Canvas& shape) {
+    void set_shape(const BoundingBox& shape) {
         shape_ = shape;
         resize_pixels();
     }
 
-    [[nodiscard]] const Canvas& get_shape() const {
+    [[nodiscard]] const BoundingBox& get_shape() const {
         return shape_;
     }
 
@@ -78,7 +78,7 @@ public:
 
 private:
     std::vector<ColorRGB> pixels_;
-    Canvas                shape_;
+    BoundingBox           shape_;
 
     void resize_pixels() {
         pixels_.resize(shape_.area());

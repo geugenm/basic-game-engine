@@ -61,7 +61,7 @@ public:
             in_file >> header >> width >> height >> color_format;
             in_file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-            Canvas texture_shape(width, height);
+            BoundingBox texture_shape(width, height);
             texture_->set_shape(texture_shape);
 
             std::vector<ColorRGB> file_read_amount(texture_shape.area());

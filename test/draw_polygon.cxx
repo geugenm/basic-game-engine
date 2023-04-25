@@ -10,10 +10,13 @@ TEST(Polygon2DTest, DrawPolygonTest) {
 
     Polygon2D polygon(start, end);
 
-    polygon.draw(ColorRGB{0, 0, 255});
+    Texture texture;
+    texture.set_shape(BoundingBox(start, end));
+
+    polygon.draw_on(texture, ColorRGB{0, 0, 255});
 
     std::filesystem::path path("test_polygon.ppm");
-    PpmHandler            handler(path, polygon.get_texture());
+    PpmHandler            handler(path, texture);
     handler.save();
 }
 

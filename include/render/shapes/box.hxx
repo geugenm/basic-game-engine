@@ -7,31 +7,31 @@
 #include <random>
 #include <stdexcept>
 
-struct Canvas {
+struct BoundingBox {
     std::size_t width  = 0;
     std::size_t height = 0;
 
-    constexpr Canvas() = default;
+    constexpr BoundingBox() = default;
 
-    Canvas(const std::size_t& new_width, const std::size_t& new_height) {
+    BoundingBox(const std::size_t& new_width, const std::size_t& new_height) {
         set_dimensions(new_width, new_height);
     }
 
-    Canvas(const std::int32_t& new_width, const std::int32_t& new_height) {
+    BoundingBox(const std::int32_t& new_width, const std::int32_t& new_height) {
         set_dimensions(new_width, new_height);
     }
 
-    Canvas(const Position2D & start, const Position2D & end) {
-        width = static_cast<size_t>(std::abs(end.x - start.x + 1));
+    BoundingBox(const Position2D& start, const Position2D& end) {
+        width  = static_cast<size_t>(std::abs(end.x - start.x + 1));
         height = static_cast<size_t>(std::abs(end.y - start.y + 1));
     }
 
-    Canvas(const Canvas& other) {
+    BoundingBox(const BoundingBox& other) {
         width  = other.width;
         height = other.height;
     }
 
-    Canvas& operator=(const Canvas& other) {
+    BoundingBox& operator=(const BoundingBox& other) {
         if (this == &other) {
             return *this;
         }
@@ -40,14 +40,14 @@ struct Canvas {
         return *this;
     }
 
-    Canvas(Canvas&& other) noexcept {
+    BoundingBox(BoundingBox&& other) noexcept {
         width        = other.width;
         height       = other.height;
         other.width  = 0;
         other.height = 0;
     }
 
-    Canvas& operator=(Canvas&& other) noexcept {
+    BoundingBox& operator=(BoundingBox&& other) noexcept {
         if (this == &other) {
             return *this;
         }
@@ -58,24 +58,19 @@ struct Canvas {
         return *this;
     }
 
-    bool operator!=(const Canvas& other) const {
+    bool operator!=(const BoundingBox& other) const {
         return (width != other.width) || (height != other.height);
     }
 
-    bool operator<(const Canvas& other) const {
+    bool operator<(const BoundingBox& other) const {
         return area() < other.area();
     }
 
-    bool operator>(const Canvas& other) const {
+    bool operator>(const BoundingBox& other) const {
         return area() > other.area();
     }
 
-    std::ostream& operator<<(std::ostream& os) const {
-        os << "Rectangle: " << width << " x " << height;
-        return os;
-    }
-
-    ~Canvas() = default;
+    ~BoundingBox() = default;
 
     [[nodiscard]] std::size_t area() const {
         return width * height;
