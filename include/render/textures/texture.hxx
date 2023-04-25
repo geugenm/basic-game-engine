@@ -49,13 +49,14 @@ public:
 
     void set_pixel(const Position2D& position, const ColorRGB& color) {
         if (shape_.contains(position) == false) {
-            throw std::out_of_range("Error: Pixel position out of range.");
+            throw std::out_of_range("Error: Pixel position: " + position.string() + " out of range: " + shape_.string());
         }
         pixels_[position.y * shape_.width + position.x] = color;
     }
 
     void set_shape(const Box2D& shape) {
         shape_ = shape;
+        resize_pixels();
     }
 
     [[nodiscard]] const Box2D& get_shape() const {

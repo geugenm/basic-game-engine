@@ -9,7 +9,6 @@ public:
         : start_(start)
         , end_(end)
         , texture_(std::make_unique<Texture>()) {
-        auto a = std::min(start_.x, end_.x);
         Box2D box = {std::abs(std::max(start_.x, end_.x)), std::abs(std::max(start_.y, end_.y))};
         texture_->set_shape(box);
     }
@@ -46,7 +45,9 @@ public:
         int y   = y0;
 
         while (true) {
-            texture_->set_pixel({ x, y }, color);
+            if (texture_->get_shape().contains({x, y})) {
+                texture_->set_pixel({ x, y }, color);
+            }
 
             if (x == x1 && y == y1) {
                 break;

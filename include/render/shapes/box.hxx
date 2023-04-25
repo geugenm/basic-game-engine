@@ -11,6 +11,8 @@ struct Box2D {
     std::size_t width  = 0;
     std::size_t height = 0;
 
+    Position2D position = {};
+
     constexpr Box2D() = default;
 
     Box2D(const std::size_t& new_width, const std::size_t& new_height) {
@@ -101,11 +103,8 @@ struct Box2D {
                point.y < static_cast<int32_t>(height);
     }
 
-    [[nodiscard]] Position2D random_point() const {
-        static std::random_device              rd;
-        static std::mt19937                    gen(rd());
-        std::uniform_int_distribution<int32_t> dist_x(0, static_cast<int32_t>(width) - 1);
-        std::uniform_int_distribution<int32_t> dist_y(0, static_cast<int32_t>(height) - 1);
-        return { dist_x(gen), dist_y(gen) };
+    [[nodiscard]] std::string string() const {
+        return std::string("[") + std::to_string(width) + "x" + std::to_string(height) + "]" +
+               " on position: " + position.string();
     }
 };

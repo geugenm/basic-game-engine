@@ -7,7 +7,6 @@
 struct Position2D {
     int32_t x = 0;
     int32_t y = 0;
-    int32_t coordinates_center = 0;
 
     constexpr Position2D() = default;
 
@@ -44,6 +43,10 @@ struct Position2D {
     void scale(double scale_x, double scale_y) {
         x *= scale_x;
         y *= scale_y;
+    }
+
+    [[nodiscard]] std::string string() const {
+        return std::string("(") + std::to_string(x) + ", " + std::to_string(y) + ")";
     }
 
     static Position2D generate_random(const int32_t& from, const int32_t& to) {

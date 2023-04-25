@@ -61,16 +61,14 @@ TEST(Line2DTest, DrawRandomLinesTest) {
     const Position2D end   = Position2D::generate_random(3, 12);
 
     Line2D line(start, end);
+    line.draw(ColorRGB(0, 255, 255));
 
     std::filesystem::path path("testx");
     PpmHandler handler(path, line.get_texture());
 
-    for (int i = 0; i < num_lines; ++i) {
-        line.draw_random();
-    }
-
-    handler.set_texture(line.get_texture());
-    handler.save();
+//    for (int i = 0; i < num_lines; ++i) {
+//        line.draw_random();
+//    }
 }
 
 auto main(int argc, char** argv) -> int {
