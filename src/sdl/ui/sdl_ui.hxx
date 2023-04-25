@@ -5,8 +5,7 @@
 #include "SDL3/SDL.h"
 #include <iostream>
 
-class SDLUI : public AbstractUI
-{
+class SDLUI : public AbstractUI {
 public:
     explicit SDLUI();
 

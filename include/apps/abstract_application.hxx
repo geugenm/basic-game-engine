@@ -1,7 +1,6 @@
 #pragma once
 
-class AbstractApplication
-{
+class AbstractApplication {
 public:
     virtual ~AbstractApplication() = default;
 

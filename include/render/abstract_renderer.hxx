@@ -6,8 +6,7 @@
 #include <memory>
 #include <vector>
 
-struct IRender
-{
+struct IRender {
     virtual void clear(const ColorRGB& color)                               = 0;
     virtual void set_pixel(const Position& position, const ColorRGB& color) = 0;
     virtual std::vector<Position> pixels_positions(const Position& start,

@@ -1,7 +1,6 @@
 #pragma once
 
-class IDLLReloader
-{
+class IDLLReloader {
 public:
     virtual ~IDLLReloader() = default;
 

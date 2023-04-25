@@ -1,11 +1,9 @@
 #include "render/textures/ppm_handler.hxx"
 #include <gtest/gtest.h>
 
-class TextureFileTest : public testing::Test
-{
+class TextureFileTest : public testing::Test {
 protected:
-    void SetUp() override
-    {
+    void SetUp() override {
         std::filesystem::create_directory("test_files");
 
         std::ofstream out_file("test_files/test_texture.ppm",
@@ -24,11 +22,12 @@ protected:
         out_file.close();
     }
 
-    void TearDown() override { std::filesystem::remove_all("test_files"); }
+    void TearDown() override {
+        std::filesystem::remove_all("test_files");
+    }
 };
 
-TEST_F(TextureFileTest, LoadFile)
-{
+TEST_F(TextureFileTest, LoadFile) {
     PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
@@ -42,8 +41,7 @@ TEST_F(TextureFileTest, LoadFile)
     EXPECT_EQ(texture_file.get_pixels(), expected_pixels);
 }
 
-TEST_F(TextureFileTest, GetPixel)
-{
+TEST_F(TextureFileTest, GetPixel) {
     PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
@@ -55,8 +53,7 @@ TEST_F(TextureFileTest, GetPixel)
     EXPECT_THROW(texture_file.get_pixel(2, 2), std::out_of_range);
 }
 
-TEST_F(TextureFileTest, SetPixel)
-{
+TEST_F(TextureFileTest, SetPixel) {
     PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
@@ -67,8 +64,7 @@ TEST_F(TextureFileTest, SetPixel)
                  std::out_of_range);
 }
 
-TEST_F(TextureFileTest, SetDimensions)
-{
+TEST_F(TextureFileTest, SetDimensions) {
     PpmHandler texture_file("test_files/test_texture.ppm");
     texture_file.load();
 
@@ -79,8 +75,7 @@ TEST_F(TextureFileTest, SetDimensions)
     EXPECT_THROW(texture_file.set_dimensions(0, 0), std::invalid_argument);
 }
 
-auto main(int argc, char** argv) -> int
-{
+auto main(int argc, char** argv) -> int {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

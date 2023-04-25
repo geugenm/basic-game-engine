@@ -2,8 +2,7 @@
 
 #include "events/events.hxx"
 
-struct AbstractUI
-{
+struct AbstractUI {
     virtual ~AbstractUI()     = default;
     virtual void initialize() = 0;
 

@@ -1,7 +1,6 @@
 #pragma once
 
-class ApplicationModel
-{
+class ApplicationModel {
 public:
     virtual ~ApplicationModel() = default;
     virtual void initialize()   = 0;

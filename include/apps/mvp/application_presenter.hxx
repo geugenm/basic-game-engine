@@ -6,25 +6,20 @@
 
 #include <stdexcept>
 
-class ApplicationPresenter
-{
+class ApplicationPresenter {
 public:
-    explicit ApplicationPresenter()
-    {
+    explicit ApplicationPresenter() {
         model_ = create_application_model();
         view_  = create_application_view();
     }
 
     explicit ApplicationPresenter(ApplicationView*  view,
-                                  ApplicationModel* model)
-    {
-        if (view == nullptr)
-        {
+                                  ApplicationModel* model) {
+        if (view == nullptr) {
             throw std::invalid_argument("Given view pointer is null");
         }
 
-        if (model == nullptr)
-        {
+        if (model == nullptr) {
             throw std::invalid_argument("Given model pointer is null");
         }
 

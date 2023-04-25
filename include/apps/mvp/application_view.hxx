@@ -2,8 +2,7 @@
 
 #include "events/events.hxx"
 
-class ApplicationView
-{
+class ApplicationView {
 public:
     virtual ~ApplicationView() = default;
 

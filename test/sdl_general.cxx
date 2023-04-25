@@ -12,8 +12,7 @@
  *
  * Checks that the compiled version of SDL matches the linked version.
  */
-TEST(SDLTest, SDLVersion)
-{
+TEST(SDLTest, SDLVersion) {
     SDL_version compiled_version = { 0, 0, 0 };
     SDL_version linked_version   = { 0, 0, 0 };
 
@@ -41,8 +40,7 @@ TEST(SDLTest, SDLVersion)
  * Checks that SDL initializes correctly by creating a window and renderer,
  * and then destroying them.
  */
-TEST(SDLTest, SDLInitialization)
-{
+TEST(SDLTest, SDLInitialization) {
     constexpr uint16_t kWindowHeight = 120;
     constexpr uint16_t kWindowWidth  = 120;
 
@@ -63,8 +61,7 @@ TEST(SDLTest, SDLInitialization)
     SDL_Quit();
 }
 
-auto main(int argc, char** argv) -> int
-{
+auto main(int argc, char** argv) -> int {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
