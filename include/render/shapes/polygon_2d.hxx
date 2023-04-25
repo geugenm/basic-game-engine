@@ -1,11 +1,12 @@
 #pragma once
 
 #include "render/shapes/abstract_shape.hxx"
+#include "render/shapes/line_2d.hxx"
 #include "render/textures/texture.hxx"
 
-class Line2D : public Shape2D {
+class Polygon2D : public Shape2D {
 public:
-    Line2D(const Position2D& start, const Position2D& end)
+    Polygon2D(const Position2D& start, const Position2D& end)
         : start_(start)
         , end_(end)
         , texture_(std::make_unique<Texture>()) {
@@ -13,103 +14,38 @@ public:
         texture_->set_shape(box);
     }
 
-    Line2D(const Line2D& other)
+    Polygon2D(const Polygon2D& other)
         : Shape2D(other)
         , start_(other.start_)
         , end_(other.end_)
         , texture_(other.texture_ ? std::make_unique<Texture>(*other.texture_) : nullptr) { }
 
-    void draw_on(Texture & texture, const ColorRGB& color) const {
-        int x0 = start_.x;
-        int y0 = start_.y;
-        int x1 = end_.x;
-        int y1 = end_.y;
-
-        const int dx = std::abs(x1 - x0);
-        const int dy = std::abs(y1 - y0);
-
-        int sx, sy;
-        if (x0 < x1) {
-            sx = 1;
-        } else {
-            sx = -1;
-        }
-        if (y0 < y1) {
-            sy = 1;
-        } else {
-            sy = -1;
-        }
-
-        int err = dx - dy;
-        int x   = x0;
-        int y   = y0;
-
-        while (true) {
-            if (texture.get_shape().contains({x, y})) {
-                texture.set_pixel({ x, y }, color);
-            }
-            else {
-                break ;
-            }
-
-            if (x == x1 && y == y1) {
-                break;
-            }
-
-            int e2 = 2 * err;
-            if (e2 > -dy) {
-                err -= dy;
-                x += sx;
-            }
-            if (e2 < dx) {
-                err += dx;
-                y += sy;
-            }
-        }
-    }
-
     void draw(const ColorRGB& color) const override {
-        int x0 = start_.x;
-        int y0 = start_.y;
-        int x1 = end_.x;
-        int y1 = end_.y;
+        const int num_sides = 3; // change as needed
+        const double angle = 2.0 * M_PI / num_sides;
 
-        const int dx = std::abs(x1 - x0);
-        const int dy = std::abs(y1 - y0);
-
-        int sx, sy;
-        if (x0 < x1) {
-            sx = 1;
-        } else {
-            sx = -1;
-        }
-        if (y0 < y1) {
-            sy = 1;
-        } else {
-            sy = -1;
+        std::vector<Position2D> vertices(num_sides);
+        const double radius_x = static_cast<double>(texture_->get_shape().width) / 2.0;
+        const double radius_y = static_cast<double>(texture_->get_shape().height) / 2.0;
+        const Position2D center{static_cast<int>(radius_x) - 1, static_cast<int>(radius_y) - 1};
+        for (int i = 0; i < num_sides; ++i) {
+            const double theta = angle * i;
+            const double x = center.x + radius_x * std::cos(theta);
+            const double y = center.y + radius_y * std::sin(theta);
+            vertices[i] = Position2D{static_cast<int>(x), static_cast<int>(y)};
         }
 
-        int err = dx - dy;
-        int x   = x0;
-        int y   = y0;
-
-        while (true) {
-            texture_->set_pixel({ x, y }, color);
-
-            if (x == x1 && y == y1) {
-                break;
-            }
-
-            int e2 = 2 * err;
-            if (e2 > -dy) {
-                err -= dy;
-                x += sx;
-            }
-            if (e2 < dx) {
-                err += dx;
-                y += sy;
-            }
+        const int num_edges = num_sides - 1;
+        for (int i = 0; i < num_edges; ++i) {
+            const Position2D& p1 = vertices[i];
+            const Position2D& p2 = vertices[i+1];
+            Line2D l(p1, p2);
+            l.draw_on(*texture_, color);
         }
+        const Position2D& p1 = vertices[num_sides-1];
+        const Position2D& p2 = vertices[0];
+        Line2D l(p1, p2);
+        l.draw_on(*texture_, color);
     }
 
     void draw_random() {
@@ -164,7 +100,7 @@ public:
     }
 
     [[nodiscard]] std::unique_ptr<Shape2D> clone() const override {
-        return std::make_unique<Line2D>(*this);
+        return std::make_unique<Polygon2D>(*this);
     }
 
     [[nodiscard]] std::string string() const override {
