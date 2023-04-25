@@ -12,15 +12,15 @@
 class PpmHandler : public File {
 public:
     explicit PpmHandler(const std::filesystem::path& file_path)
-        : File(file_path),
-        texture_(std::make_unique<Texture>()) {}
+        : File(file_path)
+        , texture_(std::make_unique<Texture>()) { }
 
     void load() override {
         std::ifstream in_file(get_path(), std::ios_base::binary);
         in_file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
         std::string header, color_format;
-        int width, height;
+        int         width, height;
 
         in_file >> header >> width >> height >> color_format;
         in_file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -29,8 +29,9 @@ public:
         texture_->set_shape(texture_shape);
 
         std::vector<ColorRGB> file_read_amount(texture_shape.area());
-        in_file.read(reinterpret_cast<char*>(file_read_amount.data()),
-                     static_cast<long>(file_read_amount.size() * sizeof(ColorRGB)));
+        in_file.read(
+            reinterpret_cast<char*>(file_read_amount.data()),
+            static_cast<long>(file_read_amount.size() * sizeof(ColorRGB)));
 
         if (!in_file) {
             throw std::runtime_error("Failed to read image data.");

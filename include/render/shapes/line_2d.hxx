@@ -5,13 +5,9 @@
 
 class LineRender2D : public IRender {
 public:
-    LineRender2D(const Texture& texture) {
+    LineRender2D(const Texture& texture) { }
 
-    }
-
-    void clear(const ColorRGB & color) override {
-
-    }
+    void clear(const ColorRGB& color) override { }
 
 private:
     std::unique_ptr<Texture> texture_;

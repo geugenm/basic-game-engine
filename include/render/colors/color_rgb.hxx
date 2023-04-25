@@ -9,9 +9,9 @@
 #pragma pack(push, 1)
 
 struct ColorRGB {
-    std::uint8_t red = 0;
+    std::uint8_t red   = 0;
     std::uint8_t green = 0;
-    std::uint8_t blue = 0;
+    std::uint8_t blue  = 0;
 
     ColorRGB() = default;
 

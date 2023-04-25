@@ -18,8 +18,8 @@ struct Position2D {
     }
 
     friend constexpr Position2D operator-(const Position2D& left,
-                                        const Position2D& right) {
-        return {left.x - right.x, left.y - right.y};
+                                          const Position2D& right) {
+        return { left.x - right.x, left.y - right.y };
     }
 
     friend constexpr bool operator==(const Position2D& left,
@@ -32,6 +32,6 @@ struct Position2D {
         static std::mt19937                    gen(rd());
         std::uniform_int_distribution<int32_t> dist_x(0, width - 1);
         std::uniform_int_distribution<int32_t> dist_y(0, height - 1);
-        return {dist_x(gen), dist_y(gen)};
+        return { dist_x(gen), dist_y(gen) };
     }
 };

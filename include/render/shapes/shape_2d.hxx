@@ -14,12 +14,12 @@ struct Shape2D {
     constexpr Shape2D() = default;
 
     explicit Shape2D(const std::size_t& new_width,
-                               const std::size_t& new_height) {
+                     const std::size_t& new_height) {
         set_dimensions(new_width, new_height);
     }
 
     explicit Shape2D(const std::int32_t& new_width,
-                               const std::int32_t& new_height) {
+                     const std::int32_t& new_height) {
         set_dimensions(new_width, new_height);
     }
 

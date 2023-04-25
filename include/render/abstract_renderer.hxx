@@ -7,10 +7,11 @@
 #include <vector>
 
 struct IRender {
-    virtual void clear(const ColorRGB& color)                               = 0;
-    virtual void set_pixel(const Position2D& position, const ColorRGB& color) = 0;
+    virtual void                    clear(const ColorRGB& color)            = 0;
+    virtual void                    set_pixel(const Position2D& position,
+                                              const ColorRGB&   color)        = 0;
     virtual std::vector<Position2D> pixels_positions(const Position2D& start,
-                                                   const Position2D& end)     = 0;
+                                                     const Position2D& end) = 0;
 
     virtual ~IRender()                 = default;
     IRender()                          = default;

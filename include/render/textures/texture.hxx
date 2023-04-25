@@ -28,7 +28,7 @@ public:
         pixels_[position.y * shape_.width + position.x] = color;
     }
 
-    void set_shape(const Shape2D & shape) {
+    void set_shape(const Shape2D& shape) {
         shape_ = shape;
     }
 
