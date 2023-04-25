@@ -14,5 +14,4 @@ public:
 };
 
 extern "C" ApplicationView* create_application_view();
-extern "C" void             destroy_application_view(
-                ApplicationView* application_presenter);
+extern "C" void             destroy_application_view(ApplicationView* application_presenter);

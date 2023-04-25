@@ -33,7 +33,7 @@ public:
      * @param delta_x The amount to move the shape in the x direction
      * @param delta_y The amount to move the shape in the y direction
      */
-    virtual void move(const Position2D & delta) = 0;
+    virtual void move(const Position2D& delta) = 0;
 
     /**
      * @brief Scales the shape by the given amount in the x and y directions
@@ -49,7 +49,7 @@ public:
      * @param center_x The x coordinate of the rotation center
      * @param center_y The y coordinate of the rotation center
      */
-    virtual void rotate(double angle, int center_x, int center_y) = 0;
+    virtual void rotate(double angle, const Position2D& center) = 0;
 
     /**
      * @brief Returns the area of the shape

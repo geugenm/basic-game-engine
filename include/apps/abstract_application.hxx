@@ -10,4 +10,4 @@ public:
 };
 
 extern "C" AbstractApplication* create_application();
-extern "C" void destroy_application(AbstractApplication* application);
+extern "C" void                 destroy_application(AbstractApplication* application);

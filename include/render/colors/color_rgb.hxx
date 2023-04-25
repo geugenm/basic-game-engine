@@ -37,37 +37,21 @@ struct ColorRGB {
     }
 
     ColorRGB operator+(const ColorRGB& other) const {
-        return {
-            static_cast<std::uint8_t>(std::min(
-                static_cast<int>(red) + static_cast<int>(other.red), 255)),
-            static_cast<std::uint8_t>(std::min(
-                static_cast<int>(green) + static_cast<int>(other.green), 255)),
-            static_cast<std::uint8_t>(std::min(
-                static_cast<int>(blue) + static_cast<int>(other.blue), 255))
-        };
+        return { static_cast<std::uint8_t>(std::min(static_cast<int>(red) + static_cast<int>(other.red), 255)),
+                 static_cast<std::uint8_t>(std::min(static_cast<int>(green) + static_cast<int>(other.green), 255)),
+                 static_cast<std::uint8_t>(std::min(static_cast<int>(blue) + static_cast<int>(other.blue), 255)) };
     }
 
     ColorRGB operator-(const ColorRGB& other) const {
-        return {
-            static_cast<std::uint8_t>(std::max(
-                static_cast<int>(red) - static_cast<int>(other.red), 0)),
-            static_cast<std::uint8_t>(std::max(
-                static_cast<int>(green) - static_cast<int>(other.green), 0)),
-            static_cast<std::uint8_t>(std::max(
-                static_cast<int>(blue) - static_cast<int>(other.blue), 0))
-        };
+        return { static_cast<std::uint8_t>(std::max(static_cast<int>(red) - static_cast<int>(other.red), 0)),
+                 static_cast<std::uint8_t>(std::max(static_cast<int>(green) - static_cast<int>(other.green), 0)),
+                 static_cast<std::uint8_t>(std::max(static_cast<int>(blue) - static_cast<int>(other.blue), 0)) };
     }
 
     ColorRGB operator*(float scalar) const {
-        return {
-            static_cast<std::uint8_t>(std::max(
-                std::min(static_cast<int>(std::round(red * scalar)), 255), 0)),
-            static_cast<std::uint8_t>(std::max(
-                std::min(static_cast<int>(std::round(green * scalar)), 255),
-                0)),
-            static_cast<std::uint8_t>(std::max(
-                std::min(static_cast<int>(std::round(blue * scalar)), 255), 0))
-        };
+        return { static_cast<std::uint8_t>(std::max(std::min(static_cast<int>(std::round(red * scalar)), 255), 0)),
+                 static_cast<std::uint8_t>(std::max(std::min(static_cast<int>(std::round(green * scalar)), 255), 0)),
+                 static_cast<std::uint8_t>(std::max(std::min(static_cast<int>(std::round(blue * scalar)), 255), 0)) };
     }
 };
 

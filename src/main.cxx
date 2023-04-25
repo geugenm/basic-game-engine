@@ -28,8 +28,7 @@ int main() {
     try {
         game->initialize();
     } catch (const std::exception& ex) {
-        std::cerr << "Failed to initialize application: " << ex.what()
-                  << std::endl;
+        std::cerr << "Failed to initialize application: " << ex.what() << std::endl;
         destroy_application(game);
         return EXIT_FAILURE;
     }

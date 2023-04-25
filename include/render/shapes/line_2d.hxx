@@ -1,71 +1,155 @@
 #pragma once
 
-#include "render/abstract_renderer.hxx"
+#include "render/shapes/abstract_shape.hxx"
 #include "render/textures/texture.hxx"
 
-/**
- * A class for rendering 2D lines using the Bresenham algorithm.
- */
-class LineRender2D {
+class Line2D : public Shape2D {
 public:
-    /**
-     * Constructs a new LineRender2D object with the given texture.
-     * @param texture The texture to draw the lines on.
-     */
-    explicit LineRender2D(const Texture& texture)
-        : texture_(std::make_unique<Texture>(texture)) { }
+    Line2D(const Position2D& start, const Position2D& end)
+        : start_(start)
+        , end_(end)
+        , texture_(std::make_unique<Texture>()) {
+        auto a = std::min(start_.x, end_.x);
+        Box2D box = {std::abs(std::max(start_.x, end_.x)), std::abs(std::max(start_.y, end_.y))};
+        texture_->set_shape(box);
+    }
 
-    /**
-     * @brief Draws a 2D line using Bresenham's algorithm.
-     *
-     * @param start The starting position of the line.
-     * @param end The ending position of the line.
-     * @param color The color of the line.
-     */
-    void draw(const Position2D& start,
-              const Position2D& end,
-              const ColorRGB&   color) {
-        int x0 = start.x;
-        int y0 = start.y;
-        int x1 = end.x;
-        int y1 = end.y;
+    Line2D(const Line2D& other)
+        : Shape2D(other)
+        , start_(other.start_)
+        , end_(other.end_)
+        , texture_(other.texture_ ? std::make_unique<Texture>(*other.texture_) : nullptr) { }
+
+    void draw(const ColorRGB& color) const override {
+        int x0 = start_.x;
+        int y0 = start_.y;
+        int x1 = end_.x;
+        int y1 = end_.y;
 
         const int dx = std::abs(x1 - x0);
         const int dy = std::abs(y1 - y0);
-        const int sx = x0 < x1 ? 1 : -1;
-        const int sy = y0 < y1 ? 1 : -1;
+
+        int sx, sy;
+        if (x0 < x1) {
+            sx = 1;
+        } else {
+            sx = -1;
+        }
+        if (y0 < y1) {
+            sy = 1;
+        } else {
+            sy = -1;
+        }
 
         int err = dx - dy;
-        int e2;
+        int x   = x0;
+        int y   = y0;
 
-        bool is_line_finished = false;
-        while (is_line_finished == false) {
-            texture_->set_pixel({ x0, y0 }, color);
+        while (true) {
+            texture_->set_pixel({ x, y }, color);
 
-            if (x0 == x1 && y0 == y1) {
+            if (x == x1 && y == y1) {
                 break;
             }
 
-            e2 = 2 * err;
+            int e2 = 2 * err;
             if (e2 > -dy) {
                 err -= dy;
-                x0 += sx;
+                x += sx;
             }
             if (e2 < dx) {
                 err += dx;
-                y0 += sy;
+                y += sy;
             }
         }
     }
 
-    /**
-     * Returns the texture that the lines are being drawn on.
-     * @return The texture object.
-     */
+    void draw_random() {
+        const auto texture_width  = static_cast<int32_t>(texture_->get_shape().width);
+        const auto texture_height = static_cast<int32_t>(texture_->get_shape().height);
+
+        const Position2D start_container = start_;
+        const Position2D end_container   = end_;
+
+        start_ = Position2D::generate_random(texture_width, texture_height);
+        end_   = Position2D::generate_random(texture_width, texture_height);
+
+        draw(ColorRGB { 255, 255, 255 });
+        start_ = start_container;
+        end_   = end_container;
+    }
+
+    void move(const Position2D& delta) override {
+        start_ += delta;
+        end_ += delta;
+    }
+
+    void scale(double scale_x, double scale_y) override {
+        start_.scale(scale_x, scale_y);
+        end_.scale(scale_x, scale_y);
+    }
+
+    void rotate(double angle, const Position2D& center) override {
+        const double radians = angle * (M_PI / 180.0);
+
+        start_.x -= center.x;
+        start_.y -= center.y;
+        end_.x -= center.x;
+        end_.y -= center.y;
+
+        const double new_start_x = start_.x * std::cos(radians) - start_.y * std::sin(radians);
+        const double new_start_y = start_.x * std::sin(radians) + start_.y * std::cos(radians);
+        const double new_end_x   = end_.x * std::cos(radians) - end_.y * std::sin(radians);
+        const double new_end_y   = end_.x * std::sin(radians) + end_.y * std::cos(radians);
+
+        start_.x = static_cast<int32_t>(new_start_x + center.x);
+        start_.y = static_cast<int32_t>(new_start_y + center.y);
+        end_.x   = static_cast<int32_t>(new_end_x + center.x);
+        end_.y   = static_cast<int32_t>(new_end_y + center.y);
+    }
+
+    [[nodiscard]] double area() const override {
+        return 0.0;
+    }
+
+    [[nodiscard]] double perimeter() const override {
+        return std::sqrt(std::pow(end_.x - start_.x, 2) + std::pow(end_.y - start_.y, 2));
+    }
+
+    [[nodiscard]] std::unique_ptr<Shape2D> clone() const override {
+        return std::make_unique<Line2D>(*this);
+    }
+
+    [[nodiscard]] const Position2D& get_start() const {
+        return start_;
+    }
+
+    void set_start(const Position2D& start) {
+        start_ = start;
+    }
+
+    [[nodiscard]] const Position2D& get_end() const {
+        return end_;
+    }
+
+    void set_end(const Position2D& end) {
+        end_ = end;
+    }
+
     [[nodiscard]] const Texture& get_texture() const {
         return *texture_;
     }
 
+    void set_texture(std::unique_ptr<Texture> texture) {
+        if (texture == nullptr) {
+            throw std::invalid_argument("Given texture is null");
+        }
+        texture_ = std::move(texture);
+    }
+
 private:
+    Position2D start_;
+    Position2D end_;
+
     std::unique_ptr<Texture> texture_;
 };

@@ -20,4 +20,4 @@ protected:
 };
 
 extern "C" AbstractMVPApplication* create_mvp_application();
-extern "C" void destroy_mvp_application(AbstractMVPApplication* application);
+extern "C" void                    destroy_mvp_application(AbstractMVPApplication* application);

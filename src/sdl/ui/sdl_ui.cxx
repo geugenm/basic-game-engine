@@ -21,24 +21,20 @@ SDLUI::~SDLUI() {
 
 void SDLUI::initialize() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        std::cerr << "SDL initialization failed: " << SDL_GetError()
-                  << std::endl;
+        std::cerr << "SDL initialization failed: " << SDL_GetError() << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
-    window_ = SDL_CreateWindow(
-        kWindowTitle_.data(), kWindowWidth_, kWindowHeight_, 0);
+    window_ = SDL_CreateWindow(kWindowTitle_.data(), kWindowWidth_, kWindowHeight_, 0);
     if (window_ == nullptr) {
         std::cerr << "Window creation failed: " << SDL_GetError() << std::endl;
         SDL_Quit();
         std::exit(EXIT_FAILURE);
     }
 
-    renderer_ = SDL_CreateRenderer(
-        window_, nullptr, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer_ = SDL_CreateRenderer(window_, nullptr, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer_ == nullptr) {
-        std::cerr << "Renderer creation failed: " << SDL_GetError()
-                  << std::endl;
+        std::cerr << "Renderer creation failed: " << SDL_GetError() << std::endl;
         SDL_DestroyWindow(window_);
         SDL_Quit();
         std::exit(EXIT_FAILURE);

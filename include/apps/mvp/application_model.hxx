@@ -7,4 +7,4 @@ public:
 };
 
 extern "C" ApplicationModel* create_application_model();
-extern "C" void destroy_application_model(ApplicationModel* application_model);
+extern "C" void              destroy_application_model(ApplicationModel* application_model);

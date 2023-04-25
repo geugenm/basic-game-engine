@@ -6,13 +6,39 @@
 #include <stdexcept>
 #include <vector>
 
-class Texture {
+class Texture final {
 public:
     Texture() = default;
 
-    Texture(const Box2D& shape, const std::vector<ColorRGB>& pixels)
+    explicit Texture(const Box2D& shape, const std::vector<ColorRGB>& pixels)
         : pixels_(pixels)
         , shape_(shape) { }
+
+    explicit Texture(const Texture& other)
+        : pixels_(other.pixels_)
+        , shape_(other.shape_) { }
+
+    Texture(Texture&& other) noexcept
+        : pixels_(std::move(other.pixels_))
+        , shape_(std::move(other.shape_)) { }
+
+    Texture& operator=(const Texture& other) {
+        if (this != &other) {
+            pixels_ = other.pixels_;
+            shape_  = other.shape_;
+        }
+        return *this;
+    }
+
+    Texture& operator=(Texture&& other) noexcept {
+        if (this != &other) {
+            pixels_ = std::move(other.pixels_);
+            shape_  = std::move(other.shape_);
+        }
+        return *this;
+    }
+
+    ~Texture() = default;
 
     [[nodiscard]] const ColorRGB& get_pixel(const Position2D& position) const {
         if (shape_.contains(position) == false) {
@@ -53,5 +79,3 @@ private:
         pixels_.resize(shape_.area());
     }
 };
-
-;

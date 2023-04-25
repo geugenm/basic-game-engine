@@ -13,8 +13,7 @@ public:
         view_  = create_application_view();
     }
 
-    explicit ApplicationPresenter(ApplicationView*  view,
-                                  ApplicationModel* model) {
+    explicit ApplicationPresenter(ApplicationView* view, ApplicationModel* model) {
         if (view == nullptr) {
             throw std::invalid_argument("Given view pointer is null");
         }
@@ -37,7 +36,5 @@ protected:
     ApplicationModel* model_;
 };
 
-extern "C" ApplicationPresenter* create_application_presenter(
-    ApplicationView* view, ApplicationModel* model);
-extern "C" void destroy_application_presenter(
-    ApplicationPresenter* application_presenter);
+extern "C" ApplicationPresenter* create_application_presenter(ApplicationView* view, ApplicationModel* model);
+extern "C" void                  destroy_application_presenter(ApplicationPresenter* application_presenter);

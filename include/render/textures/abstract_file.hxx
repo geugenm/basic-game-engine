@@ -8,11 +8,9 @@ public:
         set_path(file_path);
     }
 
+    virtual ~File() = default;
+
     void set_path(const std::filesystem::path& file_path) {
-        if (exists(file_path) == false) {
-            throw std::invalid_argument("Given texture file path '" +
-                                        file_path.string() + "' is not exist");
-        }
         path_ = file_path;
     }
 
