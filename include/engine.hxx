@@ -23,11 +23,11 @@ public:
 
     void destroy() { release_renderer(); }
 
-    [[nodiscard]] const AbstractUI* getPresenter() const {
+    [[nodiscard]] const AbstractUI* get_presenter() const {
         return renderer_.get();
     }
 
-    void setPresenter(std::unique_ptr<AbstractUI> presenter) {
+    void set_presenter(std::unique_ptr<AbstractUI> presenter) {
         if (presenter == nullptr) {
             throw std::invalid_argument("Presenter cannot be null.");
         }
