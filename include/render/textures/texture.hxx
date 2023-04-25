@@ -42,7 +42,7 @@ public:
         resize_pixels();
     }
 
-    [[nodiscard]] ColorRGB get_pixel(const size_t& x, const size_t& y) const {
+    [[nodiscard]] const ColorRGB & get_pixel(const size_t& x, const size_t& y) const {
         if (x >= width_ || y >= height_) {
             throw std::out_of_range("Error: Pixel position out of range.");
         }
@@ -75,7 +75,7 @@ public:
         pixels_ = pixels;
     }
 
-    [[nodiscard]] std::vector<ColorRGB> & get_pixel_array() {
+    [[nodiscard]] const std::vector<ColorRGB> & get_pixel_array() const {
         return pixels_;
     }
 

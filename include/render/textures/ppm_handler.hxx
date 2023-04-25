@@ -33,13 +33,15 @@ public:
         texture_->set_dimensions(static_cast<size_t>(width),
                                  static_cast<size_t>(height));
 
-
-        in_file.read(reinterpret_cast<char*>(texture_->get_pixel_array().data()),
+        auto file_read_amount = texture_->get_pixel_array();
+        in_file.read(reinterpret_cast<char*>(file_read_amount.data()),
                      static_cast<long>(texture_->get_pixel_array().size() * sizeof(ColorRGB)));
 
         if (in_file.bad()) {
             throw std::runtime_error("Failed to read image data.");
         }
+
+        texture_->set_pixel_array(file_read_amount);
     }
 
     void save() override {
@@ -75,8 +77,15 @@ public:
         set_path(saved_path);
     }
 
-    [[nodiscard]] Texture & get_texture() const {
+    [[nodiscard]] const Texture &get_texture() const {
         return *texture_;
+    }
+
+    void set_texture(std::unique_ptr<Texture> texture) {
+        if (!texture) {
+            throw std::invalid_argument("Texture pointer is null");
+        }
+        texture_ = std::move(texture);
     }
 
 private:
