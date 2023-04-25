@@ -4,8 +4,6 @@
 
 TEST(Polygon2DTest, DrawPolygonTest)
 {
-    constexpr int num_lines = 100;
-
     const Position2D start = Position2D::generate_random(200, 230);
     const Position2D end = Position2D::generate_random(300, 1200);
 
@@ -17,6 +15,25 @@ TEST(Polygon2DTest, DrawPolygonTest)
     polygon.draw_on(texture, ColorRGB{0, 0, 255});
 
     std::filesystem::path path("test_polygon.ppm");
+    PpmHandler handler(path, texture);
+    handler.save();
+}
+
+TEST(Polygon2DTest, DrawMultiplePolygonsTest)
+{
+    const Position2D start = Position2D::generate_random(200, 230);
+    const Position2D end = Position2D::generate_random(300, 1200);
+
+    Polygon2D polygon(start, end, 3);
+
+    Texture texture;
+    texture.set_shape(BoundingBox(start, end));
+
+    polygon.add_vertex({0, 0});
+    polygon.add_vertex({200, 200});
+    polygon.draw_on(texture, ColorRGB{0, 0, 255});
+
+    std::filesystem::path path("test_polygon_additional_vertex.ppm");
     PpmHandler handler(path, texture);
     handler.save();
 }

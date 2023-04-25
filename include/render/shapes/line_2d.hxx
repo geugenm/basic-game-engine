@@ -8,10 +8,10 @@ class Line2D final : public Shape2D
   public:
     Line2D(const Position2D &start, const Position2D &end) : start_(start), end_(end)
     {
-        bounding_box_ = BoundingBox(start, end);
+        bounding_box_ = BoundingBox(start_, end_);
     }
 
-    Line2D(const Line2D &other) : Shape2D(other), start_(other.start_), end_(other.end_)
+    Line2D(const Line2D &other) : Shape2D(other), start_(other.start_), end_(other.end_), bounding_box_(other.bounding_box_)
     {
     }
 

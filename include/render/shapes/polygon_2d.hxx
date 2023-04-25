@@ -54,12 +54,26 @@ class Polygon2D final : public Shape2D
         return {};
     }
 
+    void add_vertex(const Position2D &position)
+    {
+        for (const auto &vertex : vertices_)
+        {
+            if (vertex == position)
+            {
+                return;
+            }
+        }
+        sides_amount_++;
+        vertices_.reserve(sides_amount_);
+        vertices_.push_back(position);
+    }
+
   private:
     void init()
     {
         angle_ = 2.0 * M_PI / static_cast<double>(sides_amount_);
 
-        vertices_.reserve(sides_amount_);
+        vertices_.resize(sides_amount_);
         int32_t radius_x = static_cast<int32_t>(bounding_box_.width) / 2;
         int32_t radius_y = static_cast<int32_t>(bounding_box_.height) / 2;
 
