@@ -14,6 +14,7 @@ public:
     explicit PpmHandler(const std::filesystem::path& file_path)
         : File(file_path) {
         set_path(file_path);
+        texture_ = std::make_unique<Texture>();
     }
 
     void load() override {
@@ -32,8 +33,9 @@ public:
         texture_->set_dimensions(static_cast<size_t>(width),
                                  static_cast<size_t>(height));
 
-        in_file.read(reinterpret_cast<char*>(pixels_.data()),
-                     static_cast<long>(pixels_.size() * sizeof(ColorRGB)));
+
+        in_file.read(reinterpret_cast<char*>(texture_->get_pixel_array().data()),
+                     static_cast<long>(texture_->get_pixel_array().size() * sizeof(ColorRGB)));
 
         if (in_file.bad()) {
             throw std::runtime_error("Failed to read image data.");
@@ -52,12 +54,12 @@ public:
         }
         out_file.exceptions(std::ios_base::failbit);
 
-        out_file << "P6\n" << width_ << ' ' << height_ << '\n' << "255\n";
+        out_file << "P6\n" << texture_->get_width() << ' ' << texture_->get_height() << '\n' << "255\n";
 
         const auto buffer_size =
-            static_cast<std::streamsize>(sizeof(ColorRGB) * pixels_.size());
+            static_cast<std::streamsize>(sizeof(ColorRGB) * texture_->get_pixel_array().size());
         const char* written_data =
-            reinterpret_cast<const char*>(pixels_.data());
+            reinterpret_cast<const char*>(texture_->get_pixel_array().data());
         out_file.write(written_data, buffer_size);
 
         if (out_file.bad()) {
@@ -73,7 +75,7 @@ public:
         set_path(saved_path);
     }
 
-    [[nodiscard]] Texture get_texture() const {
+    [[nodiscard]] Texture & get_texture() const {
         return *texture_;
     }
 

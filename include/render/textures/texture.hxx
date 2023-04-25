@@ -66,7 +66,7 @@ public:
         resize_pixels();
     }
 
-    void set_pixels(const std::vector<ColorRGB>& pixels) {
+    void set_pixel_array(const std::vector<ColorRGB>& pixels) {
         if (pixels.size() != width_ * height_) {
             throw std::invalid_argument(
                 "Error: The number of pixels doesn't match the dimensions.");
@@ -75,7 +75,7 @@ public:
         pixels_ = pixels;
     }
 
-    [[nodiscard]] std::vector<ColorRGB> get_pixels() const {
+    [[nodiscard]] std::vector<ColorRGB> & get_pixel_array() {
         return pixels_;
     }
 
