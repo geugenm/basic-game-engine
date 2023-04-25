@@ -7,18 +7,18 @@
 #include <random>
 #include <stdexcept>
 
-struct Shape2D {
+struct Box2D {
     std::size_t width  = 0;
     std::size_t height = 0;
 
-    constexpr Shape2D() = default;
+    constexpr Box2D() = default;
 
-    explicit Shape2D(const std::size_t& new_width,
+    explicit Box2D(const std::size_t& new_width,
                      const std::size_t& new_height) {
         set_dimensions(new_width, new_height);
     }
 
-    explicit Shape2D(const std::int32_t& new_width,
+    explicit Box2D(const std::int32_t& new_width,
                      const std::int32_t& new_height) {
         set_dimensions(new_width, new_height);
     }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "render/colors/color_rgb.hxx"
-#include "render/shapes/shape_2d.hxx"
+#include "render/shapes/box.hxx"
 
 #include <stdexcept>
 #include <vector>
@@ -10,7 +10,7 @@ class Texture {
 public:
     Texture() = default;
 
-    Texture(const Shape2D& shape, const std::vector<ColorRGB>& pixels)
+    Texture(const Box2D& shape, const std::vector<ColorRGB>& pixels)
         : pixels_(pixels)
         , shape_(shape) { }
 
@@ -28,11 +28,11 @@ public:
         pixels_[position.y * shape_.width + position.x] = color;
     }
 
-    void set_shape(const Shape2D& shape) {
+    void set_shape(const Box2D& shape) {
         shape_ = shape;
     }
 
-    [[nodiscard]] const Shape2D& get_shape() const {
+    [[nodiscard]] const Box2D& get_shape() const {
         return shape_;
     }
 
@@ -47,7 +47,7 @@ public:
 
 private:
     std::vector<ColorRGB> pixels_;
-    Shape2D               shape_;
+    Box2D                 shape_;
 
     void resize_pixels() {
         pixels_.resize(shape_.area());
