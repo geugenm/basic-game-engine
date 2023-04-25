@@ -51,6 +51,9 @@ public:
     ~PpmHandler() override = default;
 
     void load() override {
+        if (exists(get_path())) {
+            std::filesystem::remove(get_path());
+        }
         std::ifstream in_file(get_path(), std::ios_base::binary);
         in_file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
