@@ -20,85 +20,45 @@ public:
         , texture_(other.texture_ ? std::make_unique<Texture>(*other.texture_) : nullptr) { }
 
     void draw(const ColorRGB& color) const override {
-        int    x0 = start_.x;
-        int    y0 = start_.y;
-        int    x1 = end_.x;
-        int    y1 = end_.y;
+        int x0 = start_.x;
+        int y0 = start_.y;
+        int x1 = end_.x;
+        int y1 = end_.y;
 
-        auto plot_line_low = [&](int x0, int y0, int x1, int y1)
-        {
-            int dx = x1 - x0;
-            int dy = y1 - y0;
-            int yi = 1;
-            if (dy < 0)
-            {
-                yi = -1;
-                dy = -dy;
-            }
-            int D = 2 * dy - dx;
-            int y = y0;
+        const int dx = std::abs(x1 - x0);
+        const int dy = std::abs(y1 - y0);
 
-            for (int x = x0; x <= x1; ++x)
-            {
-                if (texture_->get_shape().contains({x, y})) {
-                    texture_->set_pixel({x, y}, color);
-                }
-                if (D > 0)
-                {
-                    y += yi;
-                    D -= 2 * dx;
-                }
-                D += 2 * dy;
-            }
-        };
-
-        auto plot_line_high = [&](int x0, int y0, int x1, int y1)
-        {
-            int dx = x1 - x0;
-            int dy = y1 - y0;
-            int xi = 1;
-            if (dx < 0)
-            {
-                xi = -1;
-                dx = -dx;
-            }
-            int D = 2 * dx - dy;
-            int x = x0;
-
-            for (int y = y0; y <= y1; ++y)
-            {
-                if (texture_->get_shape().contains({x, y})) {
-                    texture_->set_pixel({x, y}, color);
-                }
-                if (D > 0)
-                {
-                    x += xi;
-                    D -= 2 * dy;
-                }
-                D += 2 * dx;
-            }
-        };
-
-        if (abs(y1 - y0) < abs(x1 - x0))
-        {
-            if (x0 > x1)
-            {
-                plot_line_low(x1, y1, x0, y0);
-            }
-            else
-            {
-                plot_line_low(x0, y0, x1, y1);
-            }
+        int sx, sy;
+        if (x0 < x1) {
+            sx = 1;
+        } else {
+            sx = -1;
         }
-        else
-        {
-            if (y0 > y1)
-            {
-                plot_line_high(x1, y1, x0, y0);
+        if (y0 < y1) {
+            sy = 1;
+        } else {
+            sy = -1;
+        }
+
+        int err = dx - dy;
+        int x   = x0;
+        int y   = y0;
+
+        while (true) {
+            texture_->set_pixel({ x, y }, color);
+
+            if (x == x1 && y == y1) {
+                break;
             }
-            else
-            {
-                plot_line_high(x0, y0, x1, y1);
+
+            int e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                x += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y += sy;
             }
         }
     }
@@ -107,10 +67,10 @@ public:
         const Position2D start_container = start_;
         const Position2D end_container   = end_;
 
-        const Position2D range = {static_cast<int32_t>(texture_->get_shape().width), static_cast<int32_t>(texture_->get_shape().height)};
-        start_ = Position2D::generate_random({0, 0}, range);
-        end_   = Position2D::generate_random({0, 0}, range);
-
+        const Position2D range = { static_cast<int32_t>(texture_->get_shape().width - 1),
+                                   static_cast<int32_t>(texture_->get_shape().height - 1) };
+        start_                 = Position2D::generate_random({ 0, 0 }, range);
+        end_                   = Position2D::generate_random({ 0, 0 }, range);
 
         draw(ColorRGB::generate_random());
         start_ = start_container;
