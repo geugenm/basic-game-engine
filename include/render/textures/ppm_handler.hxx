@@ -12,10 +12,8 @@
 class PpmHandler : public File {
 public:
     explicit PpmHandler(const std::filesystem::path& file_path)
-        : File(file_path) {
-        set_path(file_path);
-        texture_ = std::make_unique<Texture>();
-    }
+        : File(file_path),
+        texture_(std::make_unique<Texture>()) {}
 
     void load() override {
         std::ifstream in_file(get_path(), std::ios_base::binary);
@@ -27,13 +25,12 @@ public:
         in_file >> header >> width >> height >> color_format;
         in_file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        auto texture_shape = texture_->get_shape();
-        texture_shape.set_dimensions(width, height);
+        Shape2D texture_shape(width, height);
         texture_->set_shape(texture_shape);
 
         std::vector<ColorRGB> file_read_amount(texture_shape.area());
         in_file.read(reinterpret_cast<char*>(file_read_amount.data()),
-                     file_read_amount.size() * sizeof(ColorRGB));
+                     static_cast<long>(file_read_amount.size() * sizeof(ColorRGB)));
 
         if (!in_file) {
             throw std::runtime_error("Failed to read image data.");
@@ -47,11 +44,7 @@ public:
             throw std::invalid_argument("File path is empty");
         }
 
-        std::ofstream out_file(get_path().string(), std::ios_base::binary);
-        if (!out_file) {
-            throw std::runtime_error("Failed to open output file: " +
-                                     get_path().string());
-        }
+        std::ofstream out_file(get_path(), std::ios_base::binary);
         out_file.exceptions(std::ios_base::failbit);
 
         out_file << "P6\n"
@@ -65,7 +58,7 @@ public:
             reinterpret_cast<const char*>(texture_->get_pixel_array().data());
         out_file.write(written_data, buffer_size);
 
-        if (out_file.bad()) {
+        if (!out_file) {
             throw std::invalid_argument("Failed to write to '" +
                                         get_path().string() + "'");
         }
