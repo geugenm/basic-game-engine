@@ -22,7 +22,7 @@ TEST(Polygon2DTest, DrawPolygonTest)
 TEST(Polygon2DTest, DrawMultiplePolygonsTest)
 {
     const Position2D start = Position2D::generate_random(200, 230);
-    const Position2D end = Position2D::generate_random(300, 1200);
+    const Position2D end = Position2D::generate_random(300, 400);
 
     Polygon2D polygon(start, end, 3);
 
@@ -40,26 +40,29 @@ TEST(Polygon2DTest, DrawMultiplePolygonsTest)
 
 TEST(Polygon2DTest, DrawIndexedShape)
 {
-    const Position2D start = Position2D::generate_random(200, 230);
-    const Position2D end = Position2D::generate_random(300, 1200);
+    const Position2D start = {200, 400};
+    const Position2D end = {300, 1200};
 
     IndexedShape shape;
 
     Texture texture;
     texture.set_shape(BoundingBox(start, end));
 
-    Polygon2D polygon(start, end, 3);
+    Polygon2D polygon(start, end, 0);
+    polygon.add_vertex({0, 0});
+    polygon.add_vertex({0, 100});
+    polygon.add_vertex({100, 100});
+
+    shape.add_2d_shape(polygon);
+
+    Polygon2D polygon2(start, end, 0);
 
     polygon.add_vertex({0, 0});
-    polygon.add_vertex({200, 200});
-    //polygon.draw_on(texture, ColorRGB{0, 0, 255});
+    polygon.add_vertex({0, 100});
+    polygon.add_vertex({100, 200});
 
-    shape.add_2d_shape(polygon);
+    shape.add_2d_shape(polygon2);
 
-    const Position2D next = Position2D::generate_random(200, 230);
-    Polygon2D polygon2(next, end, 3);
-
-    shape.add_2d_shape(polygon);
 
     shape.draw_on(texture, {0, 255, 255});
 
