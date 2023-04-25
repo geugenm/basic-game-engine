@@ -22,8 +22,8 @@ struct Canvas {
     }
 
     Canvas(const Position2D & start, const Position2D & end) {
-        width = static_cast<size_t>(std::abs(end.x - start.x));
-        height = static_cast<size_t>(std::abs(end.y - start.y));
+        width = static_cast<size_t>(std::abs(end.x - start.x + 1));
+        height = static_cast<size_t>(std::abs(end.y - start.y + 1));
     }
 
     Canvas(const Canvas& other) {
