@@ -7,13 +7,14 @@
 #include <memory>
 #include <vector>
 
-class Shape2D {
-public:
+class Shape2D
+{
+  public:
     Shape2D() = default;
 
     virtual ~Shape2D() = default;
 
-    virtual void draw_on(Texture & texture, const ColorRGB& color) const = 0;
+    virtual void draw_on(Texture &texture, const ColorRGB &color) const = 0;
 
     [[nodiscard]] virtual Texture get_texture() = 0;
 

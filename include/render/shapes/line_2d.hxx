@@ -3,22 +3,22 @@
 #include "render/shapes/abstract_shape.hxx"
 #include "render/textures/texture.hxx"
 
-class Line2D final : public Shape2D {
-public:
-    Line2D(const Position2D& start, const Position2D& end)
-        : start_(start)
-        , end_(end) {
+class Line2D final : public Shape2D
+{
+  public:
+    Line2D(const Position2D &start, const Position2D &end) : start_(start), end_(end)
+    {
         bounding_box_ = BoundingBox(start, end);
     }
 
-    Line2D(const Line2D& other)
-        : Shape2D(other)
-        , start_(other.start_)
-        , end_(other.end_) { }
+    Line2D(const Line2D &other) : Shape2D(other), start_(other.start_), end_(other.end_)
+    {
+    }
 
     ~Line2D() override = default;
 
-    void draw_on(Texture& texture, const ColorRGB& color) const override {
+    void draw_on(Texture &texture, const ColorRGB &color) const override
+    {
         int x0 = start_.x;
         int y0 = start_.y;
         int x1 = end_.x;
@@ -28,83 +28,101 @@ public:
         const int dy = std::abs(y1 - y0);
 
         int sx, sy;
-        if (x0 < x1) {
+        if (x0 < x1)
+        {
             sx = 1;
-        } else {
+        }
+        else
+        {
             sx = -1;
         }
-        if (y0 < y1) {
+        if (y0 < y1)
+        {
             sy = 1;
-        } else {
+        }
+        else
+        {
             sy = -1;
         }
 
         int err = dx - dy;
-        int x   = x0;
-        int y   = y0;
+        int x = x0;
+        int y = y0;
 
-        while (true) {
-            texture.set_pixel({ x, y }, color);
+        while (true)
+        {
+            texture.set_pixel({x, y}, color);
 
-            if (x == x1 && y == y1) {
+            if (x == x1 && y == y1)
+            {
                 break;
             }
 
             int e2 = 2 * err;
-            if (e2 > -dy) {
+            if (e2 > -dy)
+            {
                 err -= dy;
                 x += sx;
             }
-            if (e2 < dx) {
+            if (e2 < dx)
+            {
                 err += dx;
                 y += sy;
             }
         }
     }
 
-    void draw_random(Texture& texture) {
+    void draw_random(Texture &texture)
+    {
         const Position2D start_container = start_;
-        const Position2D end_container   = end_;
+        const Position2D end_container = end_;
 
-        const Position2D range = { static_cast<int32_t>(bounding_box_.width - 1),
-                                   static_cast<int32_t>(bounding_box_.height - 1) };
-        start_                 = Position2D::generate_random({ 0, 0 }, range);
-        end_                   = Position2D::generate_random({ 0, 0 }, range);
+        const Position2D range = {static_cast<int32_t>(bounding_box_.width - 1),
+                                  static_cast<int32_t>(bounding_box_.height - 1)};
+        start_ = Position2D::generate_random({0, 0}, range);
+        end_ = Position2D::generate_random({0, 0}, range);
 
         draw_on(texture, ColorRGB::generate_random());
         start_ = start_container;
-        end_   = end_container;
+        end_ = end_container;
     }
 
-    [[nodiscard]] std::unique_ptr<Shape2D> clone() const override {
+    [[nodiscard]] std::unique_ptr<Shape2D> clone() const override
+    {
         return std::make_unique<Line2D>(*this);
     }
 
-    [[nodiscard]] std::string string() const override {
+    [[nodiscard]] std::string string() const override
+    {
         return "Start: " + start_.string() + " End: " + end_.string();
     }
 
-    [[nodiscard]] const Position2D& get_start() const {
+    [[nodiscard]] const Position2D &get_start() const
+    {
         return start_;
     }
 
-    void set_start(const Position2D& start) {
+    void set_start(const Position2D &start)
+    {
         start_ = start;
     }
 
-    [[nodiscard]] const Position2D& get_end() const {
+    [[nodiscard]] const Position2D &get_end() const
+    {
         return end_;
     }
 
-    void set_end(const Position2D& end) {
+    void set_end(const Position2D &end)
+    {
         end_ = end;
     }
 
-    [[nodiscard]] Texture get_texture() override {
+    [[nodiscard]] Texture get_texture() override
+    {
         return {};
     }
 
-private:
+  private:
     Position2D start_;
     Position2D end_;
 

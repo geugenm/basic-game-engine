@@ -7,29 +7,44 @@
 
 const double PI = 3.14159265358979323846;
 
-class RotatingTorDemo : public AbstractApplication {
-public:
-    explicit RotatingTorDemo() { }
+class RotatingTorDemo : public AbstractApplication
+{
+  public:
+    explicit RotatingTorDemo()
+    {
+    }
 
-    ~RotatingTorDemo() override { }
+    ~RotatingTorDemo() override
+    {
+    }
 
-    void initialize() override {
-        radius_       = 10;
-        thickness_    = 3;
+    void initialize() override
+    {
+        radius_ = 10;
+        thickness_ = 3;
         frameDelayMs_ = 100;
     }
 
-    void update() override { }
+    void update() override
+    {
+    }
 
-    void render() const override {
-        for (int i = 0; i < 360; i++) {
+    void render() const override
+    {
+        for (int i = 0; i < 360; i++)
+        {
             std::cout << "\033[2J\033[H"; // clear the terminal
-            for (int j = -radius_; j <= radius_; j++) {
-                for (int k = -radius_; k <= radius_; k++) {
+            for (int j = -radius_; j <= radius_; j++)
+            {
+                for (int k = -radius_; k <= radius_; k++)
+                {
                     double torus_eq = std::pow(std::sqrt(j * j + k * k) - radius_, 2) + std::pow(0 - i, 2);
-                    if (std::abs(std::sqrt(torus_eq) - thickness_) < 0.5) {
+                    if (std::abs(std::sqrt(torus_eq) - thickness_) < 0.5)
+                    {
                         std::cout << "*";
-                    } else {
+                    }
+                    else
+                    {
                         std::cout << " ";
                     }
                 }
@@ -40,16 +55,18 @@ public:
         }
     }
 
-private:
+  private:
     int radius_;
     int thickness_;
     int frameDelayMs_;
 };
 
-AbstractApplication* create_application() {
+AbstractApplication *create_application()
+{
     return new RotatingTorDemo;
 }
 
-void destroy_application(AbstractApplication* application) {
+void destroy_application(AbstractApplication *application)
+{
     delete application;
 }
