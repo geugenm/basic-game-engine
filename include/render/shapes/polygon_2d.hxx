@@ -57,7 +57,6 @@ class Polygon2D final : public Shape2D
   private:
     void init()
     {
-        edges_amount_ = sides_amount_ - 1;
         angle_ = 2.0 * M_PI / static_cast<double>(sides_amount_);
 
         vertices_.reserve(sides_amount_);
@@ -89,8 +88,6 @@ class Polygon2D final : public Shape2D
 
     size_t sides_amount_;
     double angle_;
-
-    size_t edges_amount_;
 
     std::vector<Position2D> vertices_;
     Position2D center_;
