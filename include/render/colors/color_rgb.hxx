@@ -1,10 +1,11 @@
 #pragma once
 
 #include <cstdint>
-
 #include <algorithm>
 #include <cmath>
+
 #include <cstdint>
+#include <random>
 
 #pragma pack(push, 1)
 
@@ -53,6 +54,14 @@ struct ColorRGB {
                  static_cast<std::uint8_t>(std::max(std::min(static_cast<int>(std::round(green * scalar)), 255), 0)),
                  static_cast<std::uint8_t>(std::max(std::min(static_cast<int>(std::round(blue * scalar)), 255), 0)) };
     }
+
+    [[nodiscard]] static ColorRGB generate_random() {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<std::uint8_t> distrib(0, 255);
+        return { distrib(gen), distrib(gen), distrib(gen) };
+    }
+
 };
 
 #pragma pack(pop)

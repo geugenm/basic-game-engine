@@ -9,7 +9,7 @@ public:
         : start_(start)
         , end_(end)
         , texture_(std::make_unique<Texture>()) {
-        Box2D box = {std::abs(std::max(start_.x, end_.x)), std::abs(std::max(start_.y, end_.y))};
+        Canvas box(start, end);
         texture_->set_shape(box);
     }
 
@@ -45,9 +45,7 @@ public:
         int y   = y0;
 
         while (true) {
-            if (texture_->get_shape().contains({x, y})) {
-                texture_->set_pixel({ x, y }, color);
-            }
+            texture_->set_pixel({ x, y }, color);
 
             if (x == x1 && y == y1) {
                 break;
@@ -69,10 +67,12 @@ public:
         const Position2D start_container = start_;
         const Position2D end_container   = end_;
 
-        start_ = Position2D::generate_random(start_, end_);
-        end_   = Position2D::generate_random(start_, end_);
+        start_ = Position2D::generate_random(start_container, end_container);
+        end_   = Position2D::generate_random(start_container, end_container);
 
-        draw(ColorRGB { 0, 255, 255 });
+        if (start_)
+
+        draw(ColorRGB::generate_random());
         start_ = start_container;
         end_   = end_container;
     }
@@ -116,6 +116,10 @@ public:
 
     [[nodiscard]] std::unique_ptr<Shape2D> clone() const override {
         return std::make_unique<Line2D>(*this);
+    }
+
+    [[nodiscard]] std::string string() const override {
+        return "Start: " + start_.string() + " End: " + end_.string() + " On the texture: " + texture_->string();
     }
 
     [[nodiscard]] const Position2D& get_start() const {

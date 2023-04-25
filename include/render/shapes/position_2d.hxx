@@ -62,7 +62,7 @@ struct Position2D {
     static Position2D generate_random(const Position2D& from, const Position2D& to) {
         Position2D x_result = generate_random(from.x, to.x);
         Position2D y_result = generate_random(from.y, to.y);
-        return {x_result.x, y_result.y};
+        return {x_result.x, y_result.x};
     }
 
     static double distance(const Position2D& p1, const Position2D& p2) {

@@ -55,17 +55,23 @@ public:
      * @brief Returns the area of the shape
      * @return The area of the shape
      */
-    virtual double area() const = 0;
+    [[nodiscard]] virtual double area() const = 0;
 
     /**
      * @brief Returns the perimeter of the shape
      * @return The perimeter of the shape
      */
-    virtual double perimeter() const = 0;
+    [[nodiscard]] virtual double perimeter() const = 0;
 
     /**
      * @brief Returns a deep copy of the shape
      * @return A unique_ptr to a deep copy of the shape
      */
-    virtual std::unique_ptr<Shape2D> clone() const = 0;
+    [[nodiscard]] virtual std::unique_ptr<Shape2D> clone() const = 0;
+
+    /**
+     * @brief String representation of the shape
+     * @return A string representation of the shape (its current parameters)
+     */
+    [[nodiscard]] virtual std::string string() const = 0;
 };

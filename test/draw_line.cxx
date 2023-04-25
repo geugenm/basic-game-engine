@@ -57,19 +57,17 @@ TEST(Line2DTest, PerimeterTest) {
 TEST(Line2DTest, DrawRandomLinesTest) {
     constexpr int num_lines = 100;
 
-    const Position2D start = Position2D::generate_random(20, 23);
-    const Position2D end   = Position2D::generate_random(30, 120);
+    const Position2D start = Position2D::generate_random(200, 230);
+    const Position2D end   = Position2D::generate_random(300, 1200);
 
     Line2D line(start, end);
-    //line.draw(ColorRGB(0, 255, 255));
-
 
     for (int i = 0; i < num_lines; ++i) {
         line.draw_random();
     }
 
-    std::filesystem::path path("testx.ppm");
-    PpmHandler handler(path, line.get_texture());
+    std::filesystem::path path("test_random_lines.ppm");
+    PpmHandler            handler(path, line.get_texture());
     handler.save();
 }
 

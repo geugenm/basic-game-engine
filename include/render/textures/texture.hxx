@@ -10,7 +10,7 @@ class Texture final {
 public:
     Texture() = default;
 
-    explicit Texture(const Box2D& shape, const std::vector<ColorRGB>& pixels)
+    explicit Texture(const Canvas& shape, const std::vector<ColorRGB>& pixels)
         : pixels_(pixels)
         , shape_(shape) { }
 
@@ -54,12 +54,12 @@ public:
         pixels_[position.y * shape_.width + position.x] = color;
     }
 
-    void set_shape(const Box2D& shape) {
+    void set_shape(const Canvas& shape) {
         shape_ = shape;
         resize_pixels();
     }
 
-    [[nodiscard]] const Box2D& get_shape() const {
+    [[nodiscard]] const Canvas& get_shape() const {
         return shape_;
     }
 
@@ -72,9 +72,13 @@ public:
         return pixels_;
     }
 
+    [[nodiscard]] std::string string() {
+        return "With the frame: " + shape_.string();
+    }
+
 private:
     std::vector<ColorRGB> pixels_;
-    Box2D                 shape_;
+    Canvas                shape_;
 
     void resize_pixels() {
         pixels_.resize(shape_.area());

@@ -7,28 +7,31 @@
 #include <random>
 #include <stdexcept>
 
-struct Box2D {
+struct Canvas {
     std::size_t width  = 0;
     std::size_t height = 0;
 
-    Position2D position = {};
+    constexpr Canvas() = default;
 
-    constexpr Box2D() = default;
-
-    Box2D(const std::size_t& new_width, const std::size_t& new_height) {
+    Canvas(const std::size_t& new_width, const std::size_t& new_height) {
         set_dimensions(new_width, new_height);
     }
 
-    Box2D(const std::int32_t& new_width, const std::int32_t& new_height) {
+    Canvas(const std::int32_t& new_width, const std::int32_t& new_height) {
         set_dimensions(new_width, new_height);
     }
 
-    Box2D(const Box2D& other) {
+    Canvas(const Position2D & start, const Position2D & end) {
+        width = static_cast<size_t>(std::abs(end.x - start.x));
+        height = static_cast<size_t>(std::abs(end.y - start.y));
+    }
+
+    Canvas(const Canvas& other) {
         width  = other.width;
         height = other.height;
     }
 
-    Box2D& operator=(const Box2D& other) {
+    Canvas& operator=(const Canvas& other) {
         if (this == &other) {
             return *this;
         }
@@ -37,14 +40,14 @@ struct Box2D {
         return *this;
     }
 
-    Box2D(Box2D&& other) noexcept {
+    Canvas(Canvas&& other) noexcept {
         width        = other.width;
         height       = other.height;
         other.width  = 0;
         other.height = 0;
     }
 
-    Box2D& operator=(Box2D&& other) noexcept {
+    Canvas& operator=(Canvas&& other) noexcept {
         if (this == &other) {
             return *this;
         }
@@ -55,15 +58,15 @@ struct Box2D {
         return *this;
     }
 
-    bool operator!=(const Box2D& other) const {
+    bool operator!=(const Canvas& other) const {
         return (width != other.width) || (height != other.height);
     }
 
-    bool operator<(const Box2D& other) const {
+    bool operator<(const Canvas& other) const {
         return area() < other.area();
     }
 
-    bool operator>(const Box2D& other) const {
+    bool operator>(const Canvas& other) const {
         return area() > other.area();
     }
 
@@ -72,7 +75,7 @@ struct Box2D {
         return os;
     }
 
-    ~Box2D() = default;
+    ~Canvas() = default;
 
     [[nodiscard]] std::size_t area() const {
         return width * height;
@@ -104,7 +107,6 @@ struct Box2D {
     }
 
     [[nodiscard]] std::string string() const {
-        return std::string("[") + std::to_string(width) + "x" + std::to_string(height) + "]" +
-               " on position: " + position.string();
+        return std::string("[") + std::to_string(width) + "x" + std::to_string(height) + "]";
     }
 };
