@@ -68,6 +68,10 @@ class Polygon2D final : public Shape2D
         vertices_.push_back(position);
     }
 
+    [[nodiscard]] Vertices get_vertices() const override {
+        return vertices_;
+    }
+
   private:
     void init()
     {
@@ -103,6 +107,6 @@ class Polygon2D final : public Shape2D
     size_t sides_amount_;
     double angle_;
 
-    std::vector<Position2D> vertices_;
+    Vertices vertices_;
     Position2D center_;
 };

@@ -97,6 +97,11 @@ class Line2D final : public Shape2D
         return "Start: " + start_.string() + " End: " + end_.string();
     }
 
+    [[nodiscard]] Vertices get_vertices() const override {
+        Vertices result = {start_, end_};
+        return result;
+    }
+
     [[nodiscard]] const Position2D &get_start() const
     {
         return start_;
