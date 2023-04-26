@@ -24,13 +24,13 @@ TEST(Polygon2DTest, DrawPolygonTest)
 
 TEST(Polygon2DTest, DrawMultiplePolygonsTest)
 {
-    const Position2D start = Position2D::generate_random(200, 230);
-    const Position2D end = Position2D::generate_random(300, 400);
+    const Position2D start = Position2D::generate_random(0, 0);
+    const Position2D end = Position2D::generate_random(100, 100);
 
     Polygon2D polygon(start, end, 3);
 
     Texture texture;
-    texture.set_shape(BoundingBox(start, end));
+    texture.set_shape(BoundingBox(500, 500));
 
     polygon.add_vertex({0, 0});
     polygon.add_vertex({200, 200});
@@ -44,19 +44,19 @@ TEST(Polygon2DTest, DrawMultiplePolygonsTest)
 TEST(Polygon2DTest, DrawIndexedShape)
 {
     const Position2D start = {200, 400};
-    const Position2D end = {300, 1200};
+    const Position2D end = {300, 400};
 
-    IndexedShape shape;
+    IndexedShape indexed_shape;
 
     Texture texture;
-    texture.set_shape(BoundingBox(start, end));
+    texture.set_shape(BoundingBox(1000, 1000));
 
     Polygon2D polygon(start, end, 0);
     polygon.add_vertex({0, 0});
     polygon.add_vertex({0, 100});
     polygon.add_vertex({100, 100});
 
-    shape.add_2d_shape(polygon);
+    indexed_shape.add_2d_shape(polygon);
 
     Polygon2D polygon2(start, end, 0);
 
@@ -64,10 +64,9 @@ TEST(Polygon2DTest, DrawIndexedShape)
     polygon.add_vertex({0, 100});
     polygon.add_vertex({100, 200});
 
-    shape.add_2d_shape(polygon2);
+    indexed_shape.add_2d_shape(polygon2);
 
-
-    shape.draw_on(texture, {0, 255, 255});
+    indexed_shape.draw_on(texture, {0, 255, 255});
 
     std::filesystem::path path("test_polygon_additional_vertex_indexed.ppm");
     PpmHandler handler(path, texture);

@@ -25,32 +25,35 @@ class IndexedShape
 
         for (const auto &vertex : vertices)
         {
-            auto iter = vertices_.find(vertex);
-            if (iter == vertices_.end() || !iter->second.is_drawn)
+            if (std::find(vertices_.begin(), vertices_.end(), vertex) == vertices_.end())
             {
-                vertices_[vertex] = {vertices_.size(), false};
+                vertices_.reserve(vertices_.size() + 1);
+                vertices_.push_back(vertex);
+                indexes_.push_back(indexes_.size());
             }
         }
     }
 
     void draw_on(Texture &texture, const ColorRGB &color)
     {
-        for (auto &[vertex, data] : vertices_)
+        for (size_t i = 0; i < indexes_.size(); i += 3)
         {
-            if (!data.is_drawn)
-            {
-                texture.set_pixel(vertex, color);
-                data.is_drawn = true;
-            }
+            const auto &v0 = vertices_[indexes_[i]];
+            const auto &v1 = vertices_[indexes_[i + 1]];
+            const auto &v2 = vertices_[indexes_[i + 2]];
+
+            Line2D l1(v0, v1);
+            l1.draw_on(texture, color);
+
+            Line2D l2(v1, v2);
+            l2.draw_on(texture, color);
+
+            Line2D l3(v2, v0);
+            l3.draw_on(texture, color);
         }
     }
 
   private:
-    struct VertexData
-    {
-        size_t index;
-        bool is_drawn;
-    };
-
-    std::unordered_map<Position2D, VertexData, Position2DHash> vertices_;
+    Vertices vertices_;
+    std::vector<size_t> indexes_;
 };
