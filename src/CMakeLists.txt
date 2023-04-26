@@ -5,6 +5,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../cmake/packages.cmake)
 include(${CPM_PACKAGES_DIR}/sdl.cmake)
 
 include(${CPM_PACKAGES_DIR}/glog.cmake)
+include(${CPM_PACKAGES_DIR}/tracy.cmake)
 include(${CPM_PACKAGES_DIR}/ccache.cmake)
 
 add_executable(main main.cxx)
