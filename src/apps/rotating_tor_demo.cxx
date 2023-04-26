@@ -1,5 +1,4 @@
-#include "apps/application.h"
-#include "engine/engine.hxx"
+#include "apps/abstract_application.hxx"
 
 #include <chrono>
 #include <cmath>
@@ -8,15 +7,16 @@
 
 const double PI = 3.14159265358979323846;
 
-class RotatingTorDemo : public Application {
-public:
+class RotatingTorDemo : public AbstractApplication
+{
+  public:
     explicit RotatingTorDemo()
     {
-        initialize();
-        render();
     }
 
-    ~RotatingTorDemo() override { }
+    ~RotatingTorDemo() override
+    {
+    }
 
     void initialize() override
     {
@@ -25,45 +25,48 @@ public:
         frameDelayMs_ = 100;
     }
 
-    void update() override { }
+    void update() override
+    {
+    }
 
     void render() const override
     {
-        for (int i = 0; i < 360; i++) {
+        for (int i = 0; i < 360; i++)
+        {
             std::cout << "\033[2J\033[H"; // clear the terminal
-            for (int j = -radius_; j <= radius_; j++) {
-                for (int k = -radius_; k <= radius_; k++) {
+            for (int j = -radius_; j <= radius_; j++)
+            {
+                for (int k = -radius_; k <= radius_; k++)
+                {
                     double torus_eq = std::pow(std::sqrt(j * j + k * k) - radius_, 2) + std::pow(0 - i, 2);
-                    if (std::abs(std::sqrt(torus_eq) - thickness_) < 0.5) {
+                    if (std::abs(std::sqrt(torus_eq) - thickness_) < 0.5)
+                    {
                         std::cout << "*";
-                    } else {
+                    }
+                    else
+                    {
                         std::cout << " ";
                     }
                 }
                 std::cout << std::endl;
             }
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(frameDelayMs_));
+            std::this_thread::sleep_for(std::chrono::milliseconds(frameDelayMs_));
             std::cout.flush();
         }
     }
 
-private:
+  private:
     int radius_;
     int thickness_;
     int frameDelayMs_;
 };
 
-Application* createApplication()
+AbstractApplication *create_application()
 {
     return new RotatingTorDemo;
 }
 
-extern "C" void test() {
-    RotatingTorDemo * test = new RotatingTorDemo();
-}
-
-void destroyApplication(Application* application)
+void destroy_application(AbstractApplication *application)
 {
     delete application;
 }

@@ -1,3 +1,5 @@
----
-Language: Cpp
-BasedOnStyle: WebKit
+BasedOnStyle: Microsoft
+TabWidth: 4
+UseTab: Never
+Standard: Latest
+SortIncludes: CaseSensitive

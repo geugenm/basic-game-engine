@@ -4,8 +4,7 @@
  * @brief Entry point for the game application.
  */
 
-#include "apps/application.h"
-#include "engine/hot-reload/dll_reloader.h"
+#include "apps/mvp/mvp_application.hxx"
 
 #include <chrono>
 #include <cstdlib>
@@ -20,61 +19,62 @@
  */
 int main()
 {
-    Application* game = createApplication();
+    AbstractApplication *game = create_application();
 
-    if (!game) {
+    if (!game)
+    {
         std::cerr << "Failed to create application instance." << std::endl;
         return EXIT_FAILURE;
     }
 
-    try {
+    try
+    {
         game->initialize();
-    } catch (const std::exception& ex) {
-        std::cerr << "Failed to initialize application: " << ex.what()
-                  << std::endl;
-        destroyApplication(game);
+    }
+    catch (const std::exception &ex)
+    {
+        std::cerr << "Failed to initialize application: " << ex.what() << std::endl;
+        destroy_application(game);
         return EXIT_FAILURE;
     }
 
     const auto framePeriod = std::chrono::seconds(3);
     auto nextFrameTime = std::chrono::steady_clock::now() + framePeriod;
-    void* gameLibraryHandle {};
+    void *gameLibraryHandle{};
 
     bool isRunning = true;
 
-    while (isRunning) {
+    while (isRunning)
+    {
         const auto now = std::chrono::steady_clock::now();
-        if (now >= nextFrameTime) {
+        if (now >= nextFrameTime)
+        {
             std::cout << "10 seconds have passed!" << std::endl;
-
-            //destroyApplication(game);
-
-            IDLLReloader * reloader = create_dll_reloader();
-            reloader->set_new_library_path("apps/5678.so");
-            reloader->set_target_library_path("apps/1234.so");
-            reloader->call_external_method_by_name("test");
-
             nextFrameTime += framePeriod;
         }
 
-        if (game != nullptr) {
+        if (game != nullptr)
+        {
             game->update();
             game->render();
-        } else {
-            game = createApplication();
+        }
+        else
+        {
+            game = create_application();
             game->initialize();
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
-        if (!std::cout.good()) {
+        if (!std::cout.good())
+        {
             std::cerr << "Standard output stream is invalid." << std::endl;
-            destroyApplication(game);
+            destroy_application(game);
             return EXIT_FAILURE;
         }
     }
 
-    destroyApplication(game);
+    destroy_application(game);
 
     return EXIT_SUCCESS;
 }

@@ -13,6 +13,7 @@ include(cmake/code_quality.cmake)
 include(cmake/check_platform.cmake)
 
 add_subdirectory(src)
+add_subdirectory(include)
 
 option(BUILD_TESTS "Build tests" ON)
 

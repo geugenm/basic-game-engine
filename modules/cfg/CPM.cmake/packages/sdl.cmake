@@ -19,7 +19,7 @@ CPMAddPackage(
         "SDL_WAYLAND_QT_TOUCH OFF"
         "SDL_WAYLAND_SHARED OFF"
         "SDL_X11 ON"
-        "SDL_X11_SHARED OFF"
+        "SDL_X11_SHARED ON"
         "SDL_X11_XCURSOR OFF"
         "SDL_X11_XDBE OFF"
         "SDL_X11_XFIXES OFF"
