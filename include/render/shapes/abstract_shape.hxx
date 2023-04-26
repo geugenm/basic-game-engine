@@ -24,19 +24,5 @@ class Shape2D
 
     [[nodiscard]] virtual Vertices get_vertices() const = 0;
 
-    [[nodiscard]] virtual Texture get_texture() {
-        Texture texture;
-        draw_on(texture, {0, 255, 255});
-        return texture;
-    }
-
-    [[nodiscard]] virtual std::vector<Position2D> get_pixels() {
-        return pixels_;
-    }
-
   protected:
-    void add_position(const Position2D & position) {
-        pixels_.push_back(position);
-    }
-    std::vector<Position2D> pixels_;
 };
