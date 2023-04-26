@@ -51,9 +51,9 @@ target_link_libraries(test-draw-line PRIVATE GTest::GTest engine-includes tracy)
 
 add_executable(test-draw-polygon draw_polygon.cxx)
 
-target_link_libraries(test-draw-polygon PRIVATE GTest::GTest engine-includes)
+target_link_libraries(test-draw-polygon PRIVATE GTest::GTest engine-includes tracy)
 
 
 add_executable(test-draw-interpolated interpolation_test.cxx)
 
-target_link_libraries(test-draw-interpolated PRIVATE GTest::GTest engine-includes)
+target_link_libraries(test-draw-interpolated PRIVATE GTest::GTest engine-includes tracy)

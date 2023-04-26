@@ -124,7 +124,8 @@ class Line2D final : public Shape2D
         end_ = end;
     }
 
-    [[nodiscard]] BoundingBox get_bounding_box() const {
+    [[nodiscard]] BoundingBox get_bounding_box() const
+    {
         return bounding_box_;
     }
 

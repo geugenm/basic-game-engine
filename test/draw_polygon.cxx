@@ -1,9 +1,8 @@
-#include "render/shapes/polygon_2d.hxx"
 #include "render/shapes/indexed_shape.hxx"
-#include "render/textures/ppm_handler.hxx"
+#include "render/shapes/polygon_2d.hxx"
 
+#include <Tracy/tracy/Tracy.hpp>
 #include <gtest/gtest.h>
-
 
 TEST(Polygon2DTest, DrawPolygonTest)
 {
@@ -27,7 +26,8 @@ TEST(Polygon2DTest, DrawMultiplePolygonsTest)
     Texture texture;
     texture.set_shape(BoundingBox(110, 110));
 
-    for (size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; i < 10; i++)
+    {
         const Position2D start = {0, 0};
         const Position2D end = Position2D::generate_random(100, 100);
         const Position2D random = Position2D::generate_random(3, 6);
@@ -62,7 +62,6 @@ TEST(Polygon2DTest, DrawIndexedShape)
     polygon2.add_vertex({0, 0});
     polygon2.add_vertex({100, 0});
     polygon2.add_vertex({100, 100});
-
 
     const int rect_size = 50;
 

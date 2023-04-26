@@ -1,7 +1,7 @@
-#include "render/textures/ppm_handler.hxx"
 #include "render/shapes/polygon_2d.hxx"
+#include "render/textures/ppm_handler.hxx"
 
-#include <gtest/gtest.h>
+#include <Tracy/tracy/Tracy.hpp>
 
 auto main(int argc, char **argv) -> int
 {
@@ -19,6 +19,6 @@ auto main(int argc, char **argv) -> int
     square.triangulate();
     square.draw_on(texture, color);
 
-    PpmHandler handler("123.ppm", texture);
+    PpmHandler handler("test_interpolation.ppm", texture);
     handler.save();
 }
