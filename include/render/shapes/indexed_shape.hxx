@@ -25,12 +25,9 @@ class IndexedShape
 
         for (const auto &vertex : vertices)
         {
-            if (std::find(vertices_.begin(), vertices_.end(), vertex) == vertices_.end())
-            {
-                vertices_.reserve(vertices_.size() + 1);
-                vertices_.push_back(vertex);
-                indexes_.push_back(indexes_.size());
-            }
+            vertices_.reserve(vertices_.size() + 1);
+            vertices_.push_back(vertex);
+            indexes_.push_back(indexes_.size());
         }
     }
 

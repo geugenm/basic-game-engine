@@ -49,7 +49,7 @@ TEST(Polygon2DTest, DrawIndexedShape)
     IndexedShape indexed_shape;
 
     Texture texture;
-    texture.set_shape(BoundingBox(1000, 1000));
+    texture.set_shape(BoundingBox(600, 600));
 
     Polygon2D polygon(start, end, 0);
     polygon.add_vertex({0, 0});
@@ -60,9 +60,9 @@ TEST(Polygon2DTest, DrawIndexedShape)
 
     Polygon2D polygon2(start, end, 0);
 
-    polygon.add_vertex({0, 0});
-    polygon.add_vertex({0, 100});
-    polygon.add_vertex({100, 200});
+    polygon2.add_vertex({0, 0});
+    polygon2.add_vertex({100, 0});
+    polygon2.add_vertex({100, 100});
 
     indexed_shape.add_2d_shape(polygon2);
 
