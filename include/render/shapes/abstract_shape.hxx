@@ -18,8 +18,6 @@ class Shape2D
 
     virtual void draw_on(Texture &texture, const ColorRGB &color) const = 0;
 
-    [[nodiscard]] virtual Texture get_texture() = 0;
-
     [[nodiscard]] virtual std::unique_ptr<Shape2D> clone() const = 0;
 
     [[nodiscard]] virtual std::string string() const = 0;

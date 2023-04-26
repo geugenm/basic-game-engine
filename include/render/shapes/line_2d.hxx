@@ -122,11 +122,6 @@ class Line2D final : public Shape2D
         end_ = end;
     }
 
-    [[nodiscard]] Texture get_texture() override
-    {
-        return {};
-    }
-
   private:
     Position2D start_;
     Position2D end_;

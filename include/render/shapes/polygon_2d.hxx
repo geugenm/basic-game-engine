@@ -16,7 +16,7 @@ class Polygon2D final : public Shape2D
     }
 
     explicit Polygon2D(BoundingBox box, Vertices vertices) : bounding_box_(std::move(box)), vertices_(std::move(vertices)) {
-        
+
     }
 
     Polygon2D(const Position2D &start, const Position2D &end, const size_t &sides_amount)
@@ -51,11 +51,6 @@ class Polygon2D final : public Shape2D
     [[nodiscard]] std::string string() const override
     {
         return bounding_box_.string();
-    }
-
-    [[nodiscard]] Texture get_texture() override
-    {
-        return {};
     }
 
     void add_vertex(const Position2D &position)
