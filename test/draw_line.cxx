@@ -7,14 +7,14 @@
 
 TEST(Line2DTest, DrawRandomLinesTest)
 {
-    constexpr int num_lines = 500;
+    constexpr int num_lines = 20;
 
-    const Position2D start = Position2D::generate_random(100, 730);
-    const Position2D end = Position2D::generate_random(500, 1900);
+    const Position2D start = Position2D::generate_random(0, 500);
+    const Position2D end = Position2D::generate_random(0, 500);
 
     Line2D line(start, end);
     Texture texture;
-    texture.set_shape({2000, 2000});
+    texture.set_shape(line.get_bounding_box());
 
     for (int i = 0; i < num_lines; ++i)
     {

@@ -24,19 +24,18 @@ TEST(Polygon2DTest, DrawPolygonTest)
 
 TEST(Polygon2DTest, DrawMultiplePolygonsTest)
 {
-    const Position2D start = Position2D::generate_random(0, 0);
-    const Position2D end = Position2D::generate_random(100, 100);
-
-    Polygon2D polygon(start, end, 3);
-
     Texture texture;
-    texture.set_shape(BoundingBox(500, 500));
+    texture.set_shape(BoundingBox(110, 110));
 
-    polygon.add_vertex({0, 0});
-    polygon.add_vertex({200, 200});
-    polygon.draw_on(texture, ColorRGB{0, 0, 255});
+    for (size_t i = 0; i < 10; i++) {
+        const Position2D start = {0, 0};
+        const Position2D end = Position2D::generate_random(100, 100);
+        const Position2D random = Position2D::generate_random(3, 6);
+        Polygon2D polygon(start, end, static_cast<const size_t>(random.x));
+        polygon.draw_on(texture, ColorRGB::generate_random());
+    }
 
-    std::filesystem::path path("test_polygon_additional_vertex.ppm");
+    std::filesystem::path path("test_multiple_polygons.ppm");
     PpmHandler handler(path, texture);
     handler.save();
 }

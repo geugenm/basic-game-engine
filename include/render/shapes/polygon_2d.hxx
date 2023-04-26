@@ -1,10 +1,13 @@
 #pragma once
 
 #include <utility>
+#include <filesystem>
 
 #include "render/shapes/abstract_shape.hxx"
 #include "render/shapes/line_2d.hxx"
 #include "render/textures/texture.hxx"
+
+#include "render/textures/ppm_handler.hxx"
 
 class Polygon2D final : public Shape2D
 {
