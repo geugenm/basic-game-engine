@@ -64,6 +64,23 @@ TEST(Polygon2DTest, DrawIndexedShape)
     polygon2.add_vertex({100, 0});
     polygon2.add_vertex({100, 100});
 
+
+    const int rect_size = 50;
+
+    for (int y = 0; y < texture.get_shape().height; y += rect_size)
+    {
+        for (int x = 0; x < texture.get_shape().width; x += rect_size)
+        {
+            Polygon2D rect({x, y}, {x + rect_size, y + rect_size}, 0);
+            rect.add_vertex({0, 0});
+            rect.add_vertex({0, rect_size});
+            rect.add_vertex({rect_size, rect_size});
+            rect.add_vertex({rect_size, 0});
+
+            indexed_shape.add_2d_shape(rect);
+        }
+    }
+
     indexed_shape.add_2d_shape(polygon2);
 
     indexed_shape.draw_on(texture, {0, 255, 255});

@@ -15,6 +15,24 @@ struct Position2D
     {
     }
 
+    constexpr Position2D(const Position2D &other) = default;
+
+    Position2D &operator=(const Position2D &other) = default;
+
+    constexpr Position2D(Position2D &&other) noexcept : x(std::exchange(other.x, 0)), y(std::exchange(other.y, 0))
+    {
+    }
+
+    Position2D &operator=(Position2D &&other) noexcept
+    {
+        if (this != &other)
+        {
+            x = std::exchange(other.x, 0);
+            y = std::exchange(other.y, 0);
+        }
+        return *this;
+    }
+
     friend constexpr Position2D operator-(const Position2D &left, const Position2D &right)
     {
         return {left.x - right.x, left.y - right.y};

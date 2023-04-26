@@ -11,13 +11,14 @@ class Line2D final : public Shape2D
         bounding_box_ = BoundingBox(start_, end_);
     }
 
-    Line2D(const Line2D &other) : Shape2D(other), start_(other.start_), end_(other.end_), bounding_box_(other.bounding_box_)
+    Line2D(const Line2D &other)
+        : Shape2D(other), start_(other.start_), end_(other.end_), bounding_box_(other.bounding_box_)
     {
     }
 
     ~Line2D() override = default;
 
-    void draw_on(Texture &texture, const ColorRGB &color) const override
+    void draw_on(Texture &texture, const ColorRGB &color) override
     {
         int x0 = start_.x;
         int y0 = start_.y;
@@ -52,6 +53,7 @@ class Line2D final : public Shape2D
         while (true)
         {
             texture.set_pixel({x, y}, color);
+            pixels_.emplace_back(x, y);
 
             if (x == x1 && y == y1)
             {
@@ -97,7 +99,8 @@ class Line2D final : public Shape2D
         return "Start: " + start_.string() + " End: " + end_.string();
     }
 
-    [[nodiscard]] Vertices get_vertices() const override {
+    [[nodiscard]] Vertices get_vertices() const override
+    {
         Vertices result = {start_, end_};
         return result;
     }

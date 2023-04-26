@@ -32,7 +32,7 @@ class Polygon2D final : public Shape2D
 
     ~Polygon2D() override = default;
 
-    void draw_on(Texture &texture, const ColorRGB &color) const override
+    void draw_on(Texture &texture, const ColorRGB &color) override
     {
         for (size_t i = 0; i < vertices_.size(); ++i)
         {
