@@ -12,7 +12,7 @@ auto main(int argc, char **argv) -> int
 
     Position2D start(10, 10);
     Position2D end(90, 90);
-    Polygon2D square({start, end}, 10);
+    Polygon2D square({start, end}, 5);
 
     ColorRGB color(255, 0, 0);
 
