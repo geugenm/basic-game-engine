@@ -66,12 +66,6 @@ struct Position2D
         return std::sqrt(x * x + y * y);
     }
 
-    void scale(double scale_x, double scale_y)
-    {
-        x *= scale_x;
-        y *= scale_y;
-    }
-
     [[nodiscard]] std::string string() const
     {
         return std::string("(") + std::to_string(x) + ", " + std::to_string(y) + ")";

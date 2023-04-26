@@ -9,14 +9,14 @@
 class Polygon2D final : public Shape2D
 {
   public:
-    explicit Polygon2D(BoundingBox box, const size_t &sides_amount)
-        : bounding_box_(std::move(box))
+    explicit Polygon2D(BoundingBox box, const size_t &sides_amount) : bounding_box_(std::move(box))
     {
         init_random(sides_amount);
     }
 
-    explicit Polygon2D(BoundingBox box, Vertices vertices) : bounding_box_(std::move(box)), vertices_(std::move(vertices)) {
-
+    explicit Polygon2D(BoundingBox box, Vertices vertices)
+        : bounding_box_(std::move(box)), vertices_(std::move(vertices))
+    {
     }
 
     Polygon2D(const Position2D &start, const Position2D &end, const size_t &sides_amount)
@@ -30,14 +30,16 @@ class Polygon2D final : public Shape2D
         init_random(other.get_vertices().size());
     }
 
-    Polygon2D(Polygon2D&& other) noexcept
-        : bounding_box_(std::move(other.bounding_box_)), triangles_(std::move(other.triangles_)), vertices_(std::move(other.vertices_))
+    Polygon2D(Polygon2D &&other) noexcept
+        : bounding_box_(std::move(other.bounding_box_)), triangles_(std::move(other.triangles_)),
+          vertices_(std::move(other.vertices_))
     {
     }
 
-    Polygon2D& operator=(const Polygon2D& other)
+    Polygon2D &operator=(const Polygon2D &other)
     {
-        if (this != &other) {
+        if (this != &other)
+        {
             bounding_box_ = other.bounding_box_;
             vertices_ = other.vertices_;
             triangles_ = other.triangles_;
@@ -45,9 +47,10 @@ class Polygon2D final : public Shape2D
         return *this;
     }
 
-    Polygon2D& operator=(Polygon2D&& other) noexcept
+    Polygon2D &operator=(Polygon2D &&other) noexcept
     {
-        if (this != &other) {
+        if (this != &other)
+        {
             bounding_box_ = std::move(other.bounding_box_);
             vertices_ = std::move(other.vertices_);
             triangles_ = std::move(other.triangles_);
@@ -67,10 +70,12 @@ class Polygon2D final : public Shape2D
             l.draw_on(texture, color);
         }
 
-        if (triangles_.empty()) {
+        if (triangles_.empty())
+        {
             return;
         }
-        for (auto & triangle : triangles_) {
+        for (auto &triangle : triangles_)
+        {
             triangle.draw_on(texture, color);
         }
     }
@@ -98,7 +103,8 @@ class Polygon2D final : public Shape2D
         vertices_.push_back(position);
     }
 
-    [[nodiscard]] Vertices get_vertices() const override {
+    [[nodiscard]] Vertices get_vertices() const override
+    {
         return vertices_;
     }
 
@@ -134,9 +140,7 @@ class Polygon2D final : public Shape2D
                 ear_index++;
             }
 
-
             draw_on(texture, {0, 255, 255});
-
 
             // Remove the ear
             remove_ear(ear_index);
@@ -160,9 +164,12 @@ class Polygon2D final : public Shape2D
         handler.save();
     }
 
-    bool contains(const Position2D & position) {
-        for (auto & vertex : vertices_) {
-            if (vertex == position) {
+    bool contains(const Position2D &position)
+    {
+        for (auto &vertex : vertices_)
+        {
+            if (vertex == position)
+            {
                 return true;
             }
         }
@@ -183,7 +190,8 @@ class Polygon2D final : public Shape2D
         Polygon2D triangle({1000, 1000}, {p1, p2, p3});
         for (size_t i = 0; i < vertices_.size(); ++i)
         {
-            if ((i != index) && (i != (index + 1) % vertices_.size()) && (i != (index + vertices_.size() - 1) % vertices_.size()))
+            if ((i != index) && (i != (index + 1) % vertices_.size()) &&
+                (i != (index + vertices_.size() - 1) % vertices_.size()))
             {
                 if (triangle.contains(vertices_[i]))
                 {
@@ -216,9 +224,8 @@ class Polygon2D final : public Shape2D
         vertices_.erase(vertices_.begin() + index);
     }
 
-
   private:
-    void init_random(const size_t & sides_amount)
+    void init_random(const size_t &sides_amount)
     {
         double angle = 2.0 * M_PI / static_cast<double>(sides_amount);
 
