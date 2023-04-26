@@ -1,6 +1,9 @@
 #include "render/shapes/polygon_2d.hxx"
+#include "render/shapes/indexed_shape.hxx"
 #include "render/textures/ppm_handler.hxx"
+
 #include <gtest/gtest.h>
+
 
 TEST(Polygon2DTest, DrawPolygonTest)
 {

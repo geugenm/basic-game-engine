@@ -12,7 +12,7 @@ class Polygon2D final : public Shape2D
     explicit Polygon2D(BoundingBox box, const size_t &sides_amount)
         : bounding_box_(std::move(box))
     {
-        init(sides_amount);
+        init_random(sides_amount);
     }
 
     explicit Polygon2D(BoundingBox box, Vertices vertices) : bounding_box_(std::move(box)), vertices_(std::move(vertices)) {
@@ -22,12 +22,12 @@ class Polygon2D final : public Shape2D
     Polygon2D(const Position2D &start, const Position2D &end, const size_t &sides_amount)
     {
         bounding_box_ = BoundingBox(start, end);
-        init(sides_amount);
+        init_random(sides_amount);
     }
 
     Polygon2D(const Polygon2D &other) : Shape2D(other)
     {
-        init(other.get_vertices().size());
+        init_random(other.get_vertices().size());
     }
 
     ~Polygon2D() override = default;
@@ -71,7 +71,7 @@ class Polygon2D final : public Shape2D
     }
 
   private:
-    void init(const size_t & sides_amount)
+    void init_random(const size_t & sides_amount)
     {
         double angle = 2.0 * M_PI / static_cast<double>(sides_amount);
 
