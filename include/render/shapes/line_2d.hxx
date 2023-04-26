@@ -53,7 +53,6 @@ class Line2D final : public Shape2D
         while (true)
         {
             texture.set_pixel({x, y}, color);
-            pixels_.emplace_back(x, y);
 
             if (x == x1 && y == y1)
             {
