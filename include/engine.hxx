@@ -1,16 +1,17 @@
 #pragma once
 
-#include "renderer/renderer.h"
+#include "ui/abstract_ui.hxx"
 
 #include <memory>
 #include <stdexcept>
 
-class Engine {
-public:
-    Engine(const Engine&) = delete;
-    Engine& operator=(const Engine&) = delete;
+class Engine
+{
+  public:
+    Engine(const Engine &) = delete;
+    Engine &operator=(const Engine &) = delete;
 
-    static Engine* get_instance()
+    static Engine *get_instance()
     {
         static Engine instance;
         return &instance;
@@ -31,25 +32,30 @@ public:
         renderer_->render();
     }
 
-    void destroy() { release_renderer(); }
+    void destroy()
+    {
+        release_renderer();
+    }
 
-    [[nodiscard]] const IRenderer* getPresenter() const
+    [[nodiscard]] const AbstractUI *get_presenter() const
     {
         return renderer_.get();
     }
 
-    void setPresenter(std::unique_ptr<IRenderer> presenter)
+    void set_presenter(std::unique_ptr<AbstractUI> presenter)
     {
-        if (presenter == nullptr) {
+        if (presenter == nullptr)
+        {
             throw std::invalid_argument("Presenter cannot be null.");
         }
         renderer_ = std::move(presenter);
     }
 
-private:
+  private:
     void release_renderer()
     {
-        if (renderer_ == nullptr) {
+        if (renderer_ == nullptr)
+        {
             return;
         }
 
@@ -60,7 +66,7 @@ private:
     void form_renderer()
     {
         release_renderer();
-        renderer_ = std::unique_ptr<IRenderer>(create_renderer());
+        renderer_ = std::unique_ptr<AbstractUI>(create_renderer());
     }
 
     Engine()
@@ -73,5 +79,5 @@ private:
         release_renderer();
     }
 
-    std::unique_ptr<IRenderer> renderer_;
+    std::unique_ptr<AbstractUI> renderer_;
 };

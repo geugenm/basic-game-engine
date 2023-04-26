@@ -1,30 +1,43 @@
-#include "apps/application.h"
-#include "engine/engine.hxx"
+#include "apps/mvp/mvp_application.hxx"
+#include "engine.hxx"
 
-#include <iostream>
+class ExampleGame : public AbstractApplication
+{
+  public:
+    explicit ExampleGame()
+    {
+    }
 
-class ExampleGame : public Application {
-public:
-    explicit ExampleGame() { }
+    ~ExampleGame() override
+    {
+    }
 
-    ~ExampleGame() override { }
+    void initialize() override
+    {
+        Engine::get_instance()->initialize();
+    }
 
-    void initialize() override { Engine::get_instance()->initialize(); }
+    void update() override
+    {
+        Engine::get_instance()->update();
+    }
 
-    void update() override { Engine::get_instance()->update(); }
-
-    void render() const override { Engine::get_instance()->render(); }
+    void render() const override
+    {
+        Engine::get_instance()->render();
+    }
 };
 
-Application* createApplication()
+AbstractApplication *create_application()
 {
-    if (Engine::get_instance() != nullptr) {
+    if (Engine::get_instance() != nullptr)
+    {
         return new ExampleGame();
     }
     return nullptr;
 }
 
-void destroyApplication(Application* application)
+void destroy_application(AbstractApplication *application)
 {
     Engine::get_instance()->destroy();
     delete application;

@@ -4,7 +4,8 @@
  * @brief Represents the events related to a game controller.
  *
  */
-enum class Event {
+enum class Event
+{
     LEFT_PRESSED,
     LEFT_RELEASED,
     RIGHT_PRESSED,
