@@ -20,55 +20,55 @@ class Line2D final : public Shape2D
 
     void draw_on(Texture &texture, const ColorRGB &color) override
     {
-        int x0 = start_.x;
-        int y0 = start_.y;
-        int x1 = end_.x;
-        int y1 = end_.y;
+        int start_x = start_.x;
+        int start_y = start_.y;
+        int end_x = end_.x;
+        int end_y = end_.y;
 
-        const int dx = std::abs(x1 - x0);
-        const int dy = std::abs(y1 - y0);
+        const int delta_x = std::abs(end_x - start_x);
+        const int delta_y = std::abs(end_y - start_y);
 
-        int sx, sy;
-        if (x0 < x1)
+        int step_x, step_y;
+        if (start_x < end_x)
         {
-            sx = 1;
+            step_x = 1;
         }
         else
         {
-            sx = -1;
+            step_x = -1;
         }
-        if (y0 < y1)
+        if (start_y < end_y)
         {
-            sy = 1;
+            step_y = 1;
         }
         else
         {
-            sy = -1;
+            step_y = -1;
         }
 
-        int err = dx - dy;
-        int x = x0;
-        int y = y0;
+        int error = delta_x - delta_y;
+        int current_x = start_x;
+        int current_y = start_y;
 
         while (true)
         {
-            texture.set_pixel({x, y}, color);
+            texture.set_pixel({current_x, current_y}, color);
 
-            if (x == x1 && y == y1)
+            if (current_x == end_x && current_y == end_y)
             {
                 break;
             }
 
-            int e2 = 2 * err;
-            if (e2 > -dy)
+            int double_error = 2 * error;
+            if (double_error > -delta_y)
             {
-                err -= dy;
-                x += sx;
+                error -= delta_y;
+                current_x += step_x;
             }
-            if (e2 < dx)
+            if (double_error < delta_x)
             {
-                err += dx;
-                y += sy;
+                error += delta_x;
+                current_y += step_y;
             }
         }
     }
