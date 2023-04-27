@@ -25,9 +25,18 @@ class IndexedShape
 
         for (const auto &vertex : vertices)
         {
-            vertices_.reserve(vertices_.size() + 1);
-            vertices_.push_back(vertex);
-            indexes_.push_back(indexes_.size());
+            auto it = std::find(vertices_.begin(), vertices_.end(), vertex);
+            if (it != vertices_.end())
+            {
+                // Vertex already exists, use its index
+                indexes_.push_back(std::distance(vertices_.begin(), it));
+            }
+            else
+            {
+                // Vertex isn't found, add it and use new index
+                vertices_.push_back(vertex);
+                indexes_.push_back(vertices_.size() - 1);
+            }
         }
     }
 
