@@ -3,6 +3,7 @@
 #include <cmath>
 #include <random>
 #include <stdexcept>
+#include <utility>
 
 struct Position2D
 {
@@ -13,6 +14,24 @@ struct Position2D
 
     constexpr Position2D(int32_t x_, int32_t y_) : x(x_), y(y_)
     {
+    }
+
+    constexpr Position2D(const Position2D &other) = default;
+
+    Position2D &operator=(const Position2D &other) = default;
+
+    constexpr Position2D(Position2D &&other) noexcept : x(std::exchange(other.x, 0)), y(std::exchange(other.y, 0))
+    {
+    }
+
+    Position2D &operator=(Position2D &&other) noexcept
+    {
+        if (this != &other)
+        {
+            x = std::exchange(other.x, 0);
+            y = std::exchange(other.y, 0);
+        }
+        return *this;
     }
 
     friend constexpr Position2D operator-(const Position2D &left, const Position2D &right)
@@ -45,12 +64,6 @@ struct Position2D
     [[nodiscard]] constexpr double length() const
     {
         return std::sqrt(x * x + y * y);
-    }
-
-    void scale(double scale_x, double scale_y)
-    {
-        x *= scale_x;
-        y *= scale_y;
     }
 
     [[nodiscard]] std::string string() const

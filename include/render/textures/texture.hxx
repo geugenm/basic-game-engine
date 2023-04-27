@@ -4,6 +4,7 @@
 #include "render/shapes/box.hxx"
 
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 class Texture final
@@ -11,11 +12,11 @@ class Texture final
   public:
     Texture() = default;
 
-    explicit Texture(const BoundingBox &shape, const std::vector<ColorRGB> &pixels) : pixels_(pixels), shape_(shape)
+    explicit Texture(BoundingBox shape, const std::vector<ColorRGB> &pixels) : pixels_(pixels), shape_(std::move(shape))
     {
     }
 
-    explicit Texture(const Texture &other) : pixels_(other.pixels_), shape_(other.shape_)
+    Texture(const Texture &other) : pixels_(other.pixels_), shape_(other.shape_)
     {
     }
 

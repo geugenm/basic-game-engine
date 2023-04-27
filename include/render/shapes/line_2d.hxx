@@ -11,13 +11,14 @@ class Line2D final : public Shape2D
         bounding_box_ = BoundingBox(start_, end_);
     }
 
-    Line2D(const Line2D &other) : Shape2D(other), start_(other.start_), end_(other.end_), bounding_box_(other.bounding_box_)
+    Line2D(const Line2D &other)
+        : Shape2D(other), start_(other.start_), end_(other.end_), bounding_box_(other.bounding_box_)
     {
     }
 
     ~Line2D() override = default;
 
-    void draw_on(Texture &texture, const ColorRGB &color) const override
+    void draw_on(Texture &texture, const ColorRGB &color) override
     {
         int x0 = start_.x;
         int y0 = start_.y;
@@ -97,7 +98,8 @@ class Line2D final : public Shape2D
         return "Start: " + start_.string() + " End: " + end_.string();
     }
 
-    [[nodiscard]] Vertices get_vertices() const override {
+    [[nodiscard]] Vertices get_vertices() const override
+    {
         Vertices result = {start_, end_};
         return result;
     }
@@ -122,9 +124,9 @@ class Line2D final : public Shape2D
         end_ = end;
     }
 
-    [[nodiscard]] Texture get_texture() override
+    [[nodiscard]] BoundingBox get_bounding_box() const
     {
-        return {};
+        return bounding_box_;
     }
 
   private:
@@ -132,60 +134,4 @@ class Line2D final : public Shape2D
     Position2D end_;
 
     BoundingBox bounding_box_;
-};
-
-
-
-#include <unordered_map>
-
-
-struct Position2DHash
-{
-    std::size_t operator()(const Position2D &pos) const
-    {
-        std::size_t h1 = std::hash<double>{}(pos.x);
-        std::size_t h2 = std::hash<double>{}(pos.y);
-        return h1 ^ (h2 << 1);
-    }
-};
-
-class IndexedShape
-{
-  public:
-    IndexedShape() = default;
-
-    void add_2d_shape(const Shape2D &shape)
-    {
-        const auto vertices = shape.get_vertices();
-
-        for (const auto &vertex : vertices)
-        {
-            auto iter = vertices_.find(vertex);
-            if (iter == vertices_.end() || !iter->second.is_drawn)
-            {
-                vertices_[vertex] = {vertices_.size(), false};
-            }
-        }
-    }
-
-    void draw_on(Texture &texture, const ColorRGB &color)
-    {
-        for (auto &[vertex, data] : vertices_)
-        {
-            if (!data.is_drawn)
-            {
-                texture.set_pixel(vertex, color);
-                data.is_drawn = true;
-            }
-        }
-    }
-
-  private:
-    struct VertexData
-    {
-        size_t index;
-        bool is_drawn;
-    };
-
-    std::unordered_map<Position2D, VertexData, Position2DHash> vertices_;
 };
