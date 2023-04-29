@@ -48,7 +48,7 @@ class Texture final
 
     [[nodiscard]] const ColorRGB &get_pixel(const Position2D &position) const
     {
-        if (shape_.contains(position) == false)
+        if (!shape_.contains(position))
         {
             throw std::out_of_range("Error: Pixel position out of range.");
         }
@@ -57,7 +57,7 @@ class Texture final
 
     void set_pixel(const Position2D &position, const ColorRGB &color)
     {
-        if (shape_.contains(position) == false)
+        if (!shape_.contains(position))
         {
             throw std::out_of_range("Error: Pixel position: " + position.string() +
                                     " out of range: " + shape_.string());

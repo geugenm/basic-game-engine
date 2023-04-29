@@ -2,18 +2,6 @@
 
 #include "render/shapes/line_2d.hxx"
 
-#include <unordered_map>
-
-struct Position2DHash
-{
-    std::size_t operator()(const Position2D &pos) const
-    {
-        std::size_t h1 = std::hash<double>{}(pos.x);
-        std::size_t h2 = std::hash<double>{}(pos.y);
-        return h1 ^ (h2 << 1);
-    }
-};
-
 class IndexedShape
 {
   public:
