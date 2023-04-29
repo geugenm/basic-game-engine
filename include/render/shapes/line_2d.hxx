@@ -98,27 +98,7 @@ class Line2D final : public Shape2D
         Vertices result = {start_, end_};
         return result;
     }
-
-    [[nodiscard]] const Position2D &get_start() const
-    {
-        return start_;
-    }
-
-    void set_start(const Position2D &start)
-    {
-        start_ = start;
-    }
-
-    [[nodiscard]] const Position2D &get_end() const
-    {
-        return end_;
-    }
-
-    void set_end(const Position2D &end)
-    {
-        end_ = end;
-    }
-
+    
     [[nodiscard]] BoundingBox get_bounding_box() const
     {
         return bounding_box_;
