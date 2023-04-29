@@ -50,14 +50,9 @@ class Line2D final : public Shape2D
         int current_x = start_x;
         int current_y = start_y;
 
-        while (true)
+        while (current_x != end_x || current_y != end_y)
         {
             texture.set_pixel({current_x, current_y}, color);
-
-            if (current_x == end_x && current_y == end_y)
-            {
-                break;
-            }
 
             int double_error = 2 * error;
             if (double_error > -delta_y)

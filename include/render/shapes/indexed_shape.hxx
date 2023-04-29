@@ -28,12 +28,10 @@ class IndexedShape
             auto it = std::find(vertices_.begin(), vertices_.end(), vertex);
             if (it != vertices_.end())
             {
-                // Vertex already exists, use its index
-                indexes_.push_back(std::distance(vertices_.begin(), it));
+                indexes_.push_back(static_cast<unsigned long>(std::distance(vertices_.begin(), it)));
             }
             else
             {
-                // Vertex isn't found, add it and use new index
                 vertices_.push_back(vertex);
                 indexes_.push_back(vertices_.size() - 1);
             }
