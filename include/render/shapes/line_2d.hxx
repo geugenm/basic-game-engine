@@ -1,12 +1,14 @@
 #pragma once
 
+#include <utility>
+
 #include "render/shapes/abstract_shape.hxx"
 #include "render/textures/texture.hxx"
 
 class Line2D final : public Shape2D
 {
   public:
-    Line2D(const Position2D &start, const Position2D &end) : start_(start), end_(end)
+    Line2D(Position2D start, Position2D end) : start_(std::move(start)), end_(std::move(end))
     {
         bounding_box_ = BoundingBox(start_, end_);
     }
@@ -53,6 +55,7 @@ class Line2D final : public Shape2D
         while (current_x != end_x || current_y != end_y)
         {
             texture.set_pixel({current_x, current_y}, color);
+            attached_pixels_.emplace_back(current_x, current_y);
 
             int double_error = 2 * error;
             if (double_error > -delta_y)
@@ -98,7 +101,7 @@ class Line2D final : public Shape2D
         Vertices result = {start_, end_};
         return result;
     }
-    
+
     [[nodiscard]] BoundingBox get_bounding_box() const
     {
         return bounding_box_;
@@ -109,4 +112,6 @@ class Line2D final : public Shape2D
     Position2D end_;
 
     BoundingBox bounding_box_;
+
+    std::vector<Position2D> attached_pixels_;
 };

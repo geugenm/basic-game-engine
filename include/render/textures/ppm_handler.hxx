@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abstract_file.hxx"
+#include "abstract_file_handler.hxx"
 #include "render/colors/color_rgb.hxx"
 
 #include <fstream>
@@ -45,7 +45,7 @@ class PpmHandler : public File
     {
         if (this != &other)
         {
-            File::operator=(std::move(other));
+            File::operator=(other);
             texture_ = std::move(other.texture_);
             other.texture_ = nullptr;
         }
