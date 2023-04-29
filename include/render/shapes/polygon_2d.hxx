@@ -34,7 +34,7 @@ class Polygon2D final : public Shape2D
     }
 
     Polygon2D(Polygon2D &&other) noexcept
-        : bounding_box_(std::move(other.bounding_box_)), triangles_(std::move(other.triangles_)),
+        : bounding_box_(std::move(other.bounding_box_)),
           vertices_(std::move(other.vertices_))
     {
     }
@@ -45,7 +45,6 @@ class Polygon2D final : public Shape2D
         {
             bounding_box_ = other.bounding_box_;
             vertices_ = other.vertices_;
-            triangles_ = other.triangles_;
         }
         return *this;
     }
@@ -56,7 +55,6 @@ class Polygon2D final : public Shape2D
         {
             bounding_box_ = std::move(other.bounding_box_);
             vertices_ = std::move(other.vertices_);
-            triangles_ = std::move(other.triangles_);
         }
         return *this;
     }
@@ -71,15 +69,6 @@ class Polygon2D final : public Shape2D
             const Position2D &p2 = vertices_[(i + 1) % vertices_.size()];
             Line2D l(p1, p2);
             l.draw_on(texture, color);
-        }
-
-        if (triangles_.empty())
-        {
-            return;
-        }
-        for (auto &triangle : triangles_)
-        {
-            triangle.draw_on(texture, color);
         }
     }
 
@@ -111,6 +100,7 @@ class Polygon2D final : public Shape2D
         return vertices_;
     }
 
+    /// TODO: make sure that everything drawn up
     void triangulate()
     {
         if (vertices_.size() < 3)
@@ -130,9 +120,6 @@ class Polygon2D final : public Shape2D
             ear[i] = is_ear(i);
         }
 
-        Texture texture;
-        texture.set_shape({200, 200});
-
         size_t remaining_vertices = vertices_.size();
         while (remaining_vertices > 3)
         {
@@ -143,12 +130,10 @@ class Polygon2D final : public Shape2D
                 ear_index++;
             }
 
-            draw_on(texture, {0, 255, 255});
-
             // Remove the ear
             remove_ear(ear_index);
-            ear.erase(ear.begin() + ear_index);
-            indices.erase(indices.begin() + ear_index);
+            ear.erase(ear.begin() + static_cast<long>(ear_index));
+            indices.erase(indices.begin() + static_cast<long>(ear_index));
 
             // Update the ears of the neighboring vertices
             size_t previous_index = (ear_index == 0) ? (vertices_.size() - 1) : (ear_index - 1);
@@ -158,23 +143,13 @@ class Polygon2D final : public Shape2D
 
             remaining_vertices--;
         }
-
-        draw_on(texture, {0, 255, 255});
-
-        std::filesystem::path path;
-        path = "test.ppm";
-        PpmHandler handler(path, texture);
-        handler.save();
     }
 
     bool contains(const Position2D &position)
     {
-        for (auto &vertex : vertices_)
+        if (std::ranges::any_of(vertices_, [&](const auto& vertex) { return vertex == position; }))
         {
-            if (vertex == position)
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }
@@ -219,12 +194,7 @@ class Polygon2D final : public Shape2D
 
     void remove_ear(size_t index)
     {
-        Polygon2D triangle({1000, 1000}, 0);
-        triangle.add_vertex(vertices_[(index + vertices_.size() - 1) % vertices_.size()]);
-        triangle.add_vertex(vertices_[index]);
-        triangle.add_vertex(vertices_[(index + 1) % vertices_.size()]);
-
-        vertices_.erase(vertices_.begin() + index);
+        vertices_.erase(vertices_.begin() + static_cast<long>(index));
     }
 
   private:
@@ -258,8 +228,6 @@ class Polygon2D final : public Shape2D
     }
 
     BoundingBox bounding_box_;
-
-    std::vector<Polygon2D> triangles_;
 
     Vertices vertices_;
 };

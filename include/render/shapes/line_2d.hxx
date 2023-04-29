@@ -44,7 +44,7 @@ class Line2D final : public Shape2D
         }
 
         int error = delta_x - delta_y;
-        Position2D current;
+        Position2D current{start_.x, start_.y};
 
         while (current.x != end_.x || current.y != end_.y)
         {
