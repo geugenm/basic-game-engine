@@ -22,16 +22,11 @@ class Line2D final : public Shape2D
 
     void draw_on(Texture &texture, const ColorRGB &color) override
     {
-        int start_x = start_.x;
-        int start_y = start_.y;
-        int end_x = end_.x;
-        int end_y = end_.y;
-
-        const int delta_x = std::abs(end_x - start_x);
-        const int delta_y = std::abs(end_y - start_y);
+        const int delta_x = std::abs(end_.x - start_.x);
+        const int delta_y = std::abs(end_.y - start_.y);
 
         int step_x, step_y;
-        if (start_x < end_x)
+        if (start_.x < end_.x)
         {
             step_x = 1;
         }
@@ -39,7 +34,7 @@ class Line2D final : public Shape2D
         {
             step_x = -1;
         }
-        if (start_y < end_y)
+        if (start_.y < end_.y)
         {
             step_y = 1;
         }
@@ -49,24 +44,23 @@ class Line2D final : public Shape2D
         }
 
         int error = delta_x - delta_y;
-        int current_x = start_x;
-        int current_y = start_y;
+        Position2D current;
 
-        while (current_x != end_x || current_y != end_y)
+        while (current.x != end_.x || current.y != end_.y)
         {
-            texture.set_pixel({current_x, current_y}, color);
-            attached_pixels_.emplace_back(current_x, current_y);
+            texture.set_pixel({current.x, current.y}, color);
+            attached_pixels_.emplace_back(current.x, current.y);
 
-            int double_error = 2 * error;
+            const int double_error = 2 * error;
             if (double_error > -delta_y)
             {
                 error -= delta_y;
-                current_x += step_x;
+                current.x += step_x;
             }
             if (double_error < delta_x)
             {
                 error += delta_x;
-                current_y += step_y;
+                current.y += step_y;
             }
         }
     }
