@@ -20,14 +20,30 @@ class Shape2D
 
     [[nodiscard]] virtual std::unique_ptr<Shape2D> clone() const = 0;
 
-    [[nodiscard]] virtual std::string string() const = 0;
-
+    [[nodiscard]] virtual std::string string() const {
+        std::string result = "Shape2D: (" + std::to_string(vertices_.size()) + ") vertices\n";
+        for (std::size_t i = 0; i < vertices_.size(); ++i) {
+            const auto& vertex = vertices_[i];
+            result += "Vertex " + std::to_string(i) + ": " + vertex.string() + "\n";
+        }
+        return result;
+    }
+    
     [[nodiscard]] const Vertices & get_vertices() const {
         return vertices_;
     }
 
     [[nodiscard]] const BoundingBox & get_bounding_box() const {
         return bounding_box_;
+    }
+
+    bool has_vertex_on(const Position2D &position)
+    {
+        if (std::ranges::any_of(vertices_, [&](const auto &vertex) { return vertex == position; }))
+        {
+            return true;
+        }
+        return false;
     }
 
   protected:

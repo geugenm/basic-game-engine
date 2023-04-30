@@ -2,36 +2,37 @@
 
 #include "polygon_2d.hxx"
 
-class TriangulatedShape2D {
+class TriangulatedShape2D : Shape2D {
   public:
     TriangulatedShape2D(const Shape2D & shape) {
-        vertices_ = shape.get_vertices();
+        set_vertices(shape.get_vertices());
+        set_bounding_box(shape.get_bounding_box());
     }
 
     /// TODO: make sure that everything drawn up
     void triangulate()
     {
-        if (vertices_.size() < 3)
+        if (access_vertices().size() < 3)
         {
             return;
         }
 
-        std::vector<size_t> indices(vertices_.size());
-        for (size_t i = 0; i < vertices_.size(); ++i)
+        std::vector<size_t> indices(access_vertices().size());
+        for (size_t i = 0; i < access_vertices().size(); ++i)
         {
             indices[i] = i;
         }
 
-        std::vector<bool> ear(vertices_.size());
-        for (size_t i = 0; i < vertices_.size(); ++i)
+        std::vector<bool> ear(access_vertices().size());
+        for (size_t i = 0; i < access_vertices().size(); ++i)
         {
             ear[i] = is_ear(i);
         }
 
         Texture texture;
-        texture.set_shape(bounding_box_);
+        texture.set_shape(get_bounding_box());
 
-        size_t remaining_vertices = vertices_.size();
+        size_t remaining_vertices = access_vertices().size();
         while (remaining_vertices > 3)
         {
             // Find the first ear
@@ -49,8 +50,8 @@ class TriangulatedShape2D {
             indices.erase(indices.begin() + static_cast<long>(ear_index));
 
             // Update the ears of the neighboring vertices
-            size_t previous_index = (ear_index == 0) ? (vertices_.size() - 1) : (ear_index - 1);
-            size_t next_index = ear_index % (vertices_.size() - 1);
+            size_t previous_index = (ear_index == 0) ? (access_vertices().size() - 1) : (ear_index - 1);
+            size_t next_index = ear_index % (access_vertices().size() - 1);
             ear[previous_index] = is_ear(previous_index);
             ear[next_index] = is_ear(next_index);
 
@@ -63,29 +64,20 @@ class TriangulatedShape2D {
 
     }
 
-    bool has_vertex_on(const Position2D &position)
-    {
-        if (std::ranges::any_of(vertices_, [&](const auto &vertex) { return vertex == position; }))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    [[nodiscard]] bool is_ear(const size_t &index) const
+    [[nodiscard]] bool is_ear(const size_t &index)
     {
         if (is_reflex(index))
         {
             return false;
         }
 
-        const auto &prev_vertex = vertices_[(index + vertices_.size() - 1) % vertices_.size()];
-        const auto &curr_vertex = vertices_[index];
-        const auto &next_vertex = vertices_[(index + 1) % vertices_.size()];
+        const auto &prev_vertex = access_vertices()[(index + access_vertices().size() - 1) % access_vertices().size()];
+        const auto &curr_vertex = access_vertices()[index];
+        const auto &next_vertex = access_vertices()[(index + 1) % access_vertices().size()];
 
-        Polygon2D triangle(bounding_box_, {prev_vertex, curr_vertex, next_vertex});
+        Polygon2D triangle(get_bounding_box(), {prev_vertex, curr_vertex, next_vertex});
 
-        for (const auto &vertex : vertices_)
+        for (const auto &vertex : access_vertices())
         {
             const bool is_current_vertex = (&vertex == &curr_vertex);
             const bool is_prev_vertex = (&vertex == &prev_vertex);
@@ -105,22 +97,19 @@ class TriangulatedShape2D {
         return true;
     }
 
-    [[nodiscard]] bool is_reflex(size_t index) const
+    [[nodiscard]] bool is_reflex(const size_t & index)
     {
-        const Position2D &p1 = vertices_[(index + vertices_.size() - 1) % vertices_.size()];
-        const Position2D &p2 = vertices_[index];
-        const Position2D &p3 = vertices_[(index + 1) % vertices_.size()];
+        const Position2D &p1 = access_vertices()[(index + access_vertices().size() - 1) % access_vertices().size()];
+        const Position2D &p2 = access_vertices()[index];
+        const Position2D &p3 = access_vertices()[(index + 1) % access_vertices().size()];
 
         double cross_product = (p2.x - p1.x) * (p3.y - p2.y) - (p2.y - p1.y) * (p3.x - p2.x);
 
         return (cross_product < 0);
     }
 
-    void remove_ear(size_t index)
+    void remove_ear(const size_t & index)
     {
-        vertices_.erase(vertices_.begin() + static_cast<long>(index));
+        access_vertices().erase(access_vertices().begin() + static_cast<long>(index));
     }
-
-  private:
-    Vertices vertices_;
 };
