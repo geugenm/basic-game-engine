@@ -24,16 +24,15 @@ TEST(Polygon2DTest, DrawPolygonTest)
 TEST(Polygon2DTest, DrawMultiplePolygonsTest)
 {
     Texture texture;
-    texture.set_shape(BoundingBox(110, 110));
+    texture.set_shape(BoundingBox(1100, 1100));
 
     for (size_t i = 0; i < 12; i++)
     {
         const Position2D start = {0, 0};
-        const Position2D end = Position2D::generate_random(100, 100);
+        const Position2D end = Position2D::generate_random(1000, 1000);
         const Position2D random = Position2D::generate_random(3, 12);
         Polygon2D polygon(start, end, static_cast<const size_t>(random.x));
         polygon.draw_on(texture, ColorRGB::generate_random());
-        sleep(1);
     }
 
     std::filesystem::path path("test_multiple_polygons.ppm");

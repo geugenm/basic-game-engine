@@ -34,8 +34,7 @@ class Polygon2D final : public Shape2D
     }
 
     Polygon2D(Polygon2D &&other) noexcept
-        : bounding_box_(std::move(other.bounding_box_)),
-          vertices_(std::move(other.vertices_))
+        : bounding_box_(std::move(other.bounding_box_)), vertices_(std::move(other.vertices_))
     {
     }
 
@@ -61,8 +60,29 @@ class Polygon2D final : public Shape2D
 
     ~Polygon2D() override = default;
 
+    void draw_mesh(Texture &texture)
+    {
+        const auto& shape = texture.get_shape();
+
+        constexpr float kMeshDensity = 0.02f;
+        const auto step = static_cast<size_t>((float)std::max(shape.width, shape.height) * kMeshDensity);
+
+        for (std::size_t y = 0; y < shape.height; y += step)
+        {
+            Line2D line({0, static_cast<int>(y)}, {static_cast<int>(shape.width - 1), static_cast<int>(y)});
+            line.draw_on(texture, {0, 255, 255});
+        }
+
+        for (std::size_t x = 0; x < shape.width; x += step)
+        {
+            Line2D line({static_cast<int>(x), 0}, {static_cast<int>(x), static_cast<int>(shape.height - 1)});
+            line.draw_on(texture, {0, 255, 255});
+        }
+    }
+
     void draw_on(Texture &texture, const ColorRGB &color) override
     {
+        draw_mesh(texture);
         for (size_t i = 0; i < vertices_.size(); ++i)
         {
             const Position2D &p1 = vertices_[i];
@@ -80,6 +100,10 @@ class Polygon2D final : public Shape2D
     [[nodiscard]] std::string string() const override
     {
         return bounding_box_.string();
+    }
+
+    void rasterize()
+    {
     }
 
     void add_vertex(const Position2D &position)
@@ -145,9 +169,9 @@ class Polygon2D final : public Shape2D
         }
     }
 
-    bool contains(const Position2D &position)
+    bool has_vertex_on(const Position2D &position)
     {
-        if (std::ranges::any_of(vertices_, [&](const auto& vertex) { return vertex == position; }))
+        if (std::ranges::any_of(vertices_, [&](const auto &vertex) { return vertex == position; }))
         {
             return true;
         }
@@ -171,7 +195,7 @@ class Polygon2D final : public Shape2D
             if ((i != index) && (i != (index + 1) % vertices_.size()) &&
                 (i != (index + vertices_.size() - 1) % vertices_.size()))
             {
-                if (triangle.contains(vertices_[i]))
+                if (triangle.has_vertex_on(vertices_[i]))
                 {
                     return false;
                 }
