@@ -9,13 +9,13 @@ auto main(int argc, char **argv) -> int
 
     Position2D start(100, 100);
     Position2D end(900, 900);
-    Polygon2D square({start, end}, 5);
+    Polygon2D square({start, end}, 2);
 
     ColorRGB color(255, 0, 0);
 
-    square.triangulate();
     square.draw_on(texture, color);
 
+    texture.draw_mesh();
     PpmHandler handler("test_interpolation.ppm", texture);
     handler.save();
 }

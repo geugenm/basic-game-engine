@@ -10,12 +10,7 @@ class Line2D final : public Shape2D
   public:
     Line2D(Position2D start, Position2D end) : start_(std::move(start)), end_(std::move(end))
     {
-        bounding_box_ = BoundingBox(start_, end_);
-    }
-
-    Line2D(const Line2D &other)
-        : Shape2D(other), start_(other.start_), end_(other.end_), bounding_box_(other.bounding_box_)
-    {
+        set_bounding_box(BoundingBox(start_, end_));
     }
 
     ~Line2D() override = default;
@@ -49,7 +44,7 @@ class Line2D final : public Shape2D
         while (current.x != end_.x || current.y != end_.y)
         {
             texture.set_pixel({current.x, current.y}, color);
-            attached_pixels_.emplace_back(current.x, current.y);
+            access_vertices().emplace_back(current.x, current.y);
 
             const int double_error = 2 * error;
             if (double_error > -delta_y)
@@ -70,8 +65,8 @@ class Line2D final : public Shape2D
         const Position2D start_container = start_;
         const Position2D end_container = end_;
 
-        const Position2D range = {static_cast<int32_t>(bounding_box_.width - 1),
-                                  static_cast<int32_t>(bounding_box_.height - 1)};
+        const Position2D range = {static_cast<int32_t>(access_bounding_box().width - 1),
+                                  static_cast<int32_t>(access_bounding_box().height - 1)};
         start_ = Position2D::generate_random({0, 0}, range);
         end_ = Position2D::generate_random({0, 0}, range);
 
@@ -90,22 +85,7 @@ class Line2D final : public Shape2D
         return "Start: " + start_.string() + " End: " + end_.string();
     }
 
-    [[nodiscard]] Vertices get_vertices() const override
-    {
-        Vertices result = {start_, end_};
-        return result;
-    }
-
-    [[nodiscard]] BoundingBox get_bounding_box() const
-    {
-        return bounding_box_;
-    }
-
   private:
     Position2D start_;
     Position2D end_;
-
-    BoundingBox bounding_box_;
-
-    std::vector<Position2D> attached_pixels_;
 };
