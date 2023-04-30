@@ -18,8 +18,6 @@ class Shape2D
 
     virtual void draw_on(Texture &texture, const ColorRGB &color) = 0;
 
-    [[nodiscard]] virtual std::unique_ptr<Shape2D> clone() const = 0;
-
     [[nodiscard]] virtual std::string string() const {
         std::string result = "Shape2D: (" + std::to_string(vertices_.size()) + ") vertices\n";
         for (std::size_t i = 0; i < vertices_.size(); ++i) {
@@ -28,7 +26,7 @@ class Shape2D
         }
         return result;
     }
-    
+
     [[nodiscard]] const Vertices & get_vertices() const {
         return vertices_;
     }

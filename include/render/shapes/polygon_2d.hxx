@@ -52,11 +52,6 @@ class Polygon2D final : public Shape2D
         }
     }
 
-    [[nodiscard]] std::unique_ptr<Shape2D> clone() const override
-    {
-        return std::make_unique<Polygon2D>(*this);
-    }
-
     [[nodiscard]] std::string string() const override
     {
         return get_bounding_box().string();

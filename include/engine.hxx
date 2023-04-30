@@ -12,5 +12,7 @@
 #include "render/shapes/polygon_2d.hxx"
 #include "render/shapes/position_2d.hxx"
 
+#include "render/shapes/triangulated_shape.hxx"
+
 #include "render/textures/ppm_handler.hxx"
 #include "render/textures/texture.hxx"

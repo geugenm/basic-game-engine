@@ -75,11 +75,6 @@ class Line2D final : public Shape2D
         end_ = end_container;
     }
 
-    [[nodiscard]] std::unique_ptr<Shape2D> clone() const override
-    {
-        return std::make_unique<Line2D>(*this);
-    }
-
     [[nodiscard]] std::string string() const override
     {
         return "Start: " + start_.string() + " End: " + end_.string();

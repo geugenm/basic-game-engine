@@ -2,11 +2,31 @@
 
 #include "polygon_2d.hxx"
 
-class TriangulatedShape2D : Shape2D {
+class TriangulatedShape2D : Shape2D
+{
   public:
-    TriangulatedShape2D(const Shape2D & shape) {
+    explicit TriangulatedShape2D(const Shape2D &shape)
+    {
         set_vertices(shape.get_vertices());
         set_bounding_box(shape.get_bounding_box());
+    }
+
+    ~TriangulatedShape2D() override = default;
+
+    [[nodiscard]] std::string string() const override
+    {
+        return Shape2D::string();
+    }
+
+    void draw_on(Texture &texture, const ColorRGB &color) override
+    {
+        for (size_t i = 0; i < access_vertices().size(); ++i)
+        {
+            const Position2D &p1 = access_vertices()[i];
+            const Position2D &p2 = access_vertices()[(i + 1) % access_vertices().size()];
+            Line2D l(p1, p2);
+            l.draw_on(texture, color);
+        }
     }
 
     /// TODO: make sure that everything drawn up
@@ -61,7 +81,6 @@ class TriangulatedShape2D : Shape2D {
         draw_on(texture, {255, 255, 0});
         PpmHandler ppm_handler("12345.ppm", texture);
         ppm_handler.save();
-
     }
 
     [[nodiscard]] bool is_ear(const size_t &index)
@@ -97,7 +116,7 @@ class TriangulatedShape2D : Shape2D {
         return true;
     }
 
-    [[nodiscard]] bool is_reflex(const size_t & index)
+    [[nodiscard]] bool is_reflex(const size_t &index)
     {
         const Position2D &p1 = access_vertices()[(index + access_vertices().size() - 1) % access_vertices().size()];
         const Position2D &p2 = access_vertices()[index];
@@ -108,7 +127,7 @@ class TriangulatedShape2D : Shape2D {
         return (cross_product < 0);
     }
 
-    void remove_ear(const size_t & index)
+    void remove_ear(const size_t &index)
     {
         access_vertices().erase(access_vertices().begin() + static_cast<long>(index));
     }
