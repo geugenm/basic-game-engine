@@ -88,6 +88,47 @@ TEST(Polygon2DTest, DrawIndexedShape)
     handler.save();
 }
 
+TEST(Polygon2DTest, ConstructorWithBoundingBoxAndSidesAmount)
+{
+    BoundingBox box({0, 0}, {10, 10});
+    Polygon2D polygon(box, 5);
+    EXPECT_EQ(polygon.get_vertices().size(), 5);
+}
+
+TEST(Polygon2DTest, ConstructorWithBoundingBoxAndVertices)
+{
+    BoundingBox box({0, 0}, {10, 10});
+    Vertices vertices = {{2, 2}, {8, 2}, {8, 8}, {2, 8}};
+    Polygon2D polygon(box, vertices);
+    EXPECT_EQ(polygon.get_vertices(), vertices);
+}
+
+TEST(Polygon2DTest, ConstructorWithStartEndPositionsAndSidesAmount)
+{
+    Position2D start(0, 0);
+    Position2D end(10, 10);
+    Polygon2D polygon(start, end, 4);
+    EXPECT_EQ(polygon.get_vertices().size(), 4);
+}
+
+TEST(Polygon2DTest, CopyConstructor)
+{
+    const BoundingBox box({0, 0}, {10, 10});
+    const Vertices vertices = {{2, 2}, {8, 2}, {8, 8}, {2, 8}};
+    const Polygon2D polygon1(box, vertices);
+    const Polygon2D polygon2(polygon1);
+    EXPECT_EQ(polygon1.get_vertices(), polygon2.get_vertices());
+}
+
+TEST(Polygon2DTest, AddVertex)
+{
+    BoundingBox box({0, 0}, {10, 10});
+    Polygon2D polygon(box, 3);
+    polygon.add_vertex({5, 5});
+    EXPECT_EQ(polygon.get_vertices().size(), 4);
+    EXPECT_EQ(polygon.get_vertices().back(), Position2D(5, 5));
+}
+
 auto main(int argc, char **argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);

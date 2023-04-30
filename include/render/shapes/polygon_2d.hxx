@@ -32,11 +32,14 @@ class Polygon2D final : public Shape2D
 
     Polygon2D(const Polygon2D &other) : Shape2D(other)
     {
-        init_random(other.get_vertices().size());
+        set_vertices(other.get_vertices());
+        set_bounding_box(other.get_bounding_box());
     }
 
     Polygon2D(Polygon2D &&other) noexcept
     {
+        set_vertices(other.get_vertices());
+        set_bounding_box(other.get_bounding_box());
     }
 
     ~Polygon2D() override = default;
