@@ -14,10 +14,11 @@ auto main(int argc, char **argv) -> int
     ColorRGB color(255, 0, 0);
 
     square.draw_on(texture, color);
+    square.fill(texture, color);
 
-    TriangulatedShape2D triangulated_shape2_d(square);
-    triangulated_shape2_d.triangulate();
-    triangulated_shape2_d.draw_on(texture, {155, 155, 0});
+//    TriangulatedShape2D triangulated_shape2_d(square);
+//    triangulated_shape2_d.triangulate();
+//    triangulated_shape2_d.draw_on(texture, {155, 155, 0});
 
     texture.draw_mesh();
     PpmHandler handler("test_interpolation.ppm", texture);

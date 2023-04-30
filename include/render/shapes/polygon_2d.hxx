@@ -52,9 +52,59 @@ class Polygon2D final : public Shape2D
         }
     }
 
+    void fill(Texture& texture, const ColorRGB& color)
+    {
+        // Get the minimum and maximum y-coordinates of the polygon vertices
+        int min_y = std::numeric_limits<int>::max();
+        int max_y = std::numeric_limits<int>::min();
+        for (const auto& vertex : access_vertices())
+        {
+            if (vertex.y < min_y)
+            {
+                min_y = vertex.y;
+            }
+            if (vertex.y > max_y)
+            {
+                max_y = vertex.y;
+            }
+        }
+
+        // Loop over all rows of pixels within the polygon's bounding box
+        for (int y = min_y; y <= max_y; ++y)
+        {
+            std::vector<std::pair<int, int>> intersections;
+            for (size_t i = 0; i < access_vertices().size(); ++i)
+            {
+                const Position2D& p1 = access_vertices()[i];
+                const Position2D& p2 = access_vertices()[(i + 1) % access_vertices().size()];
+                if ((p1.y <= y && p2.y > y) || (p1.y > y && p2.y <= y))
+                {
+                    // Compute the x-coordinate of the edge at the point of intersection with the current row
+                    const double slope = static_cast<double>(p2.x - p1.x) / static_cast<double>(p2.y - p1.y);
+                    const double x = p1.x + slope * (y - p1.y);
+                    intersections.emplace_back(static_cast<int>(x), static_cast<int>(i));
+                }
+            }
+
+            // Sort the intersecting edges by their x-coordinate at the point of intersection with the current row
+            std::sort(intersections.begin(), intersections.end());
+
+            // Fill in the pixels between adjacent pairs of intersecting edges
+            for (size_t i = 0; i < intersections.size(); i += 2)
+            {
+                const int x_start = std::max(0, intersections[i].first);
+                const int x_end = std::min(static_cast<int>(access_bounding_box().width) - 1, intersections[i + 1].first);
+                for (int x = x_start; x <= x_end; ++x)
+                {
+                    texture.set_pixel({x, y}, color);
+                }
+            }
+        }
+    }
+
     [[nodiscard]] std::string string() const override
     {
-        return get_bounding_box().string();
+        return Shape2D::string();
     }
 
     void add_vertex(const Position2D &position)
