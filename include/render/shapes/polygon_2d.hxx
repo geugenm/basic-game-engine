@@ -62,7 +62,7 @@ class Polygon2D final : public Shape2D
 
     void draw_mesh(Texture &texture)
     {
-        const auto& shape = texture.get_shape();
+        const auto &shape = texture.get_shape();
 
         constexpr float kMeshDensity = 0.02f;
         const auto step = static_cast<size_t>((float)std::max(shape.width, shape.height) * kMeshDensity);
@@ -144,6 +144,9 @@ class Polygon2D final : public Shape2D
             ear[i] = is_ear(i);
         }
 
+        Texture texture;
+        texture.set_shape(bounding_box_);
+
         size_t remaining_vertices = vertices_.size();
         while (remaining_vertices > 3)
         {
@@ -153,6 +156,8 @@ class Polygon2D final : public Shape2D
             {
                 ear_index++;
             }
+
+            draw_on(texture, {255, 255, 0});
 
             // Remove the ear
             remove_ear(ear_index);
@@ -167,6 +172,11 @@ class Polygon2D final : public Shape2D
 
             remaining_vertices--;
         }
+
+        draw_on(texture, {255, 255, 0});
+        PpmHandler ppm_handler("12345.ppm", texture);
+        ppm_handler.save();
+
     }
 
     bool has_vertex_on(const Position2D &position)
@@ -178,27 +188,33 @@ class Polygon2D final : public Shape2D
         return false;
     }
 
-    [[nodiscard]] bool is_ear(size_t index) const
+    [[nodiscard]] bool is_ear(const size_t &index) const
     {
-        const Position2D &p1 = vertices_[(index + vertices_.size() - 1) % vertices_.size()];
-        const Position2D &p2 = vertices_[index];
-        const Position2D &p3 = vertices_[(index + 1) % vertices_.size()];
-
         if (is_reflex(index))
         {
             return false;
         }
 
-        Polygon2D triangle({1000, 1000}, {p1, p2, p3});
-        for (size_t i = 0; i < vertices_.size(); ++i)
+        const auto &prev_vertex = vertices_[(index + vertices_.size() - 1) % vertices_.size()];
+        const auto &curr_vertex = vertices_[index];
+        const auto &next_vertex = vertices_[(index + 1) % vertices_.size()];
+
+        Polygon2D triangle(bounding_box_, {prev_vertex, curr_vertex, next_vertex});
+
+        for (const auto &vertex : vertices_)
         {
-            if ((i != index) && (i != (index + 1) % vertices_.size()) &&
-                (i != (index + vertices_.size() - 1) % vertices_.size()))
+            const bool is_current_vertex = (&vertex == &curr_vertex);
+            const bool is_prev_vertex = (&vertex == &prev_vertex);
+            const bool is_next_vertex = (&vertex == &next_vertex);
+
+            if (is_current_vertex || is_prev_vertex || is_next_vertex)
             {
-                if (triangle.has_vertex_on(vertices_[i]))
-                {
-                    return false;
-                }
+                continue;
+            }
+
+            if (triangle.has_vertex_on(vertex))
+            {
+                return false;
             }
         }
 
