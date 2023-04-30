@@ -60,19 +60,12 @@ class Shape2D
     }
 
     void shrink_bounding_box() {
-        int min_x = INT_MAX, min_y = INT_MAX, max_x = INT_MIN, max_y = INT_MIN;
-        for (const auto &vertex : access_vertices())
-        {
-            min_x = std::min(min_x, vertex.x);
-            min_y = std::min(min_y, vertex.y);
-            max_x = std::max(max_x, vertex.x);
-            max_y = std::max(max_y, vertex.y);
-        }
+        auto [min_x, min_y] = *std::ranges::min_element(vertices_, {}, &Position2D::x);
+        auto [max_x, max_y] = *std::ranges::max_element(vertices_, {}, &Position2D::y);
 
-        const Position2D bottom_left = {min_x, min_y};
-        const Position2D top_right = {max_x, max_y};
-        set_bounding_box(BoundingBox(bottom_left, top_right));
+        set_bounding_box(BoundingBox({min_x, min_y}, {max_x, max_y}));
     }
+
 
     [[nodiscard]] Vertices &access_vertices()
     {
