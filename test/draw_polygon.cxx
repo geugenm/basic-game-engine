@@ -1,7 +1,5 @@
-#include "render/shapes/indexed_shape.hxx"
-#include "render/shapes/polygon_2d.hxx"
+#include "engine.hxx"
 
-#include <Tracy/tracy/Tracy.hpp>
 #include <gtest/gtest.h>
 
 TEST(Polygon2DTest, DrawPolygonTest)
@@ -127,6 +125,38 @@ TEST(Polygon2DTest, AddVertex)
     polygon.add_vertex({5, 5});
     EXPECT_EQ(polygon.get_vertices().size(), 4);
     EXPECT_EQ(polygon.get_vertices().back(), Position2D(5, 5));
+}
+
+TEST(Polygon2DTest, Triangulate) {
+    const BoundingBox bounding_box(1000, 1000);
+    Texture texture;
+    texture.set_shape(bounding_box);
+
+    constexpr size_t angles_amount = 10;
+    Polygon2D polygon(bounding_box, angles_amount);
+
+    TriangulatedShape2D triangulated_shape2_d(polygon);
+    triangulated_shape2_d.triangulate(texture, {155, 155, 0});
+
+    texture.draw_mesh();
+    PpmHandler handler("test_triangulation.ppm", texture);
+    handler.save();
+}
+
+TEST(Polygon2DTest, Rasterize) {
+    const BoundingBox bounding_box(1000, 1000);
+    Texture texture;
+    texture.set_shape(bounding_box);
+
+    constexpr size_t angles_amount = 3;
+    Polygon2D polygon(bounding_box, angles_amount);
+
+    polygon.fill(texture, {255, 0, 0});
+    polygon.draw_on(texture, {0, 0, 255});
+
+    texture.draw_mesh();
+    PpmHandler handler("test_rasterization.ppm", texture);
+    handler.save();
 }
 
 auto main(int argc, char **argv) -> int

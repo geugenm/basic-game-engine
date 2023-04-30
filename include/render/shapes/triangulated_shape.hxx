@@ -30,7 +30,7 @@ class TriangulatedShape2D : Shape2D
     }
 
     /// TODO: make sure that everything drawn up
-    void triangulate()
+    void triangulate(Texture & texture, const ColorRGB &color)
     {
         if (access_vertices().size() < 3)
         {
@@ -49,7 +49,6 @@ class TriangulatedShape2D : Shape2D
             ear[i] = is_ear(i);
         }
 
-        Texture texture;
         texture.set_shape(get_bounding_box());
 
         size_t remaining_vertices = access_vertices().size();
@@ -79,8 +78,6 @@ class TriangulatedShape2D : Shape2D
         }
 
         draw_on(texture, {255, 255, 0});
-        PpmHandler ppm_handler("12345.ppm", texture);
-        ppm_handler.save();
     }
 
     [[nodiscard]] bool is_ear(const size_t &index)
