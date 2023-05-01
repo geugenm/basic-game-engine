@@ -165,9 +165,11 @@ TEST(Polygon2DTest, Interpolate) {
     texture.set_shape(bounding_box);
 
     constexpr size_t angles_amount = 3;
-    Polygon2D polygon<double>(bounding_box, angles_amount);
+    Polygon2D polygon(bounding_box, angles_amount);
 
-    polygon.interpolate(texture, texture);
+    PpmHandler handler1("leo.ppm");
+    Texture leo(handler1.get_texture());
+
     polygon.draw_on(texture, {0, 0, 255});
 
     texture.draw_mesh();

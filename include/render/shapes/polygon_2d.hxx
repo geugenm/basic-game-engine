@@ -58,22 +58,11 @@ class Polygon2D final : public Shape2D
     void fill(Texture &texture, const ColorRGB &color)
     {
         // Get the minimum and maximum y-coordinates of the polygon vertices
-        int min_y = std::numeric_limits<int>::max();
-        int max_y = std::numeric_limits<int>::min();
-        for (const auto &vertex : get_vertices())
-        {
-            if (vertex.y < min_y)
-            {
-                min_y = vertex.y;
-            }
-            if (vertex.y > max_y)
-            {
-                max_y = vertex.y;
-            }
-        }
+        auto vertices = get_vertices();
+        auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto& vertex) { return vertex.y; });
 
         // Loop over all rows of pixels within the polygon's bounding box
-        for (int y = min_y; y <= max_y; ++y)
+        for (int y = min_y->y; y <= max_y->y; ++y)
         {
             std::vector<std::pair<int, int>> intersections;
             for (size_t i = 0; i < get_vertices().size(); ++i)
