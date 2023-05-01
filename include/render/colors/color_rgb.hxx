@@ -68,7 +68,7 @@ struct ColorRGB
         return {distrib(gen), distrib(gen), distrib(gen)};
     }
 
-    [[nodiscard]] static ColorRGB lerp(const ColorRGB& first, const ColorRGB& second, double t) {
+    [[nodiscard]] static ColorRGB interpolate_linearly(const ColorRGB& first, const ColorRGB& second, double t) {
         // Ensure t is within the valid range [0, 1]
         t = std::clamp(t, 0.0, 1.0);
 

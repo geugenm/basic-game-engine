@@ -57,7 +57,7 @@ class Polygon2D final : public Shape2D
         }
     }
 
-    void interpolate(Texture &texture, const ColorRGB &color)
+    void interpolate(Texture &texture, const ColorRGB & gradient_begin, const ColorRGB & gradient_end)
     {
         // Get the minimum and maximum y-coordinates of the polygon vertices
         auto vertices = get_vertices();
@@ -67,28 +67,7 @@ class Polygon2D final : public Shape2D
         for (int y = min_y->y; y <= max_y->y; ++y)
         {
             std::vector<std::pair<int, int>> intersections;
-            for (size_t i = 0; i < get_vertices().size(); ++i)
-            {
-                const Position2D& p1 = get_vertices()[i];
-                const Position2D& p2 = get_vertices()[(i + 1) % get_vertices().size()];
-
-                // Compute the y-coordinates of the two endpoints of the current edge
-                const int y1 = p1.y;
-                const int y2 = p2.y;
-
-                // Check if the edge intersects the current row
-                if ((y1 <= y && y2 > y) || (y2 <= y && y1 > y))
-                {
-                    // Compute the interpolation factor for the current row
-                    double t = (static_cast<double>(y) - p1.y) / (p2.y - p1.y);
-
-                    // Interpolate between the two endpoints of the edge at the current row
-                    Position2D p = Position2D::interpolate(p1, p2, t);
-
-                    // Add the intersection to the list
-                    intersections.emplace_back(static_cast<int>(p.x), static_cast<int>(i));
-                }
-            }
+            compute_edge_intersections(y, vertices, intersections);
 
             // Sort the intersecting edges by their x-coordinate at the point of intersection with the current row
             std::sort(intersections.begin(), intersections.end());
@@ -101,7 +80,7 @@ class Polygon2D final : public Shape2D
                 for (int x = x_start; x <= x_end; ++x)
                 {
                     double t = (static_cast<double>(x) - intersections[i].first) / (intersections[i + 1].first - intersections[i].first);
-                    ColorRGB interpolated_color = ColorRGB::lerp({0, 0, 255}, {255, 0, 0}, t);
+                    ColorRGB interpolated_color = ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t);
                     texture.set_pixel({x, y}, interpolated_color);
                 }
             }
@@ -119,25 +98,7 @@ class Polygon2D final : public Shape2D
         for (int y = min_y->y; y <= max_y->y; ++y)
         {
             std::vector<std::pair<int, int>> intersections;
-            for (size_t i = 0; i < get_vertices().size(); ++i)
-            {
-                const Position2D &p1 = get_vertices()[i];
-                const Position2D &p2 = get_vertices()[(i + 1) % get_vertices().size()];
-
-                const bool edge_starts_above = p1.y > y;
-                const bool edge_ends_below = p2.y <= y;
-
-                const bool edge_starts_below = p1.y <= y;
-                const bool edge_ends_above = p2.y > y;
-
-                if ((edge_starts_above && edge_ends_below) || (edge_starts_below && edge_ends_above))
-                {
-                    // Compute the x-coordinate of the edge at the point of intersection with the current row
-                    const double slope = static_cast<double>(p2.x - p1.x) / static_cast<double>(p2.y - p1.y);
-                    const double x = p1.x + slope * (y - p1.y);
-                    intersections.emplace_back(static_cast<int>(x), static_cast<int>(i));
-                }
-            }
+            compute_edge_intersections(y, vertices, intersections);
 
             // Sort the intersecting edges by their x-coordinate at the point of intersection with the current row
             std::sort(intersections.begin(), intersections.end());
@@ -200,6 +161,29 @@ class Polygon2D final : public Shape2D
             const double x = center.x + radius_x * std::cos(theta);
             const double y = center.y + radius_y * std::sin(theta);
             access_vertices()[i] = {static_cast<int>(x), static_cast<int>(y)};
+        }
+    }
+
+    static void compute_edge_intersections(int y, const std::vector<Position2D>& vertices, std::vector<std::pair<int, int>>& intersections)
+    {
+        for (size_t i = 0; i < vertices.size(); ++i)
+        {
+            const Position2D &p1 = vertices[i];
+            const Position2D &p2 = vertices[(i + 1) % vertices.size()];
+
+            const bool edge_starts_above = p1.y > y;
+            const bool edge_ends_below = p2.y <= y;
+
+            const bool edge_starts_below = p1.y <= y;
+            const bool edge_ends_above = p2.y > y;
+
+            if ((edge_starts_above && edge_ends_below) || (edge_starts_below && edge_ends_above))
+            {
+                // Compute the x-coordinate of the edge at the point of intersection with the current row
+                const double slope = static_cast<double>(p2.x - p1.x) / static_cast<double>(p2.y - p1.y);
+                const double x = p1.x + slope * (y - p1.y);
+                intersections.emplace_back(static_cast<int>(x), static_cast<int>(i));
+            }
         }
     }
 };

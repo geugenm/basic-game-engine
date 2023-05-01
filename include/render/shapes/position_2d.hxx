@@ -89,28 +89,4 @@ struct Position2D
         Position2D y_result = generate_random(from.y, to.y);
         return {x_result.x, y_result.x};
     }
-
-    static double distance(const Position2D &p1, const Position2D &p2)
-    {
-        const auto dx = static_cast<double>(p2.x - p1.x);
-        const auto dy = static_cast<double>(p2.y - p1.y);
-        return std::sqrt(dx * dx + dy * dy);
-    }
-
-    static double dot(const Position2D &p1, const Position2D &p2)
-    {
-        return static_cast<double>(p1.x * p2.x + p1.y * p2.y);
-    }
-
-    static double cross(const Position2D &p1, const Position2D &p2)
-    {
-        return static_cast<double>(p1.x * p2.y - p1.y * p2.x);
-    }
-
-    static Position2D interpolate(const Position2D& p1, const Position2D& p2, double t)
-    {
-        int x = static_cast<int>(p1.x + (p2.x - p1.x) * t);
-        int y = static_cast<int>(p1.y + (p2.y - p1.y) * t);
-        return {x, y};
-    }
 };
