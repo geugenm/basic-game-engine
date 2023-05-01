@@ -14,23 +14,23 @@ class ExampleGame : public AbstractApplication
 
     void initialize() override
     {
-        Engine::get_instance()->initialize();
+        UIEngineSingleton::get_instance()->initialize();
     }
 
     void update() override
     {
-        Engine::get_instance()->update();
+        UIEngineSingleton::get_instance()->update();
     }
 
     void render() const override
     {
-        Engine::get_instance()->render();
+        UIEngineSingleton::get_instance()->render();
     }
 };
 
 AbstractApplication *create_application()
 {
-    if (Engine::get_instance() != nullptr)
+    if (UIEngineSingleton::get_instance() != nullptr)
     {
         return new ExampleGame();
     }
@@ -39,6 +39,6 @@ AbstractApplication *create_application()
 
 void destroy_application(AbstractApplication *application)
 {
-    Engine::get_instance()->destroy();
+    UIEngineSingleton::get_instance()->destroy();
     delete application;
 }
