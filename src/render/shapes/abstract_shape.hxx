@@ -1,8 +1,8 @@
 #pragma once
 
-#include "render/colors/color_rgb.hxx"
-#include "render/shapes/position_2d.hxx"
-#include "render/textures/texture.hxx"
+#include "../colors/color_rgb.hxx"
+#include "../textures/texture.hxx"
+#include "position_2d.hxx"
 
 #include <memory>
 #include <vector>

@@ -8,18 +8,18 @@ include(${CPM_PACKAGES_DIR}/glog.cmake)
 include(${CPM_PACKAGES_DIR}/tracy.cmake)
 include(${CPM_PACKAGES_DIR}/ccache.cmake)
 
-add_executable(main main.cxx)
 
-add_subdirectory(sdl)
-add_subdirectory(apps)
+add_library(engine)
 
-target_include_directories(main PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/../include/
+file(GLOB_RECURSE RENDER_SOURCES CONFIGURE_DEPENDS "render/*.cxx" "render/*.cpp" "render/*.cc" "render/*.c")
+file(GLOB_RECURSE RENDER_HEADERS CONFIGURE_DEPENDS "render/*.h" "render/*.hpp" "render/*.hxx" engine.hxx)
+
+target_include_directories(engine PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
+target_sources(engine PUBLIC
+        ${RENDER_SOURCES}
         )
 
-target_compile_features(main PRIVATE cxx_std_23)
+target_link_libraries(engine PUBLIC engine-includes)
 
-target_link_libraries(main PRIVATE
-        sdl-engine
-        example-game
-        )
+target_compile_features(engine PRIVATE cxx_std_23)

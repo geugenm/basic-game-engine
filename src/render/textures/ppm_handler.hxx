@@ -1,13 +1,13 @@
 #pragma once
 
+#include "../colors/color_rgb.hxx"
 #include "abstract_file_handler.hxx"
-#include "render/colors/color_rgb.hxx"
 
 #include <fstream>
 #include <regex>
 #include <vector>
 
-#include <render/textures/texture.hxx>
+#include "texture.hxx"
 
 class PpmHandler : public File
 {

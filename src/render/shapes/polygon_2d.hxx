@@ -3,13 +3,13 @@
 #include <filesystem>
 #include <utility>
 
-#include "render/shapes/abstract_shape.hxx"
-#include "render/shapes/line_2d.hxx"
-#include "render/textures/texture.hxx"
+#include "../textures/texture.hxx"
+#include "abstract_shape.hxx"
+#include "line_2d.hxx"
 
-#include "render/shaders/gfx_program.hxx"
+#include "../shaders/gfx_program.hxx"
 
-#include "render/textures/ppm_handler.hxx"
+#include "../textures/ppm_handler.hxx"
 
 class Polygon2D : public Shape2D
 {
