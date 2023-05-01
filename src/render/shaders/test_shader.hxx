@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "gfx_program.hxx"
 
 namespace GFX
@@ -20,13 +22,12 @@ class TestShader : public GFXProgram
 
     ColorRGB fragment_shader(const Position2D &vertex) override
     {
-        if (vertex.x < 800)
-        {
-            return {0, 255, 200};
-        }
-        return {100, 0, 0};
-    }
+        auto distortion = static_cast<float>(0.05f * std::sin(5.0f * static_cast<float>(vertex.x)));
+        Position2D distortedVertex = vertex + Position2D(static_cast<int32_t>(distortion), 0.0f);
 
-  private:
+        ColorRGB texColor = distortedVertex.color;
+
+        return texColor;
+    }
 };
 } // namespace GFX
