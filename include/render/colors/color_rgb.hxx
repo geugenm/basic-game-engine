@@ -39,35 +39,6 @@ struct ColorRGB
         return !(*this == other);
     }
 
-    ColorRGB operator+(const ColorRGB &other) const
-    {
-        return {static_cast<std::uint8_t>(std::min(static_cast<int>(red) + static_cast<int>(other.red), 255)),
-                static_cast<std::uint8_t>(std::min(static_cast<int>(green) + static_cast<int>(other.green), 255)),
-                static_cast<std::uint8_t>(std::min(static_cast<int>(blue) + static_cast<int>(other.blue), 255))};
-    }
-
-    ColorRGB operator-(const ColorRGB &other) const
-    {
-        return {static_cast<std::uint8_t>(std::max(static_cast<int>(red) - static_cast<int>(other.red), 0)),
-                static_cast<std::uint8_t>(std::max(static_cast<int>(green) - static_cast<int>(other.green), 0)),
-                static_cast<std::uint8_t>(std::max(static_cast<int>(blue) - static_cast<int>(other.blue), 0))};
-    }
-
-    ColorRGB operator*(float scalar) const
-    {
-        return {static_cast<std::uint8_t>(std::max(std::min(static_cast<int>(std::round(red * scalar)), 255), 0)),
-                static_cast<std::uint8_t>(std::max(std::min(static_cast<int>(std::round(green * scalar)), 255), 0)),
-                static_cast<std::uint8_t>(std::max(std::min(static_cast<int>(std::round(blue * scalar)), 255), 0))};
-    }
-
-    [[nodiscard]] static ColorRGB generate_random()
-    {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<std::uint8_t> distrib(0, 255);
-        return {distrib(gen), distrib(gen), distrib(gen)};
-    }
-
     [[nodiscard]] static ColorRGB interpolate_linearly(const ColorRGB& first, const ColorRGB& second, double t) {
         // Ensure t is within the valid range [0, 1]
         t = std::clamp(t, 0.0, 1.0);

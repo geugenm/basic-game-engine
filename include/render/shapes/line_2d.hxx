@@ -60,21 +60,6 @@ class Line2D final : public Shape2D
         }
     }
 
-    void draw_random(Texture &texture)
-    {
-        const Position2D start_container = start_;
-        const Position2D end_container = end_;
-
-        const Position2D range = {static_cast<int32_t>(access_bounding_box().width - 1),
-                                  static_cast<int32_t>(access_bounding_box().height - 1)};
-        start_ = Position2D::generate_random({0, 0}, range);
-        end_ = Position2D::generate_random({0, 0}, range);
-
-        draw_on(texture, ColorRGB::generate_random());
-        start_ = start_container;
-        end_ = end_container;
-    }
-
     [[nodiscard]] std::string string() const override
     {
         return "Start: " + start_.string() + " End: " + end_.string();

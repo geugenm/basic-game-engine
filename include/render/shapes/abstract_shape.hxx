@@ -59,13 +59,6 @@ class Shape2D
         access_vertices() = vertices;
     }
 
-    void shrink_bounding_box() {
-        auto [min_x, min_y] = *std::ranges::min_element(vertices_, {}, &Position2D::x);
-        auto [max_x, max_y] = *std::ranges::max_element(vertices_, {}, &Position2D::y);
-
-        set_bounding_box(BoundingBox({min_x, min_y}, {max_x, max_y}));
-    }
-
 
     [[nodiscard]] Vertices &access_vertices()
     {

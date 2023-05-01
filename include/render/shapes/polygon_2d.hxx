@@ -87,6 +87,52 @@ class Polygon2D : public Shape2D
         }
     }
 
+    void apply_shader(Texture &texture)
+    {
+        // Get the minimum and maximum y-coordinates of the polygon vertices
+        auto vertices = get_vertices();
+        auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto &vertex) { return vertex.y; });
+
+        // Loop over all rows of pixels within the polygon's bounding box
+        for (int y = min_y->y; y <= max_y->y; ++y)
+        {
+            std::vector<std::pair<int, int>> intersections;
+            compute_edge_intersections(y, vertices, intersections);
+
+            // Sort the intersecting edges by their x-coordinate at the point of intersection with the current row
+            std::sort(intersections.begin(), intersections.end());
+
+            Vertices vertices1;
+            for (auto & intersection : intersections) {
+                vertices1.emplace_back(intersection.first, y);
+            }
+
+            for (auto & vertex : vertices1) {
+                vertex = gfx_program->vertex_shader(vertex);
+                vertex.color = gfx_program->fragment_shader(vertex);
+            }
+
+            if (vertices1.size() != intersections.size()) {
+                throw std::invalid_argument("Sizes do not match.");
+            }
+
+            // Fill in the pixels between adjacent pairs of intersecting edges
+            for (size_t i = 0; i < intersections.size(); i += 2)
+            {
+                const int x_start = std::max(0, intersections[i].first);
+                const int x_end = std::min(static_cast<int>(get_bounding_box().width) - 1, intersections[i + 1].first);
+                ColorRGB gradient_begin = vertices1[i].color;
+                ColorRGB gradient_end = vertices1[i + 1].color;
+                for (int x = x_start; x <= x_end; ++x)
+                {
+                    double t = (static_cast<double>(x) - intersections[i].first) / (intersections[i + 1].first - intersections[i].first);
+                    ColorRGB interpolated_color = ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t);
+                    texture.set_pixel({x, y}, interpolated_color);
+                }
+            }
+        }
+    }
+
 
     void fill(Texture &texture, const ColorRGB &color)
     {
@@ -187,5 +233,5 @@ class Polygon2D : public Shape2D
         }
     }
 
-    GFX::GFXProgram * gfx_program;
+    GFX::GFXProgram * gfx_program = nullptr;
 };

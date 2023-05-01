@@ -15,12 +15,11 @@ struct Uniform
     Texture *texture = nullptr;
 };
 
-class GFXProgram
+struct GFXProgram
 {
-  public:
     virtual ~GFXProgram() = default;
 
-    virtual void set_uniforms(const Uniform &) = 0;
+    virtual void set_uniform(const Uniform &) = 0;
     virtual Position2D vertex_shader(const Position2D &vertex) = 0;
     virtual ColorRGB fragment_shader(const Position2D &vertex) = 0;
 };
