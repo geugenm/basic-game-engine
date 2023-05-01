@@ -1,7 +1,7 @@
 #pragma once
 
 #include "render/colors/color_rgb.hxx"
-#include "render/shapes/box.hxx"
+#include "render/shapes/bounding_box.hxx"
 
 #include <stdexcept>
 #include <utility>
