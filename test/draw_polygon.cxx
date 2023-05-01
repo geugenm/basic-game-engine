@@ -4,8 +4,8 @@
 
 TEST(Polygon2DTest, DrawPolygonTest)
 {
-    const Position2D start = Position2D::generate_random(200, 230);
-    const Position2D end = Position2D::generate_random(300, 1200);
+    const Position2D start(200, 230);
+    const Position2D end(300, 1200);
 
     Polygon2D polygon(start, end, 8);
 
@@ -27,10 +27,10 @@ TEST(Polygon2DTest, DrawMultiplePolygonsTest)
     for (size_t i = 0; i < 12; i++)
     {
         const Position2D start = {0, 0};
-        const Position2D end = Position2D::generate_random(1000, 1000);
-        const Position2D random = Position2D::generate_random(3, 12);
+        const Position2D end(1000, 1000);
+        const Position2D random(3, 12);
         Polygon2D polygon(start, end, static_cast<const size_t>(random.x));
-        polygon.draw_on(texture, ColorRGB::generate_random());
+        polygon.draw_on(texture, {0, 1, 255});
     }
 
     std::filesystem::path path("test_multiple_polygons.ppm");
@@ -127,7 +127,8 @@ TEST(Polygon2DTest, AddVertex)
     EXPECT_EQ(polygon.get_vertices().back(), Position2D(5, 5));
 }
 
-TEST(Polygon2DTest, Triangulate) {
+TEST(Polygon2DTest, Triangulate)
+{
     const BoundingBox bounding_box(1000, 1000);
     Texture texture;
     texture.set_shape(bounding_box);
@@ -143,7 +144,8 @@ TEST(Polygon2DTest, Triangulate) {
     handler.save();
 }
 
-TEST(Polygon2DTest, Rasterize) {
+TEST(Polygon2DTest, Rasterize)
+{
     const BoundingBox bounding_box(1000, 1000);
     Texture texture;
     texture.set_shape(bounding_box);
@@ -159,7 +161,24 @@ TEST(Polygon2DTest, Rasterize) {
     handler.save();
 }
 
-TEST(Polygon2DTest, Interpolate) {
+TEST(Polygon2DTest, Interpolate)
+{
+    Texture texture;
+    texture.set_shape({1000, 1000});
+
+    constexpr size_t angles_amount = 3;
+
+    Polygon2D polygon(texture.get_shape(), angles_amount);
+
+    polygon.interpolate(texture, {0, 0, 255}, {255, 0, 0});
+
+    texture.draw_mesh();
+    PpmHandler handler("test_interpolated.ppm", texture);
+    handler.save();
+}
+
+TEST(Polygon2DTest, ApplyShader)
+{
     PpmHandler handler1("leo.ppm");
     handler1.load();
     Texture leo = handler1.get_texture();
@@ -169,13 +188,13 @@ TEST(Polygon2DTest, Interpolate) {
 
     constexpr size_t angles_amount = 3;
 
-
     Polygon2D polygon(texture.get_shape(), angles_amount);
 
-    polygon.interpolate(texture, {0, 0, 255}, {255, 0, 0});
+    GFX::TestShader shader;
+    polygon.apply_shader(texture, shader);
 
     texture.draw_mesh();
-    PpmHandler handler("test_interpolated.ppm", texture);
+    PpmHandler handler("test_shader_applied.ppm", texture);
     handler.save();
 }
 

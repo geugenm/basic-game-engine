@@ -87,7 +87,7 @@ class Polygon2D : public Shape2D
         }
     }
 
-    void apply_shader(Texture &texture)
+    void apply_shader(Texture &texture, GFX::GFXProgram & gfx_program)
     {
         // Get the minimum and maximum y-coordinates of the polygon vertices
         auto vertices = get_vertices();
@@ -108,8 +108,8 @@ class Polygon2D : public Shape2D
             }
 
             for (auto & vertex : vertices1) {
-                vertex = gfx_program->vertex_shader(vertex);
-                vertex.color = gfx_program->fragment_shader(vertex);
+                vertex = gfx_program.vertex_shader(vertex);
+                vertex.color = gfx_program.fragment_shader(vertex);
             }
 
             if (vertices1.size() != intersections.size()) {
@@ -232,6 +232,4 @@ class Polygon2D : public Shape2D
             }
         }
     }
-
-    GFX::GFXProgram * gfx_program = nullptr;
 };

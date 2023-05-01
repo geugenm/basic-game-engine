@@ -18,3 +18,4 @@
 #include "render/textures/texture.hxx"
 
 #include "render/shaders/gfx_program.hxx"
+#include "render/shaders/test_shader.hxx"
