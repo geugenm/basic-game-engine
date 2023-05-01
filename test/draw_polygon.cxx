@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+/// TODO: make it random
 TEST(Polygon2DTest, DrawPolygonTest)
 {
     const Position2D start(200, 230);
@@ -19,6 +20,7 @@ TEST(Polygon2DTest, DrawPolygonTest)
     handler.save();
 }
 
+/// TODO: make it random
 TEST(Polygon2DTest, DrawMultiplePolygonsTest)
 {
     Texture texture;
@@ -66,7 +68,7 @@ TEST(Polygon2DTest, CopyConstructor)
     const BoundingBox box({0, 0}, {10, 10});
     const Vertices vertices = {{2, 2}, {8, 2}, {8, 8}, {2, 8}};
     const Polygon2D polygon1(box, vertices);
-    const Polygon2D polygon2(polygon1);
+    const Polygon2D& polygon2(polygon1);
     EXPECT_EQ(polygon1.get_vertices(), polygon2.get_vertices());
 }
 
