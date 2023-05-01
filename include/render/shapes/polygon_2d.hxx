@@ -59,7 +59,7 @@ class Polygon2D final : public Shape2D
     {
         // Get the minimum and maximum y-coordinates of the polygon vertices
         auto vertices = get_vertices();
-        auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto& vertex) { return vertex.y; });
+        auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto &vertex) { return vertex.y; });
 
         // Loop over all rows of pixels within the polygon's bounding box
         for (int y = min_y->y; y <= max_y->y; ++y)

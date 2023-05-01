@@ -16,7 +16,9 @@ class Texture final
     {
     }
 
-    Texture(const Texture &other) = default;
+    Texture(const Texture &other) : pixels_(other.pixels_), shape_(other.shape_)
+    {
+    }
 
     Texture(Texture &&other) noexcept : pixels_(std::move(other.pixels_)), shape_(std::move(other.shape_))
     {

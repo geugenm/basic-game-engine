@@ -160,15 +160,17 @@ TEST(Polygon2DTest, Rasterize) {
 }
 
 TEST(Polygon2DTest, Interpolate) {
-    const BoundingBox bounding_box(1000, 1000);
+    PpmHandler handler1("leo.ppm");
+    handler1.load();
+    Texture leo = handler1.get_texture();
+
     Texture texture;
-    texture.set_shape(bounding_box);
+    texture.set_shape(leo.get_shape());
 
     constexpr size_t angles_amount = 3;
-    Polygon2D polygon(bounding_box, angles_amount);
 
-    PpmHandler handler1("leo.ppm");
-    Texture leo(handler1.get_texture());
+
+    Polygon2D polygon(texture.get_shape(), angles_amount);
 
     polygon.draw_on(texture, {0, 0, 255});
 
