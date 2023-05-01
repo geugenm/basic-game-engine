@@ -28,5 +28,3 @@ struct ColorRGB
 
     [[nodiscard]] static ColorRGB interpolate_linearly(const ColorRGB &first, const ColorRGB &second, double t);
 };
-
-#pragma pack(pop)

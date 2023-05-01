@@ -63,9 +63,11 @@ struct Position2D
         return *this;
     }
 
-    [[nodiscard]] constexpr double length() const
+    [[nodiscard]] double distance_to(const Position2D &other) const
     {
-        return std::sqrt(x * x + y * y);
+        const auto dx = static_cast<double>(x - other.x);
+        const auto dy = static_cast<double>(y - other.y);
+        return std::sqrt(dx * dx + dy * dy);
     }
 
     [[nodiscard]] std::string string() const
