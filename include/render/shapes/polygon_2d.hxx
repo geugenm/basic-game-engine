@@ -7,11 +7,11 @@
 #include "render/shapes/line_2d.hxx"
 #include "render/textures/texture.hxx"
 
-#include "render/shaders/vertex.hxx"
+#include "render/shaders/gfx_program.hxx"
 
 #include "render/textures/ppm_handler.hxx"
 
-class Polygon2D final : public Shape2D
+class Polygon2D : public Shape2D
 {
   public:
     explicit Polygon2D(const BoundingBox &box, const size_t &sides_amount)
@@ -186,4 +186,6 @@ class Polygon2D final : public Shape2D
             }
         }
     }
+
+    GFX::GFXProgram * gfx_program;
 };

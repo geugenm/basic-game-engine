@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cmath>
 #include <random>
 #include <stdexcept>
@@ -88,5 +89,17 @@ struct Position2D
         Position2D x_result = generate_random(from.x, to.x);
         Position2D y_result = generate_random(from.y, to.y);
         return {x_result.x, y_result.x};
+    }
+
+    static int32_t interpolate(const double f0, const double f1, const double t)
+    {
+        assert(t >= 0.0);
+        assert(t <= 1.0);
+        return static_cast<int32_t>(f0 + (f1 - f0) * t);
+    }
+
+    static Position2D interpolate(const Position2D &v0, const Position2D &v1, const double t)
+    {
+        return {interpolate(v0.x, v1.x, t), interpolate(v0.y, v1.y, t)};
     }
 };
