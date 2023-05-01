@@ -1,4 +1,4 @@
-#include "render/textures/ppm_handler.hxx"
+#include "engine.hxx"
 #include <gtest/gtest.h>
 
 class TextureFileTest : public testing::Test

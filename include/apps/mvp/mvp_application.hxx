@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../abstract_application.hxx"
-#include "application_presenter.hxx"
+#include "apps/abstract_application.hxx"
+#include "apps/mvp/application_presenter.hxx"
 
 class AbstractMVPApplication : public AbstractApplication
 {

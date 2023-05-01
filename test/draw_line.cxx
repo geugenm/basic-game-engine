@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <unistd.h>
 
+/// TODO: fix random
 TEST(Line2DTest, DrawRandomLinesTest)
 {
     constexpr int num_lines = 20;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "render/colors/color_rgb.hxx"
-#include "render/shapes/box.hxx"
+#include "../colors/color_rgb.hxx"
+#include "../shapes/bounding_box.hxx"
 
 #include <stdexcept>
 #include <utility>
@@ -48,21 +48,47 @@ class Texture final
 
     [[nodiscard]] const ColorRGB &get_pixel(const Position2D &position) const
     {
-        if (shape_.contains(position) == false)
+        if (!shape_.contains(position))
         {
             throw std::out_of_range("Error: Pixel position out of range.");
         }
-        return pixels_[position.y * shape_.width + position.x];
+        return pixels_[static_cast<size_t>(position.y) * shape_.width + static_cast<size_t>(position.x)];
     }
 
     void set_pixel(const Position2D &position, const ColorRGB &color)
     {
-        if (shape_.contains(position) == false)
+        if (!shape_.contains(position))
         {
             throw std::out_of_range("Error: Pixel position: " + position.string() +
                                     " out of range: " + shape_.string());
         }
-        pixels_[position.y * shape_.width + position.x] = color;
+        pixels_[static_cast<size_t>(position.y) * shape_.width + static_cast<size_t>(position.x)] = color;
+    }
+
+    void draw_mesh()
+    {
+        const auto &shape = get_shape();
+
+        constexpr float kMeshDensity = 0.02f;
+        const auto step = static_cast<size_t>((float)std::max(shape.width, shape.height) * kMeshDensity);
+
+        // Draw horizontal lines
+        for (std::size_t y = 0; y < shape.height; y += step)
+        {
+            for (std::size_t x = 0; x < shape.width; ++x)
+            {
+                set_pixel({static_cast<int32_t>(x), static_cast<int32_t>(y)}, {0, 255, 255});
+            }
+        }
+
+        // Draw vertical lines
+        for (std::size_t x = 0; x < shape.width; x += step)
+        {
+            for (std::size_t y = 0; y < shape.height; ++y)
+            {
+                set_pixel({static_cast<int32_t>(x), static_cast<int32_t>(y)}, {0, 255, 255});
+            }
+        }
     }
 
     void set_shape(const BoundingBox &shape)

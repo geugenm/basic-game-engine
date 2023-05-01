@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cmath>
 #include <random>
 #include <stdexcept>
@@ -9,6 +10,7 @@ struct Position2D
 {
     int32_t x = 0;
     int32_t y = 0;
+    ColorRGB color;
 
     constexpr Position2D() = default;
 
@@ -61,49 +63,25 @@ struct Position2D
         return *this;
     }
 
-    [[nodiscard]] constexpr double length() const
+    constexpr bool operator<(const Position2D &other) const
     {
-        return std::sqrt(x * x + y * y);
+        return x < other.x || (x == other.x && y < other.y);
+    }
+
+    constexpr bool operator>(const Position2D &other) const
+    {
+        return x > other.x || (x == other.x && y > other.y);
+    }
+
+    [[nodiscard]] double distance_to(const Position2D &other) const
+    {
+        const auto dx = static_cast<double>(x - other.x);
+        const auto dy = static_cast<double>(y - other.y);
+        return std::sqrt(dx * dx + dy * dy);
     }
 
     [[nodiscard]] std::string string() const
     {
         return std::string("(") + std::to_string(x) + ", " + std::to_string(y) + ")";
-    }
-
-    static Position2D generate_random(const int32_t &from, const int32_t &to)
-    {
-        if (from > to)
-        {
-            throw std::invalid_argument("Minimal generation value can't be larger than maximal.");
-        }
-        std::uniform_int_distribution<int32_t> distrib(from, to);
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        return {distrib(gen), distrib(gen)};
-    }
-
-    static Position2D generate_random(const Position2D &from, const Position2D &to)
-    {
-        Position2D x_result = generate_random(from.x, to.x);
-        Position2D y_result = generate_random(from.y, to.y);
-        return {x_result.x, y_result.x};
-    }
-
-    static double distance(const Position2D &p1, const Position2D &p2)
-    {
-        const auto dx = static_cast<double>(p2.x - p1.x);
-        const auto dy = static_cast<double>(p2.y - p1.y);
-        return std::sqrt(dx * dx + dy * dy);
-    }
-
-    static double dot(const Position2D &p1, const Position2D &p2)
-    {
-        return static_cast<double>(p1.x * p2.x + p1.y * p2.y);
-    }
-
-    static double cross(const Position2D &p1, const Position2D &p2)
-    {
-        return static_cast<double>(p1.x * p2.y - p1.y * p2.x);
     }
 };

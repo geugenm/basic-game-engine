@@ -1,13 +1,13 @@
 #pragma once
 
-#include "abstract_file.hxx"
-#include "render/colors/color_rgb.hxx"
+#include "../colors/color_rgb.hxx"
+#include "abstract_file_handler.hxx"
 
 #include <fstream>
 #include <regex>
 #include <vector>
 
-#include <render/textures/texture.hxx>
+#include "texture.hxx"
 
 class PpmHandler : public File
 {
@@ -45,7 +45,7 @@ class PpmHandler : public File
     {
         if (this != &other)
         {
-            File::operator=(std::move(other));
+            File::operator=(other);
             texture_ = std::move(other.texture_);
             other.texture_ = nullptr;
         }

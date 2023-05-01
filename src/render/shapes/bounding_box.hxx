@@ -1,6 +1,6 @@
 #pragma once
 
-#include "render/shapes/position_2d.hxx"
+#include "position_2d.hxx"
 
 #include <cmath>
 #include <cstddef>

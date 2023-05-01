@@ -1,13 +1,12 @@
-#include "render/shapes/indexed_shape.hxx"
-#include "render/shapes/polygon_2d.hxx"
+#include "engine.hxx"
 
-#include <Tracy/tracy/Tracy.hpp>
 #include <gtest/gtest.h>
 
+/// TODO: make it random
 TEST(Polygon2DTest, DrawPolygonTest)
 {
-    const Position2D start = Position2D::generate_random(200, 230);
-    const Position2D end = Position2D::generate_random(300, 1200);
+    const Position2D start(200, 230);
+    const Position2D end(300, 1200);
 
     Polygon2D polygon(start, end, 8);
 
@@ -21,19 +20,19 @@ TEST(Polygon2DTest, DrawPolygonTest)
     handler.save();
 }
 
+/// TODO: make it random
 TEST(Polygon2DTest, DrawMultiplePolygonsTest)
 {
     Texture texture;
-    texture.set_shape(BoundingBox(110, 110));
+    texture.set_shape(BoundingBox(1100, 1100));
 
     for (size_t i = 0; i < 12; i++)
     {
         const Position2D start = {0, 0};
-        const Position2D end = Position2D::generate_random(100, 100);
-        const Position2D random = Position2D::generate_random(3, 12);
+        const Position2D end(1000, 1000);
+        const Position2D random(3, 12);
         Polygon2D polygon(start, end, static_cast<const size_t>(random.x));
-        polygon.draw_on(texture, ColorRGB::generate_random());
-        sleep(1);
+        polygon.draw_on(texture, {0, 1, 255});
     }
 
     std::filesystem::path path("test_multiple_polygons.ppm");
@@ -41,51 +40,115 @@ TEST(Polygon2DTest, DrawMultiplePolygonsTest)
     handler.save();
 }
 
-TEST(Polygon2DTest, DrawIndexedShape)
+TEST(Polygon2DTest, ConstructorWithBoundingBoxAndSidesAmount)
 {
-    const Position2D start = {200, 400};
-    const Position2D end = {300, 400};
+    BoundingBox box({0, 0}, {10, 10});
+    Polygon2D polygon(box, 5);
+    EXPECT_EQ(polygon.get_vertices().size(), 5);
+}
 
-    IndexedShape indexed_shape;
+TEST(Polygon2DTest, ConstructorWithBoundingBoxAndVertices)
+{
+    BoundingBox box({0, 0}, {10, 10});
+    Vertices vertices = {{2, 2}, {8, 2}, {8, 8}, {2, 8}};
+    Polygon2D polygon(box, vertices);
+    EXPECT_EQ(polygon.get_vertices(), vertices);
+}
+
+TEST(Polygon2DTest, ConstructorWithStartEndPositionsAndSidesAmount)
+{
+    Position2D start(0, 0);
+    Position2D end(10, 10);
+    Polygon2D polygon(start, end, 4);
+    EXPECT_EQ(polygon.get_vertices().size(), 4);
+}
+
+TEST(Polygon2DTest, CopyConstructor)
+{
+    const BoundingBox box({0, 0}, {10, 10});
+    const Vertices vertices = {{2, 2}, {8, 2}, {8, 8}, {2, 8}};
+    const Polygon2D polygon1(box, vertices);
+    const Polygon2D& polygon2(polygon1);
+    EXPECT_EQ(polygon1.get_vertices(), polygon2.get_vertices());
+}
+
+TEST(Polygon2DTest, AddVertex)
+{
+    BoundingBox box({0, 0}, {10, 10});
+    Polygon2D polygon(box, 3);
+    polygon.add_vertex({5, 5});
+    EXPECT_EQ(polygon.get_vertices().size(), 4);
+    EXPECT_EQ(polygon.get_vertices().back(), Position2D(5, 5));
+}
+
+TEST(Polygon2DTest, Triangulate)
+{
+    const BoundingBox bounding_box(1000, 1000);
+    Texture texture;
+    texture.set_shape(bounding_box);
+
+    constexpr size_t angles_amount = 10;
+    Polygon2D polygon(bounding_box, angles_amount);
+
+    TriangulatedShape2D triangulated_shape2_d(polygon);
+    triangulated_shape2_d.triangulate(texture, {155, 155, 0});
+
+    texture.draw_mesh();
+    PpmHandler handler("test_triangulation.ppm", texture);
+    handler.save();
+}
+
+TEST(Polygon2DTest, Rasterize)
+{
+    const BoundingBox bounding_box(1000, 1000);
+    Texture texture;
+    texture.set_shape(bounding_box);
+
+    constexpr size_t angles_amount = 3;
+    Polygon2D polygon(bounding_box, angles_amount);
+
+    polygon.fill(texture, {255, 0, 0});
+    polygon.draw_on(texture, {0, 0, 255});
+
+    texture.draw_mesh();
+    PpmHandler handler("test_rasterization.ppm", texture);
+    handler.save();
+}
+
+TEST(Polygon2DTest, Interpolate)
+{
+    Texture texture;
+    texture.set_shape({1000, 1000});
+
+    constexpr size_t angles_amount = 3;
+
+    Polygon2D polygon(texture.get_shape(), angles_amount);
+
+    polygon.interpolate(texture, {0, 0, 255}, {255, 0, 0});
+
+    texture.draw_mesh();
+    PpmHandler handler("test_interpolated.ppm", texture);
+    handler.save();
+}
+
+TEST(Polygon2DTest, ApplyShader)
+{
+    PpmHandler handler1("leo.ppm");
+    handler1.load();
+    Texture leo = handler1.get_texture();
 
     Texture texture;
-    texture.set_shape(BoundingBox(600, 600));
+    texture.set_shape(leo.get_shape());
 
-    Polygon2D polygon(start, end, 0);
-    polygon.add_vertex({0, 0});
-    polygon.add_vertex({0, 100});
-    polygon.add_vertex({100, 100});
+    constexpr size_t angles_amount = 3;
 
-    indexed_shape.add_2d_shape(polygon);
+    Polygon2D polygon(texture.get_shape(), angles_amount);
 
-    Polygon2D polygon2(start, end, 0);
+    GFX::TestShader shader;
+    polygon.apply_shader(texture, shader);
 
-    polygon2.add_vertex({0, 0});
-    polygon2.add_vertex({100, 0});
-    polygon2.add_vertex({100, 100});
-
-    const int rect_size = 50;
-
-    for (int y = 0; y < texture.get_shape().height; y += rect_size)
-    {
-        for (int x = 0; x < texture.get_shape().width; x += rect_size)
-        {
-            Polygon2D rect({x, y}, {x + rect_size, y + rect_size}, 0);
-            rect.add_vertex({0, 0});
-            rect.add_vertex({0, rect_size});
-            rect.add_vertex({rect_size, rect_size});
-            rect.add_vertex({rect_size, 0});
-
-            indexed_shape.add_2d_shape(rect);
-        }
-    }
-
-    indexed_shape.add_2d_shape(polygon2);
-
-    indexed_shape.draw_on(texture, {0, 255, 255});
-
-    std::filesystem::path path("test_polygon_additional_vertex_indexed.ppm");
-    PpmHandler handler(path, texture);
+    texture.draw_mesh();
+    PpmHandler handler("test_shader_applied.ppm", texture);
     handler.save();
 }
 

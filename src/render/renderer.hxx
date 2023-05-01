@@ -5,15 +5,15 @@
 #include <memory>
 #include <stdexcept>
 
-class Engine
+class UIEngineSingleton
 {
   public:
-    Engine(const Engine &) = delete;
-    Engine &operator=(const Engine &) = delete;
+    UIEngineSingleton(const UIEngineSingleton &) = delete;
+    UIEngineSingleton &operator=(const UIEngineSingleton &) = delete;
 
-    static Engine *get_instance()
+    static UIEngineSingleton *get_instance()
     {
-        static Engine instance;
+        static UIEngineSingleton instance;
         return &instance;
     }
 
@@ -69,12 +69,12 @@ class Engine
         renderer_ = std::unique_ptr<AbstractUI>(create_renderer());
     }
 
-    Engine()
+    UIEngineSingleton()
     {
         form_renderer();
     }
 
-    virtual ~Engine()
+    virtual ~UIEngineSingleton()
     {
         release_renderer();
     }
