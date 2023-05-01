@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "render/textures/texture.hxx"
 #include "abstract_shape.hxx"
+#include "render/textures/texture.hxx"
 
 class Line2D final : public Shape2D
 {

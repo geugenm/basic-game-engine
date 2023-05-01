@@ -30,7 +30,7 @@ class TriangulatedShape2D : Shape2D
     }
 
     /// TODO: make sure that everything drawn up
-    void triangulate(Texture & texture, const ColorRGB &color)
+    void triangulate(Texture &texture, const ColorRGB &color)
     {
         if (access_vertices().size() < 3)
         {

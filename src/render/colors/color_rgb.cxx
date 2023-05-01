@@ -1,6 +1,6 @@
 #include "color_rgb.hxx"
 
-ColorRGB::ColorRGB(std::uint8_t r, std::uint8_t g, std::uint8_t b) : red(r), green(g), blue(b)
+ColorRGB::ColorRGB(const uint8_t &r, const uint8_t &g, const uint8_t &b) : red(r), green(g), blue(b)
 {
 }
 

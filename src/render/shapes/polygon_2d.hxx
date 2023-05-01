@@ -57,7 +57,7 @@ class Polygon2D : public Shape2D
         }
     }
 
-    void interpolate(Texture &texture, const ColorRGB & gradient_begin, const ColorRGB & gradient_end)
+    void interpolate(Texture &texture, const ColorRGB &gradient_begin, const ColorRGB &gradient_end)
     {
         // Get the minimum and maximum y-coordinates of the polygon vertices
         auto vertices = get_vertices();
@@ -79,7 +79,8 @@ class Polygon2D : public Shape2D
                 const int x_end = std::min(static_cast<int>(get_bounding_box().width) - 1, intersections[i + 1].first);
                 for (int x = x_start; x <= x_end; ++x)
                 {
-                    double t = (static_cast<double>(x) - intersections[i].first) / (intersections[i + 1].first - intersections[i].first);
+                    double t = (static_cast<double>(x) - intersections[i].first) /
+                               (intersections[i + 1].first - intersections[i].first);
                     ColorRGB interpolated_color = ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t);
                     texture.set_pixel({x, y}, interpolated_color);
                 }
@@ -87,7 +88,7 @@ class Polygon2D : public Shape2D
         }
     }
 
-    void apply_shader(Texture &texture, GFX::GFXProgram & gfx_program)
+    void apply_shader(Texture &texture, GFX::GFXProgram &gfx_program)
     {
         // Get the minimum and maximum y-coordinates of the polygon vertices
         auto vertices = get_vertices();
@@ -103,16 +104,19 @@ class Polygon2D : public Shape2D
             std::sort(intersections.begin(), intersections.end());
 
             Vertices vertices1;
-            for (auto & intersection : intersections) {
+            for (auto &intersection : intersections)
+            {
                 vertices1.emplace_back(intersection.first, y);
             }
 
-            for (auto & vertex : vertices1) {
+            for (auto &vertex : vertices1)
+            {
                 vertex = gfx_program.vertex_shader(vertex);
                 vertex.color = gfx_program.fragment_shader(vertex);
             }
 
-            if (vertices1.size() != intersections.size()) {
+            if (vertices1.size() != intersections.size())
+            {
                 throw std::invalid_argument("Sizes do not match.");
             }
 
@@ -125,14 +129,14 @@ class Polygon2D : public Shape2D
                 ColorRGB gradient_end = vertices1[i + 1].color;
                 for (int x = x_start; x <= x_end; ++x)
                 {
-                    double t = (static_cast<double>(x) - intersections[i].first) / (intersections[i + 1].first - intersections[i].first);
+                    double t = (static_cast<double>(x) - intersections[i].first) /
+                               (intersections[i + 1].first - intersections[i].first);
                     ColorRGB interpolated_color = ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t);
                     texture.set_pixel({x, y}, interpolated_color);
                 }
             }
         }
     }
-
 
     void fill(Texture &texture, const ColorRGB &color)
     {
@@ -210,7 +214,8 @@ class Polygon2D : public Shape2D
         }
     }
 
-    static void compute_edge_intersections(int y, const std::vector<Position2D>& vertices, std::vector<std::pair<int, int>>& intersections)
+    static void compute_edge_intersections(int y, const std::vector<Position2D> &vertices,
+                                           std::vector<std::pair<int, int>> &intersections)
     {
         for (size_t i = 0; i < vertices.size(); ++i)
         {

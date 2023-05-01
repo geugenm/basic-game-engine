@@ -59,7 +59,6 @@ class Shape2D
         access_vertices() = vertices;
     }
 
-
     [[nodiscard]] Vertices &access_vertices()
     {
         return vertices_;
