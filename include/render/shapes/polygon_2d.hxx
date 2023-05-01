@@ -7,6 +7,8 @@
 #include "render/shapes/line_2d.hxx"
 #include "render/textures/texture.hxx"
 
+#include "render/shaders/vertex.hxx"
+
 #include "render/textures/ppm_handler.hxx"
 
 class Polygon2D final : public Shape2D
@@ -54,6 +56,58 @@ class Polygon2D final : public Shape2D
             l.draw_on(texture, color);
         }
     }
+
+    void interpolate(Texture &texture, const ColorRGB &color)
+    {
+        // Get the minimum and maximum y-coordinates of the polygon vertices
+        auto vertices = get_vertices();
+        auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto &vertex) { return vertex.y; });
+
+        // Loop over all rows of pixels within the polygon's bounding box
+        for (int y = min_y->y; y <= max_y->y; ++y)
+        {
+            std::vector<std::pair<int, int>> intersections;
+            for (size_t i = 0; i < get_vertices().size(); ++i)
+            {
+                const Position2D& p1 = get_vertices()[i];
+                const Position2D& p2 = get_vertices()[(i + 1) % get_vertices().size()];
+
+                // Compute the y-coordinates of the two endpoints of the current edge
+                const int y1 = p1.y;
+                const int y2 = p2.y;
+
+                // Check if the edge intersects the current row
+                if ((y1 <= y && y2 > y) || (y2 <= y && y1 > y))
+                {
+                    // Compute the interpolation factor for the current row
+                    double t = (static_cast<double>(y) - p1.y) / (p2.y - p1.y);
+
+                    // Interpolate between the two endpoints of the edge at the current row
+                    Position2D p = Position2D::interpolate(p1, p2, t);
+
+                    // Add the intersection to the list
+                    intersections.emplace_back(static_cast<int>(p.x), static_cast<int>(i));
+                }
+            }
+
+            // Sort the intersecting edges by their x-coordinate at the point of intersection with the current row
+            std::sort(intersections.begin(), intersections.end());
+
+            // Fill in the pixels between adjacent pairs of intersecting edges
+            for (size_t i = 0; i < intersections.size(); i += 2)
+            {
+                const int x_start = std::max(0, intersections[i].first);
+                const int x_end = std::min(static_cast<int>(get_bounding_box().width) - 1, intersections[i + 1].first);
+                for (int x = x_start; x <= x_end; ++x)
+                {
+                    double t = (static_cast<double>(x) - intersections[i].first) / (intersections[i + 1].first - intersections[i].first);
+                    ColorRGB interpolated_color = ColorRGB::lerp({0, 0, 255}, {255, 0, 0}, t);
+                    texture.set_pixel({x, y}, interpolated_color);
+                }
+            }
+        }
+    }
+
 
     void fill(Texture &texture, const ColorRGB &color)
     {

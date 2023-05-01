@@ -67,6 +67,17 @@ struct ColorRGB
         std::uniform_int_distribution<std::uint8_t> distrib(0, 255);
         return {distrib(gen), distrib(gen), distrib(gen)};
     }
+
+    [[nodiscard]] static ColorRGB lerp(const ColorRGB& first, const ColorRGB& second, double t) {
+        // Ensure t is within the valid range [0, 1]
+        t = std::clamp(t, 0.0, 1.0);
+
+        const auto r = static_cast<uint8_t>(first.red + (second.red - first.red) * t);
+        const auto g = static_cast<uint8_t>(first.green + (second.green - first.green) * t);
+        const auto b = static_cast<uint8_t>(first.blue + (second.blue - first.blue) * t);
+
+        return {r, g, b};
+    }
 };
 
 #pragma pack(pop)

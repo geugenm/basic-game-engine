@@ -172,7 +172,7 @@ TEST(Polygon2DTest, Interpolate) {
 
     Polygon2D polygon(texture.get_shape(), angles_amount);
 
-    polygon.draw_on(texture, {0, 0, 255});
+    polygon.interpolate(texture, {0, 0, 255});
 
     texture.draw_mesh();
     PpmHandler handler("test_interpolated.ppm", texture);

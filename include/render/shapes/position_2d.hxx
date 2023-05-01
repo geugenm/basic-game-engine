@@ -106,4 +106,11 @@ struct Position2D
     {
         return static_cast<double>(p1.x * p2.y - p1.y * p2.x);
     }
+
+    static Position2D interpolate(const Position2D& p1, const Position2D& p2, double t)
+    {
+        int x = static_cast<int>(p1.x + (p2.x - p1.x) * t);
+        int y = static_cast<int>(p1.y + (p2.y - p1.y) * t);
+        return {x, y};
+    }
 };

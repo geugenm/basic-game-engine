@@ -17,4 +17,7 @@
 #include "render/textures/ppm_handler.hxx"
 #include "render/textures/texture.hxx"
 
+#include "render/shaders/vertex.hxx"
+#include "render/shaders/uniform.hxx"
+
 
