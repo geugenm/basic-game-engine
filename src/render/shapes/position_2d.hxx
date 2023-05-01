@@ -63,11 +63,13 @@ struct Position2D
         return *this;
     }
 
-    constexpr bool operator<(const Position2D& other) const {
+    constexpr bool operator<(const Position2D &other) const
+    {
         return x < other.x || (x == other.x && y < other.y);
     }
 
-    constexpr bool operator>(const Position2D& other) const {
+    constexpr bool operator>(const Position2D &other) const
+    {
         return x > other.x || (x == other.x && y > other.y);
     }
 

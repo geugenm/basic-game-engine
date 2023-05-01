@@ -1,15 +1,15 @@
 #pragma once
 
+#include "abstract_shape.hxx"
+
+#include "render/shapes/line_2d.hxx"
+#include "render/textures/texture.hxx"
+
+#include "render/shaders/gfx_program.hxx"
+#include "render/textures/ppm_handler.hxx"
+
 #include <filesystem>
 #include <utility>
-
-#include "../textures/texture.hxx"
-#include "abstract_shape.hxx"
-#include "line_2d.hxx"
-
-#include "../shaders/gfx_program.hxx"
-
-#include "../textures/ppm_handler.hxx"
 
 class Polygon2D : public Shape2D
 {
@@ -57,7 +57,7 @@ class Polygon2D : public Shape2D
         }
     }
 
-    void process_rows(Texture &texture, std::function<ColorRGB(int, double)> color_func)
+    void process_rows(Texture &texture, const std::function<ColorRGB(int, double)> &color_func)
     {
         // Get the minimum and maximum y-coordinates of the polygon vertices
         auto vertices = get_vertices();
@@ -79,8 +79,9 @@ class Polygon2D : public Shape2D
                 const int x_end = std::min(static_cast<int>(get_bounding_box().width) - 1, intersections[i + 1].first);
                 for (int x = x_start; x <= x_end; ++x)
                 {
-                    if (!get_bounding_box().contains({x, y})) {
-                        continue ;
+                    if (!get_bounding_box().contains({x, y}))
+                    {
+                        continue;
                     }
                     double t = (static_cast<double>(x) - intersections[i].first) /
                                (intersections[i + 1].first - intersections[i].first);
@@ -93,9 +94,8 @@ class Polygon2D : public Shape2D
 
     void interpolate(Texture &texture, const ColorRGB &gradient_begin, const ColorRGB &gradient_end)
     {
-        process_rows(texture, [&](int y, double t) {
-            return ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t);
-        });
+        process_rows(texture,
+                     [&](int y, double t) { return ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t); });
     }
 
     void apply_shader(Texture &texture, GFX::GFXProgram &gfx_program)
@@ -106,16 +106,12 @@ class Polygon2D : public Shape2D
             vertex.color = gfx_program.fragment_shader(vertex);
         }
 
-        process_rows(texture, [&](int y, double t) {
-            return ColorRGB{0, 0, 255};
-        });
+        process_rows(texture, [&](int y, double t) { return ColorRGB{0, 0, 255}; });
     }
 
     void fill(Texture &texture, const ColorRGB &color)
     {
-        process_rows(texture, [&](int y, double t) {
-            return color;
-        });
+        process_rows(texture, [&](int y, double t) { return color; });
     }
 
     [[nodiscard]] std::string string() const override

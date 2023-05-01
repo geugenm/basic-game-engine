@@ -2,7 +2,8 @@
 
 #include "render/textures/texture.hxx"
 
-namespace GFX {
+namespace GFX
+{
 struct Uniform
 {
     double f0 = 0;
@@ -15,4 +16,4 @@ struct Uniform
     double f7 = 0;
     Texture *texture = nullptr;
 };
-}
+} // namespace GFX

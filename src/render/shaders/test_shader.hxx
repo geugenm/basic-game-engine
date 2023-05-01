@@ -17,7 +17,7 @@ class TestShader : public GFXProgram
 
     Position2D vertex_shader(const Position2D &vertex) override
     {
-        const float strength = 170000.2f; // adjust this to control the strength of the distortion
+        const float strength = 170000.2f;  // adjust this to control the strength of the distortion
         const Position2D center(500, 500); // set the center point of the distortion
 
         // calculate the distance from the center point
