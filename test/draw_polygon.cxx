@@ -159,6 +159,22 @@ TEST(Polygon2DTest, Rasterize) {
     handler.save();
 }
 
+TEST(Polygon2DTest, Interpolate) {
+    const BoundingBox bounding_box(1000, 1000);
+    Texture texture;
+    texture.set_shape(bounding_box);
+
+    constexpr size_t angles_amount = 3;
+    Polygon2D polygon<double>(bounding_box, angles_amount);
+
+    polygon.interpolate(texture, texture);
+    polygon.draw_on(texture, {0, 0, 255});
+
+    texture.draw_mesh();
+    PpmHandler handler("test_interpolated.ppm", texture);
+    handler.save();
+}
+
 auto main(int argc, char **argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);
