@@ -57,45 +57,8 @@ class Polygon2D : public Shape2D
         }
     }
 
-    void interpolate(Texture &texture, const ColorRGB &gradient_begin, const ColorRGB &gradient_end)
+    void process_rows(Texture &texture, std::function<ColorRGB(int, double)> color_func)
     {
-        // Get the minimum and maximum y-coordinates of the polygon vertices
-        auto vertices = get_vertices();
-        auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto &vertex) { return vertex.y; });
-
-        // Loop over all rows of pixels within the polygon's bounding box
-        for (int y = min_y->y; y <= max_y->y; ++y)
-        {
-            std::vector<std::pair<int, int>> intersections;
-            compute_edge_intersections(y, vertices, intersections);
-
-            // Sort the intersecting edges by their x-coordinate at the point of intersection with the current row
-            std::sort(intersections.begin(), intersections.end());
-
-            // Fill in the pixels between adjacent pairs of intersecting edges
-            for (size_t i = 0; i < intersections.size(); i += 2)
-            {
-                const int x_start = std::max(0, intersections[i].first);
-                const int x_end = std::min(static_cast<int>(get_bounding_box().width) - 1, intersections[i + 1].first);
-                for (int x = x_start; x <= x_end; ++x)
-                {
-                    double t = (static_cast<double>(x) - intersections[i].first) /
-                               (intersections[i + 1].first - intersections[i].first);
-                    ColorRGB interpolated_color = ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t);
-                    texture.set_pixel({x, y}, interpolated_color);
-                }
-            }
-        }
-    }
-
-    void apply_shader(Texture &texture, GFX::GFXProgram &gfx_program)
-    {
-        for (auto &vertex : access_vertices())
-        {
-            vertex = gfx_program.vertex_shader(vertex);
-            vertex.color = gfx_program.fragment_shader(vertex);
-        }
-
         // Get the minimum and maximum y-coordinates of the polygon vertices
         auto vertices = get_vertices();
         auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto &vertex) { return vertex.y; });
@@ -121,39 +84,38 @@ class Polygon2D : public Shape2D
                     }
                     double t = (static_cast<double>(x) - intersections[i].first) /
                                (intersections[i + 1].first - intersections[i].first);
-                    ColorRGB interpolated_color = ColorRGB::interpolate_linearly({0, 0, 255}, {255, 0, 1}, t);
-                    texture.set_pixel({x, y}, interpolated_color);
+                    ColorRGB color = color_func(y, t);
+                    texture.set_pixel({x, y}, color);
                 }
             }
         }
     }
 
+    void interpolate(Texture &texture, const ColorRGB &gradient_begin, const ColorRGB &gradient_end)
+    {
+        process_rows(texture, [&](int y, double t) {
+            return ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t);
+        });
+    }
+
+    void apply_shader(Texture &texture, GFX::GFXProgram &gfx_program)
+    {
+        for (auto &vertex : access_vertices())
+        {
+            vertex = gfx_program.vertex_shader(vertex);
+            vertex.color = gfx_program.fragment_shader(vertex);
+        }
+
+        process_rows(texture, [&](int y, double t) {
+            return ColorRGB{0, 0, 255};
+        });
+    }
+
     void fill(Texture &texture, const ColorRGB &color)
     {
-        // Get the minimum and maximum y-coordinates of the polygon vertices
-        auto vertices = get_vertices();
-        auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto &vertex) { return vertex.y; });
-
-        // Loop over all rows of pixels within the polygon's bounding box
-        for (int y = min_y->y; y <= max_y->y; ++y)
-        {
-            std::vector<std::pair<int, int>> intersections;
-            compute_edge_intersections(y, vertices, intersections);
-
-            // Sort the intersecting edges by their x-coordinate at the point of intersection with the current row
-            std::sort(intersections.begin(), intersections.end());
-
-            // Fill in the pixels between adjacent pairs of intersecting edges
-            for (size_t i = 0; i < intersections.size(); i += 2)
-            {
-                const int x_start = std::max(0, intersections[i].first);
-                const int x_end = std::min(static_cast<int>(get_bounding_box().width) - 1, intersections[i + 1].first);
-                for (int x = x_start; x <= x_end; ++x)
-                {
-                    texture.set_pixel({x, y}, color);
-                }
-            }
-        }
+        process_rows(texture, [&](int y, double t) {
+            return color;
+        });
     }
 
     [[nodiscard]] std::string string() const override
