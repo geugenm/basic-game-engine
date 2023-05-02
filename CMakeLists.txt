@@ -13,6 +13,7 @@ include(cmake/code_quality.cmake)
 include(cmake/check_platform.cmake)
 
 include(cmake/git_update_submodules.cmake)
+include(cmake/check_include_file.cmake)
 
 add_subdirectory(src)
 add_subdirectory(include)
@@ -23,3 +24,9 @@ if (BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif ()
+
+message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")
+
+message(STATUS "Linker flags: ${CMAKE_EXE_LINKER_FLAGS}")
+
+message(STATUS "Build directory: ${CMAKE_BINARY_DIR}")
