@@ -9,68 +9,71 @@
 
 class Texture final
 {
-  public:
+public:
     Texture() = default;
 
-    explicit Texture(BoundingBox shape, const std::vector<ColorRGB> &pixels) : pixels_(pixels), shape_(std::move(shape))
+    explicit Texture(BoundingBox shape, const std::vector<ColorRGB>& pixels)
+        : pixels_(pixels), shape_(std::move(shape))
     {
     }
 
-    Texture(const Texture &other) : pixels_(other.pixels_), shape_(other.shape_)
+    Texture(const Texture& other) : pixels_(other.pixels_), shape_(other.shape_) {}
+
+    Texture(Texture&& other) noexcept
+        : pixels_(std::move(other.pixels_)), shape_(std::move(other.shape_))
     {
     }
 
-    Texture(Texture &&other) noexcept : pixels_(std::move(other.pixels_)), shape_(std::move(other.shape_))
-    {
-    }
-
-    Texture &operator=(const Texture &other)
+    Texture& operator=(const Texture& other)
     {
         if (this != &other)
         {
             pixels_ = other.pixels_;
-            shape_ = other.shape_;
+            shape_  = other.shape_;
         }
         return *this;
     }
 
-    Texture &operator=(Texture &&other) noexcept
+    Texture& operator=(Texture&& other) noexcept
     {
         if (this != &other)
         {
             pixels_ = std::move(other.pixels_);
-            shape_ = std::move(other.shape_);
+            shape_  = std::move(other.shape_);
         }
         return *this;
     }
 
     ~Texture() = default;
 
-    [[nodiscard]] const ColorRGB &get_pixel(const Position2D &position) const
+    [[nodiscard]] const ColorRGB& get_pixel(const Position2D& position) const
     {
         if (!shape_.contains(position))
         {
             throw std::out_of_range("Error: Pixel position out of range.");
         }
-        return pixels_[static_cast<size_t>(position.y) * shape_.width + static_cast<size_t>(position.x)];
+        return pixels_[static_cast<size_t>(position.y) * shape_.width +
+                       static_cast<size_t>(position.x)];
     }
 
-    void set_pixel(const Position2D &position, const ColorRGB &color)
+    void set_pixel(const Position2D& position, const ColorRGB& color)
     {
         if (!shape_.contains(position))
         {
             throw std::out_of_range("Error: Pixel position: " + position.string() +
                                     " out of range: " + shape_.string());
         }
-        pixels_[static_cast<size_t>(position.y) * shape_.width + static_cast<size_t>(position.x)] = color;
+        pixels_[static_cast<size_t>(position.y) * shape_.width + static_cast<size_t>(position.x)] =
+            color;
     }
 
     void draw_mesh()
     {
-        const auto &shape = get_shape();
+        const auto& shape = get_shape();
 
         constexpr float kMeshDensity = 0.02f;
-        const auto step = static_cast<size_t>((float)std::max(shape.width, shape.height) * kMeshDensity);
+        const auto step =
+            static_cast<size_t>((float)std::max(shape.width, shape.height) * kMeshDensity);
 
         // Draw horizontal lines
         for (std::size_t y = 0; y < shape.height; y += step)
@@ -91,24 +94,24 @@ class Texture final
         }
     }
 
-    void set_shape(const BoundingBox &shape)
+    void set_shape(const BoundingBox& shape)
     {
         shape_ = shape;
         resize_pixels();
     }
 
-    [[nodiscard]] const BoundingBox &get_shape() const
+    [[nodiscard]] const BoundingBox& get_shape() const
     {
         return shape_;
     }
 
-    void set_pixel_array(const std::vector<ColorRGB> &pixels)
+    void set_pixel_array(const std::vector<ColorRGB>& pixels)
     {
         resize_pixels();
         pixels_ = pixels;
     }
 
-    [[nodiscard]] const std::vector<ColorRGB> &get_pixel_array() const
+    [[nodiscard]] const std::vector<ColorRGB>& get_pixel_array() const
     {
         return pixels_;
     }
@@ -118,7 +121,7 @@ class Texture final
         return "With the frame: " + shape_.string();
     }
 
-  private:
+private:
     std::vector<ColorRGB> pixels_;
     BoundingBox shape_;
 

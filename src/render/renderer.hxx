@@ -7,11 +7,11 @@
 
 class UIEngineSingleton
 {
-  public:
-    UIEngineSingleton(const UIEngineSingleton &) = delete;
-    UIEngineSingleton &operator=(const UIEngineSingleton &) = delete;
+public:
+    UIEngineSingleton(const UIEngineSingleton&)            = delete;
+    UIEngineSingleton& operator=(const UIEngineSingleton&) = delete;
 
-    static UIEngineSingleton *get_instance()
+    static UIEngineSingleton* get_instance()
     {
         static UIEngineSingleton instance;
         return &instance;
@@ -37,7 +37,7 @@ class UIEngineSingleton
         release_renderer();
     }
 
-    [[nodiscard]] const AbstractUI *get_presenter() const
+    [[nodiscard]] const AbstractUI* get_presenter() const
     {
         return renderer_.get();
     }
@@ -51,7 +51,7 @@ class UIEngineSingleton
         renderer_ = std::move(presenter);
     }
 
-  private:
+private:
     void release_renderer()
     {
         if (renderer_ == nullptr)

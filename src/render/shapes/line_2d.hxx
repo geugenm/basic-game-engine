@@ -7,7 +7,7 @@
 
 class Line2D final : public Shape2D
 {
-  public:
+public:
     Line2D(Position2D start, Position2D end) : start_(std::move(start)), end_(std::move(end))
     {
         set_bounding_box(BoundingBox(start_, end_));
@@ -15,7 +15,7 @@ class Line2D final : public Shape2D
 
     ~Line2D() override = default;
 
-    void draw_on(Texture &texture, const ColorRGB &color) override
+    void draw_on(Texture& texture, const ColorRGB& color) override
     {
         const int delta_x = std::abs(end_.x - start_.x);
         const int delta_y = std::abs(end_.y - start_.y);
@@ -65,7 +65,7 @@ class Line2D final : public Shape2D
         return "Start: " + start_.string() + " End: " + end_.string();
     }
 
-  private:
+private:
     Position2D start_;
     Position2D end_;
 };

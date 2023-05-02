@@ -11,7 +11,7 @@ TEST(Line2DTest, DrawRandomLinesTest)
     constexpr int num_lines = 20;
 
     const Position2D start = Position2D::generate_random(0, 500);
-    const Position2D end = Position2D::generate_random(0, 500);
+    const Position2D end   = Position2D::generate_random(0, 500);
 
     Line2D line(start, end);
     Texture texture;
@@ -28,7 +28,7 @@ TEST(Line2DTest, DrawRandomLinesTest)
     handler.save();
 }
 
-auto main(int argc, char **argv) -> int
+auto main(int argc, char** argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

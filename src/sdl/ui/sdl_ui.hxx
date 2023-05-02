@@ -7,7 +7,7 @@
 
 class SDLUI : public AbstractUI
 {
-  public:
+public:
     explicit SDLUI();
 
     ~SDLUI() override;
@@ -22,11 +22,11 @@ class SDLUI : public AbstractUI
 
     Event get_last_event() override;
 
-  private:
+private:
     static constexpr std::string_view kWindowTitle_{"Hello SDL"};
-    static constexpr int kWindowWidth_ = 640;
+    static constexpr int kWindowWidth_  = 640;
     static constexpr int kWindowHeight_ = 480;
 
-    SDL_Window *window_;
-    SDL_Renderer *renderer_;
+    SDL_Window* window_;
+    SDL_Renderer* renderer_;
 };

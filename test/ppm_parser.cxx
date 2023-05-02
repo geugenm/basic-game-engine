@@ -3,7 +3,7 @@
 
 class TextureFileTest : public testing::Test
 {
-  protected:
+protected:
     static void SetUpTestSuite()
     {
         std::filesystem::create_directory("test_files");
@@ -20,10 +20,11 @@ class TextureFileTest : public testing::Test
         out_file << "P6\n"
                  << "2 2\n"
                  << "255\n"
-                 << static_cast<char>(255) << static_cast<char>(0) << static_cast<char>(0)      // red
-                 << static_cast<char>(0) << static_cast<char>(255) << static_cast<char>(0)      // green
-                 << static_cast<char>(0) << static_cast<char>(0) << static_cast<char>(255)      // blue
-                 << static_cast<char>(255) << static_cast<char>(255) << static_cast<char>(255); // white
+                 << static_cast<char>(255) << static_cast<char>(0) << static_cast<char>(0) // red
+                 << static_cast<char>(0) << static_cast<char>(255) << static_cast<char>(0) // green
+                 << static_cast<char>(0) << static_cast<char>(0) << static_cast<char>(255) // blue
+                 << static_cast<char>(255) << static_cast<char>(255)
+                 << static_cast<char>(255);                                                // white
         out_file.close();
     }
 };
@@ -39,8 +40,8 @@ TEST_F(TextureFileTest, LoadFile)
     EXPECT_EQ(texture.get_shape().width, 2);
     EXPECT_EQ(texture.get_shape().height, 2);
 
-    const std::vector<ColorRGB> expected_pixels = {ColorRGB(255, 0, 0), ColorRGB(0, 255, 0), ColorRGB(0, 0, 255),
-                                                   ColorRGB(255, 255, 255)};
+    const std::vector<ColorRGB> expected_pixels = {ColorRGB(255, 0, 0), ColorRGB(0, 255, 0),
+                                                   ColorRGB(0, 0, 255), ColorRGB(255, 255, 255)};
     EXPECT_EQ(texture.get_pixel_array(), expected_pixels);
 }
 
@@ -88,7 +89,7 @@ TEST_F(TextureFileTest, SetDimensions)
     EXPECT_THROW(texture_shape.set_dimensions(0, 0), std::invalid_argument);
 }
 
-auto main(int argc, char **argv) -> int
+auto main(int argc, char** argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

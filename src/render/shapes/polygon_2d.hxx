@@ -13,32 +13,32 @@
 
 class Polygon2D : public Shape2D
 {
-  public:
-    explicit Polygon2D(const BoundingBox &box, const size_t &sides_amount)
+public:
+    explicit Polygon2D(const BoundingBox& box, const size_t& sides_amount)
     {
         set_bounding_box(box);
         init_random(sides_amount);
     }
 
-    explicit Polygon2D(const BoundingBox &box, const Vertices &vertices)
+    explicit Polygon2D(const BoundingBox& box, const Vertices& vertices)
     {
         set_bounding_box(box);
         set_vertices(vertices);
     }
 
-    Polygon2D(const Position2D &start, const Position2D &end, const size_t &sides_amount)
+    Polygon2D(const Position2D& start, const Position2D& end, const size_t& sides_amount)
     {
         set_bounding_box(BoundingBox(start, end));
         init_random(sides_amount);
     }
 
-    Polygon2D(const Polygon2D &other) : Shape2D(other)
+    Polygon2D(const Polygon2D& other) : Shape2D(other)
     {
         set_vertices(other.get_vertices());
         set_bounding_box(other.get_bounding_box());
     }
 
-    Polygon2D(Polygon2D &&other) noexcept
+    Polygon2D(Polygon2D&& other) noexcept
     {
         set_vertices(other.get_vertices());
         set_bounding_box(other.get_bounding_box());
@@ -46,22 +46,23 @@ class Polygon2D : public Shape2D
 
     ~Polygon2D() override = default;
 
-    void draw_on(Texture &texture, const ColorRGB &color) override
+    void draw_on(Texture& texture, const ColorRGB& color) override
     {
         for (size_t i = 0; i < access_vertices().size(); ++i)
         {
-            const Position2D &p1 = access_vertices()[i];
-            const Position2D &p2 = access_vertices()[(i + 1) % access_vertices().size()];
+            const Position2D& p1 = access_vertices()[i];
+            const Position2D& p2 = access_vertices()[(i + 1) % access_vertices().size()];
             Line2D l(p1, p2);
             l.draw_on(texture, color);
         }
     }
 
-    void process_rows(Texture &texture, const std::function<ColorRGB(int, double)> &color_func)
+    void process_rows(Texture& texture, const std::function<ColorRGB(int, double)>& color_func)
     {
         // Get the minimum and maximum y-coordinates of the polygon vertices
         auto vertices = get_vertices();
-        auto [min_y, max_y] = std::ranges::minmax_element(vertices, {}, [](const auto &vertex) { return vertex.y; });
+        auto [min_y, max_y] =
+            std::ranges::minmax_element(vertices, {}, [](const auto& vertex) { return vertex.y; });
 
         // Loop over all rows of pixels within the polygon's bounding box
         for (int y = min_y->y; y <= max_y->y; ++y)
@@ -69,14 +70,16 @@ class Polygon2D : public Shape2D
             std::vector<std::pair<int, int>> intersections;
             compute_edge_intersections(y, vertices, intersections);
 
-            // Sort the intersecting edges by their x-coordinate at the point of intersection with the current row
+            // Sort the intersecting edges by their x-coordinate at the point of intersection with
+            // the current row
             std::sort(intersections.begin(), intersections.end());
 
             // Fill in the pixels between adjacent pairs of intersecting edges
             for (size_t i = 0; i < intersections.size(); i += 2)
             {
                 const int x_start = std::max(0, intersections[i].first);
-                const int x_end = std::min(static_cast<int>(get_bounding_box().width) - 1, intersections[i + 1].first);
+                const int x_end   = std::min(static_cast<int>(get_bounding_box().width) - 1,
+                                             intersections[i + 1].first);
                 for (int x = x_start; x <= x_end; ++x)
                 {
                     if (!get_bounding_box().contains({x, y}))
@@ -92,24 +95,24 @@ class Polygon2D : public Shape2D
         }
     }
 
-    void interpolate(Texture &texture, const ColorRGB &gradient_begin, const ColorRGB &gradient_end)
+    void interpolate(Texture& texture, const ColorRGB& gradient_begin, const ColorRGB& gradient_end)
     {
-        process_rows(texture,
-                     [&](int y, double t) { return ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t); });
+        process_rows(texture, [&](int y, double t)
+                     { return ColorRGB::interpolate_linearly(gradient_begin, gradient_end, t); });
     }
 
-    void apply_shader(Texture &texture, GFX::GFXProgram &gfx_program)
+    void apply_shader(Texture& texture, GFX::GFXProgram& gfx_program)
     {
-        for (auto &vertex : access_vertices())
+        for (auto& vertex : access_vertices())
         {
-            vertex = gfx_program.vertex_shader(vertex);
+            vertex       = gfx_program.vertex_shader(vertex);
             vertex.color = gfx_program.fragment_shader(vertex);
         }
 
         process_rows(texture, [&](int y, double t) { return ColorRGB{0, 0, 255}; });
     }
 
-    void fill(Texture &texture, const ColorRGB &color)
+    void fill(Texture& texture, const ColorRGB& color)
     {
         process_rows(texture, [&](int y, double t) { return color; });
     }
@@ -119,9 +122,9 @@ class Polygon2D : public Shape2D
         return Shape2D::string();
     }
 
-    void add_vertex(const Position2D &position)
+    void add_vertex(const Position2D& position)
     {
-        for (const auto &vertex : access_vertices())
+        for (const auto& vertex : access_vertices())
         {
             if (vertex == position)
             {
@@ -132,8 +135,8 @@ class Polygon2D : public Shape2D
         access_vertices().push_back(position);
     }
 
-  private:
-    void init_random(const size_t &sides_amount)
+private:
+    void init_random(const size_t& sides_amount)
     {
         double angle = 2.0 * M_PI / static_cast<double>(sides_amount);
 
@@ -155,31 +158,33 @@ class Polygon2D : public Shape2D
 
         for (size_t i = 0; i < sides_amount; ++i)
         {
-            const double theta = angle * static_cast<double>(i);
-            const double x = center.x + radius_x * std::cos(theta);
-            const double y = center.y + radius_y * std::sin(theta);
+            const double theta   = angle * static_cast<double>(i);
+            const double x       = center.x + radius_x * std::cos(theta);
+            const double y       = center.y + radius_y * std::sin(theta);
             access_vertices()[i] = {static_cast<int>(x), static_cast<int>(y)};
         }
     }
 
-    static void compute_edge_intersections(int y, const std::vector<Position2D> &vertices,
-                                           std::vector<std::pair<int, int>> &intersections)
+    static void compute_edge_intersections(int y, const std::vector<Position2D>& vertices,
+                                           std::vector<std::pair<int, int>>& intersections)
     {
         for (size_t i = 0; i < vertices.size(); ++i)
         {
-            const Position2D &p1 = vertices[i];
-            const Position2D &p2 = vertices[(i + 1) % vertices.size()];
+            const Position2D& p1 = vertices[i];
+            const Position2D& p2 = vertices[(i + 1) % vertices.size()];
 
             const bool edge_starts_above = p1.y > y;
-            const bool edge_ends_below = p2.y <= y;
+            const bool edge_ends_below   = p2.y <= y;
 
             const bool edge_starts_below = p1.y <= y;
-            const bool edge_ends_above = p2.y > y;
+            const bool edge_ends_above   = p2.y > y;
 
             if ((edge_starts_above && edge_ends_below) || (edge_starts_below && edge_ends_above))
             {
-                // Compute the x-coordinate of the edge at the point of intersection with the current row
-                const double slope = static_cast<double>(p2.x - p1.x) / static_cast<double>(p2.y - p1.y);
+                // Compute the x-coordinate of the edge at the point of intersection with the
+                // current row
+                const double slope =
+                    static_cast<double>(p2.x - p1.x) / static_cast<double>(p2.y - p1.y);
                 const double x = p1.x + slope * (y - p1.y);
                 intersections.emplace_back(static_cast<int>(x), static_cast<int>(i));
             }
