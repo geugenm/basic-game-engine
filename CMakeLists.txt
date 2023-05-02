@@ -10,6 +10,7 @@ endif ()
 
 include(cmake/configure_compiler.cmake)
 include(cmake/code_quality.cmake)
+include(cmake/build_docs.cmake)
 include(cmake/check_platform.cmake)
 
 include(cmake/git_update_submodules.cmake)
