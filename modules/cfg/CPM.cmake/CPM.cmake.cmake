@@ -8,7 +8,7 @@ set(CPM_PACKAGES_DIR "${CMAKE_CURRENT_LIST_DIR}/packages")
 
 set(CPM_SOURCE_CACHE "${CMAKE_CURRENT_LIST_DIR}/../../../cache")
 
-set(CPM_USE_LOCAL_PACKAGES ON)
+set(CPM_USE_LOCAL_PACKAGES OFF)
 
 message(STATUS "Using CPM.cmake version ${CPM_VERSION}")
 message(STATUS "CPM packages directory: ${CPM_PACKAGES_DIR}")

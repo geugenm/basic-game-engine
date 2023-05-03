@@ -1,14 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
 
-include(${CMAKE_CURRENT_LIST_DIR}/../cmake/packages.cmake)
-
-include(${CPM_PACKAGES_DIR}/sdl.cmake)
-
-include(${CPM_PACKAGES_DIR}/glog.cmake)
-include(${CPM_PACKAGES_DIR}/tracy.cmake)
-include(${CPM_PACKAGES_DIR}/ccache.cmake)
-
-
 add_library(engine)
 
 file(GLOB_RECURSE RENDER_SOURCES CONFIGURE_DEPENDS "render/*.cxx" "render/*.cpp" "render/*.cc" "render/*.c")

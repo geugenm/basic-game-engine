@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
 
 add_library(sdl-engine SHARED ui/sdl_ui.cxx dll_reloader.cxx)
-target_link_libraries(sdl-engine PRIVATE SDL3::SDL3-shared engine-includes)
+target_link_libraries(sdl-engine PRIVATE SDL3::SDL3-shared engine)
 target_compile_features(sdl-engine PRIVATE cxx_std_23)

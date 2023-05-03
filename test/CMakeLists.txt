@@ -1,9 +1,5 @@
 include(${CMAKE_CURRENT_LIST_DIR}/../cmake/packages.cmake)
 
-include(${CPM_PACKAGES_DIR}/gtest.cmake)
-include(${CPM_PACKAGES_DIR}/sdl.cmake)
-
-
 add_executable(Test_Static_Compilation sdl_general.cxx)
 
 target_link_libraries(Test_Static_Compilation PRIVATE GTest::GTest SDL3::SDL3-static)

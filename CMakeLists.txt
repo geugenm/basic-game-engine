@@ -16,6 +16,17 @@ include(cmake/check_platform.cmake)
 include(cmake/git_update_submodules.cmake)
 include(cmake/check_include_file.cmake)
 
+
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/packages.cmake)
+
+
+get_directory_property(MY_LIBRARIES_NAMES BUILDSYSTEM_TARGETS)
+message(STATUS "Library Names: ${MY_LIBRARIES_NAMES}")
+
+get_property(_allTargets GLOBAL PROPERTY GlobalTargetList)
+message(STATUS "GlobalTargetList: ${_allTargets}")
+
+
 add_subdirectory(src)
 add_subdirectory(include)
 
