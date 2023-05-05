@@ -33,3 +33,9 @@ if (USE_CUSTOM_SDL_SHARED_LIB AND SHARED_LIB_PATH)
             COMMAND ${CMAKE_COMMAND} -E env LD_PRELOAD=${SHARED_LIB_PATH}/libSDL2.so ${CMAKE_BINARY_DIR}/test/./Test_DLL_Injection
             )
 endif ()
+
+
+
+add_executable(Test_OpenGL_Init opengl_general.cxx)
+
+target_link_libraries(Test_OpenGL_Init PRIVATE opengl-glad GTest::GTest SDL3::SDL3-shared)
