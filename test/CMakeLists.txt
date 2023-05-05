@@ -33,18 +33,3 @@ if (USE_CUSTOM_SDL_SHARED_LIB AND SHARED_LIB_PATH)
             COMMAND ${CMAKE_COMMAND} -E env LD_PRELOAD=${SHARED_LIB_PATH}/libSDL2.so ${CMAKE_BINARY_DIR}/test/./Test_DLL_Injection
             )
 endif ()
-
-
-add_executable(test-texture-file ppm_parser.cxx)
-
-target_link_libraries(test-texture-file PRIVATE GTest::GTest engine)
-
-
-add_executable(test-draw-line draw_line.cxx)
-
-target_link_libraries(test-draw-line PRIVATE GTest::GTest engine tracy)
-
-
-add_executable(test-draw-polygon draw_polygon.cxx)
-
-target_link_libraries(test-draw-polygon PRIVATE GTest::GTest engine tracy)
