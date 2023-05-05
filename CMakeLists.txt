@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
 project(Basic_Game_Engine VERSION 1.0.0 LANGUAGES CXX C)
-set(CMAKE_CXX_STANDARD 23)
 
 message(STATUS "Configuring Basic_Game_Engine")
 
@@ -8,12 +7,12 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
-include(cmake/configure_compiler.cmake)
-include(cmake/code_quality.cmake)
-include(cmake/build_docs.cmake)
-include(cmake/check_platform.cmake)
-include(cmake/git_update_submodules.cmake)
-include(cmake/check_include_file.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/configure_compiler.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/code_quality.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/build_docs.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/check_platform.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/git_update_submodules.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/check_include_file.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/packages.cmake)
 
 get_directory_property(MY_LIBRARIES_NAMES BUILDSYSTEM_TARGETS)
