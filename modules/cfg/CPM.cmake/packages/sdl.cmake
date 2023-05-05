@@ -8,12 +8,12 @@ CPMAddPackage(
         "SDL_ATOMIC OFF"
         "SDL_STATIC ON"
         "SDL_SHARED ON"
-        "SDL_VIRTUAL_JOYSTICK ON"
-        "SDL_HIDAPI_JOYSTICK ON"
-        "SDL_HAPTIC ON"
-        "SDL_JOYSTICK ON"
-        "SDL_CCACHE ON"
-        "SDL_WAYLAND OFF"
+        "SDL_VIRTUAL_JOYSTICK OFF"
+        "SDL_HIDAPI_JOYSTICK OFF"
+        "SDL_HAPTIC OFF"
+        "SDL_JOYSTICK OFF"
+        "SDL_CCACHE OFF"
+        "SDL_WAYLAND OFF"  # Since you're using KDE, you might want to enable Wayland support
         "SDL_WAYLAND_LIBDECOR OFF"
         "SDL_WAYLAND_LIBDECOR_SHARED OFF"
         "SDL_WAYLAND_QT_TOUCH OFF"
@@ -29,3 +29,4 @@ CPMAddPackage(
         "SDL_X11_XSHAPE OFF"
         "X11_LIB ON"
 )
+
