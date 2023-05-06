@@ -1,11 +1,8 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
 #include <filesystem>
-#include <stdexcept>
+#include <iostream>
+#include <string>
 
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
@@ -17,8 +14,7 @@ constexpr uint16_t kOpenGLMinorVersion = 2;
 
 bool init_sdl();
 
-SDL_Window* create_window(const char* window_title, const int& height,
-                                               const int& width);
+SDL_Window* create_window(const char* window_title, const int& height, const int& width);
 
 SDL_GLContext create_opengl_context(SDL_Window* window);
 
@@ -29,5 +25,10 @@ void load_gl_func(const char* func_name);
 bool is_opengl_version_supported();
 
 std::string read_shader_file(const std::filesystem::path& filePath);
+
+void GLAPIENTRY opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
+                                      GLsizei length, const GLchar* message, const void* userParam);
+
+void listen_opengl_errors();
 
 } // namespace GL

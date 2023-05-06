@@ -1,5 +1,12 @@
 #include "opengl_functions.hxx"
 
+#include <fstream>
+
+#include <sstream>
+#include <stdexcept>
+
+#include <glad/glad.h>
+
 bool GL::init_sdl()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
@@ -9,7 +16,6 @@ bool GL::init_sdl()
     }
     return true;
 }
-
 
 SDL_Window* GL::create_window(const char* window_title, const int& height, const int& width)
 {
@@ -28,7 +34,6 @@ SDL_Window* GL::create_window(const char* window_title, const int& height, const
     return window;
 }
 
-
 SDL_GLContext GL::create_opengl_context(SDL_Window* window)
 {
     SDL_GLContext context = SDL_GL_CreateContext(window);
@@ -40,7 +45,6 @@ SDL_GLContext GL::create_opengl_context(SDL_Window* window)
     return context;
 }
 
-
 bool GL::load_opengl_functions()
 {
     if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
@@ -51,7 +55,6 @@ bool GL::load_opengl_functions()
     return true;
 }
 
-
 void GL::load_gl_func(const char* func_name)
 {
     SDL_FunctionPointer gl_pointer = SDL_GL_GetProcAddress(func_name);
@@ -60,7 +63,6 @@ void GL::load_gl_func(const char* func_name)
         throw std::runtime_error(std::string("Can't load GL function ") + func_name);
     }
 }
-
 
 bool GL::is_opengl_version_supported()
 {
@@ -77,7 +79,6 @@ bool GL::is_opengl_version_supported()
 
     return true;
 }
-
 
 std::string GL::read_shader_file(const std::filesystem::path& filePath)
 {
@@ -97,4 +98,26 @@ std::string GL::read_shader_file(const std::filesystem::path& filePath)
     shaderFile.close();
 
     return shaderStream.str();
+}
+
+void GL::opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
+                               GLsizei length, const GLchar* message, const void* userParam)
+{
+    std::cerr << "OpenGL Error:" << std::endl;
+    std::cerr << "  Source: " << source << std::endl;
+    std::cerr << "  Type: " << type << std::endl;
+    std::cerr << "  ID: " << id << std::endl;
+    std::cerr << "  Severity: " << severity << std::endl;
+    std::cerr << "  Message: " << message << std::endl;
+    std::cerr << std::endl;
+}
+
+void GL::listen_opengl_errors()
+{
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+    glDebugMessageCallback(opengl_debug_callback, nullptr);
+
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 }
