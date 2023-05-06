@@ -5,9 +5,9 @@ project(sdl-engine VERSION 1.0.0 LANGUAGES CXX)
 set(SOURCES
         ui/sdl_ui.cxx
         dll_reloader.cxx
-        render/vertex.hxx
-        render/opengl_functions.hxx
-        render/shader.hxx
+        render/shader.cxx
+        render/vertex.cxx
+        render/opengl_functions.cxx
         )
 
 add_library(sdl-engine SHARED ${SOURCES})

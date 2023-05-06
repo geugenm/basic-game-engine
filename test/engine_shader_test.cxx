@@ -21,10 +21,6 @@ TEST(TriangleTest, BasicInterpolation)
     GL::load_opengl_functions();
     GL::is_opengl_version_supported();
 
-    //glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    Engine::Shader shader("vertex_shader.glsl", "fragment_shader.glsl");
-
     // Set up the triangle vertices
     std::array<Engine::Vertex, 3> vertices = {
         Engine::Vertex{1, 2},
@@ -59,10 +55,8 @@ TEST(TriangleTest, BasicInterpolation)
             }
         }
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
 
-        shader.use();
+
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
