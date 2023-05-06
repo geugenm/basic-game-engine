@@ -18,7 +18,10 @@ TEST(TriangleTest, BasicInterpolation)
 
     SDL_GLContext context = GL::create_opengl_context(window);
 
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    GL::load_opengl_functions();
+    GL::is_opengl_version_supported();
+
+    //glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     Engine::Shader shader("vertex_shader.glsl", "fragment_shader.glsl");
 
