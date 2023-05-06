@@ -47,4 +47,6 @@ private:
     std::ptrdiff_t y_;
 };
 
+template std::ptrdiff_t Vertex::get<0>() const;
+template std::ptrdiff_t Vertex::get<1>() const;
 } // namespace Engine
