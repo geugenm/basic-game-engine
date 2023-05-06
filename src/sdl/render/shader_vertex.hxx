@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abstract_engine.hxx"
+#include "render/abstract_vertex.hxx"
 
 namespace Engine
 {
@@ -14,5 +14,6 @@ public:
 
     ~ShaderVertex() override = default;
 };
+
 
 } // namespace Engine

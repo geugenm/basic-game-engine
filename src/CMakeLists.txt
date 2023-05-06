@@ -6,6 +6,6 @@ target_sources(opengl-glad
         PRIVATE glad.c
         )
 
-target_link_libraries(opengl-glad PUBLIC opengl-includes)
+target_link_libraries(opengl-glad PUBLIC opengl-includes engine-includes)
 
 add_subdirectory(sdl)
