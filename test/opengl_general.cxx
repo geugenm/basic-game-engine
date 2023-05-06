@@ -1,4 +1,4 @@
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <glad/glad.h>
 #include <gtest/gtest.h>
 #include <iostream>

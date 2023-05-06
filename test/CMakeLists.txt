@@ -39,4 +39,4 @@ add_executable(Test_OpenGL_Init opengl_general.cxx)
 target_link_libraries(Test_OpenGL_Init PRIVATE opengl-glad GTest::GTest SDL3::SDL3-shared)
 
 add_executable(Test_Engine_Shaders_SDL engine_shader_test.cxx)
-target_link_libraries(Test_Engine_Shaders_SDL PRIVATE opengl-glad GTest::GTest SDL3::SDL3-shared)
+target_link_libraries(Test_Engine_Shaders_SDL PRIVATE opengl-glad sdl-engine GTest::GTest SDL3::SDL3-shared)

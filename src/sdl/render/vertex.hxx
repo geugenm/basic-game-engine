@@ -1,12 +1,8 @@
-export module vertex;
-
-import <array>;
-import <cstddef>;
-import <tuple>;
+#include <array>
 
 namespace Engine
 {
-export class Vertex
+class Vertex
 {
 public:
     constexpr explicit Vertex(std::ptrdiff_t x = 0, std::ptrdiff_t y = 0) : x_(x), y_(y){};
