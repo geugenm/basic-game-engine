@@ -24,10 +24,10 @@ SDL_Window* CreateWindow()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, kOpenGLMinorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
     SDL_Window* window =
-        SDL_CreateWindow("(sdl-compile-test) Test SDL3 Window", kWindowHeight, kWindowWidth, flags);
+        SDL_CreateWindow("(opengl-compile-test) Test OPenGL SDL3 Window", kWindowHeight, kWindowWidth, flags);
     if (!window)
     {
         std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;

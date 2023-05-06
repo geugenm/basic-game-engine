@@ -7,3 +7,5 @@ target_sources(opengl-glad
         )
 
 target_link_libraries(opengl-glad PUBLIC engine-includes)
+
+add_subdirectory(sdl)

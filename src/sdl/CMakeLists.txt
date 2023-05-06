@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.25)
 
-add_library(sdl-engine SHARED ui/sdl_ui.cxx dll_reloader.cxx)
+set(SOURCES
+        ui/sdl_ui.cxx
+        dll_reloader.cxx
+        render/vertex.ixx
+        render/vertex.cxx
+        )
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++23 -fmodules-ts")
+
+add_library(sdl-engine SHARED ${SOURCES})
 target_link_libraries(sdl-engine PRIVATE SDL3::SDL3-shared engine)
-target_compile_features(sdl-engine PRIVATE cxx_std_23)
