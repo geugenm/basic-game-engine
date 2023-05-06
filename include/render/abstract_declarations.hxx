@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ivertex.hxx"
-#include <vector>
+#include "abstract_vertex.hxx"
 #include <array>
+#include <vector>
 
 namespace AbstractEngine
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "declarations.hxx"
+#include "abstract_declarations.hxx"
 
 #include <stdexcept>
 

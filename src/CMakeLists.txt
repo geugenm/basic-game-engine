@@ -9,3 +9,13 @@ target_sources(opengl-glad
 target_link_libraries(opengl-glad PUBLIC engine-includes)
 
 add_subdirectory(sdl)
+
+
+add_library(engine)
+
+target_sources(engine
+        PRIVATE engine.cxx
+        engine.hxx
+        )
+
+target_link_libraries(engine PUBLIC engine-includes)
