@@ -1,15 +1,21 @@
 export module opengl_functions;
 
 import <iostream>;
+import <fstream>;
+import <string>;
+import <sstream>;
+import <filesystem>;
+import <stdexcept>;
+
 #include <SDL.h>
 #include <glad/glad.h>
 
 namespace GL
 {
-constexpr uint16_t kOpenGLMajorVersion = 3;
-constexpr uint16_t kOpenGLMinorVersion = 2;
+export constexpr uint16_t kOpenGLMajorVersion = 3;
+export constexpr uint16_t kOpenGLMinorVersion = 2;
 
-bool init_sdl()
+export [[nodiscard]] bool init_sdl()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -19,7 +25,7 @@ bool init_sdl()
     return true;
 }
 
-SDL_Window* create_window(const std::int32_t& height, const std::int32_t& width)
+export [[nodiscard]] SDL_Window* create_window(const std::int32_t& height, const std::int32_t& width)
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, kOpenGLMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, kOpenGLMinorVersion);
@@ -37,7 +43,7 @@ SDL_Window* create_window(const std::int32_t& height, const std::int32_t& width)
     return window;
 }
 
-SDL_GLContext create_opengl_context(SDL_Window* window)
+export [[nodiscard]] SDL_GLContext create_opengl_context(SDL_Window* window)
 {
     SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context)
@@ -48,7 +54,7 @@ SDL_GLContext create_opengl_context(SDL_Window* window)
     return context;
 }
 
-bool load_opengl_functions()
+export [[nodiscard]] bool load_opengl_functions()
 {
     if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
     {
@@ -58,7 +64,7 @@ bool load_opengl_functions()
     return true;
 }
 
-template <typename T> static void load_gl_func(const char* func_name, T& result)
+export void load_gl_func(const char* func_name)
 {
     SDL_FunctionPointer gl_pointer = SDL_GL_GetProcAddress(func_name);
     if (nullptr == gl_pointer)
@@ -66,10 +72,9 @@ template <typename T> static void load_gl_func(const char* func_name, T& result)
         throw std::runtime_error(std::string("Can't load GL function ") +
                                  func_name);
     }
-    result = reinterpret_cast<T>(gl_pointer);
 }
 
-bool is_opengl_version_supported()
+export [[nodiscard]] bool is_opengl_version_supported()
 {
     int major, minor;
     glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -84,4 +89,25 @@ bool is_opengl_version_supported()
 
     return true;
 }
+
+export [[nodiscard]] std::string ReadShaderFile(const std::filesystem::path& filePath)
+{
+    if (!std::filesystem::exists(filePath))
+    {
+        throw std::runtime_error("File not found: " + filePath.string());
+    }
+
+    std::ifstream shaderFile(filePath);
+    if (!shaderFile.is_open())
+    {
+        throw std::runtime_error("Failed to open shader file: " + filePath.string());
+    }
+
+    std::stringstream shaderStream;
+    shaderStream << shaderFile.rdbuf();
+    shaderFile.close();
+
+    return shaderStream.str();
+}
+
 } // namespace gl
