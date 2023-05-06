@@ -1,6 +1,6 @@
 #include "runtime-loader/dll_reloader.hxx"
 
-#include <SDL3/SDL.h>
+#include "SDL3/SDL.h"
 #include <filesystem>
 #include <iostream>
 
@@ -13,7 +13,7 @@ public:
 
     void set_target_library_path(const char* path) override
     {
-        if (std::filesystem::exists(path) == false)
+        if (!std::filesystem::exists(path))
         {
             throw std::invalid_argument("Target library does not exist: " +
                                         target_library_path_.string());
@@ -23,7 +23,7 @@ public:
 
     void set_new_library_path(const char* path) override
     {
-        if (std::filesystem::exists(path) == false)
+        if (!std::filesystem::exists(path))
         {
             throw std::invalid_argument("Target library does not exist: " +
                                         target_library_path_.string());
