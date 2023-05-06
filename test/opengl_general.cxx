@@ -1,9 +1,10 @@
-#include <gtest/gtest.h>
-#include <glad/glad.h>
 #include <SDL.h>
+#include <glad/glad.h>
+#include <gtest/gtest.h>
 #include <iostream>
 
-TEST(OpenGLTest, GladInitialization) {
+TEST(OpenGLTest, GladInitialization)
+{
     constexpr uint16_t kWindowHeight = 120;
     constexpr uint16_t kWindowWidth  = 120;
 
@@ -15,7 +16,9 @@ TEST(OpenGLTest, GladInitialization) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    SDL_Window* window = SDL_CreateWindow("(sdl-compile-test) Test SDL3 Window", kWindowHeight, kWindowWidth, SDL_WINDOW_OPENGL);
+    Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    SDL_Window* window = SDL_CreateWindow("(sdl-compile-test) Test SDL3 Window", kWindowHeight,
+                                          kWindowWidth, flags);
     ASSERT_NE(window, nullptr) << "Failed to create SDL window: " << SDL_GetError();
 
     // Create an OpenGL context
@@ -32,17 +35,23 @@ TEST(OpenGLTest, GladInitialization) {
     glGetIntegerv(GL_MINOR_VERSION, &minor);
 
     ASSERT_GE(major, 3) << "OpenGL major version is less than 3";
-    if (major == 3) {
+    if (major == 3)
+    {
         ASSERT_GE(minor, 2) << "OpenGL minor version is less than 2";
     }
+
+    // Fill the window with red color
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Swap buffers
+    SDL_GL_SwapWindow(window);
 
     // Clean up
     SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
-
-
 
 auto main(int argc, char** argv) -> int
 {

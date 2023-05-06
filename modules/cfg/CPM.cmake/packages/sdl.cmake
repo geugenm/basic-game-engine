@@ -13,7 +13,7 @@ CPMAddPackage(
         "SDL_HAPTIC OFF"
         "SDL_JOYSTICK OFF"
         "SDL_CCACHE OFF"
-        "SDL_WAYLAND OFF"  # Since you're using KDE, you might want to enable Wayland support
+        "SDL_WAYLAND OFF"
         "SDL_WAYLAND_LIBDECOR OFF"
         "SDL_WAYLAND_LIBDECOR_SHARED OFF"
         "SDL_WAYLAND_QT_TOUCH OFF"
