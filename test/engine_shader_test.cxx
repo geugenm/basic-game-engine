@@ -158,11 +158,19 @@ public:
 
     void render() override
     {
-        Engine::ShaderVertex alpha(1.0, 2.0);
-        Engine::ShaderVertex beta(3.0, 6.0);
-        Engine::ShaderVertex gamma(4.0, 1.0);
-        std::array<Engine::ShaderVertex, 3> triangle = {alpha, beta, gamma};
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Engine::ShaderVertex), &triangle[0]);
+        GLuint vao;
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+
+        std::array<Engine::ShaderVertex, 3> triangle = {*alpha_, *beta_, *gamma_};
+
+        GLuint vbo;
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Engine::ShaderVertex) * triangle.size(), triangle.data(), GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Engine::ShaderVertex), (void*)0);
         GL::listen_opengl_errors();
         glEnableVertexAttribArray(0);
         GL::listen_opengl_errors();
@@ -186,6 +194,9 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 3);
         GL::listen_opengl_errors();
 
+        glDeleteVertexArrays(1, &vao); // Clean up the VAO after rendering
+        glDeleteBuffers(1, &vbo); // Clean up the VBO after rendering
+
         swap_buffers();
     }
 
@@ -199,6 +210,7 @@ public:
         GL::listen_opengl_errors();
     }
 
+
     void destroy() override
     {
         SDL_GL_DeleteContext(context_);
@@ -210,6 +222,10 @@ private:
     SDL_Window* window_    = nullptr;
     SDL_GLContext context_ = nullptr;
     GLuint program_id_     = 0;
+
+    Engine::ShaderVertex * alpha_ = new Engine::ShaderVertex(0.1, 1.2);
+    Engine::ShaderVertex * beta_ = new Engine::ShaderVertex(54.1, 3.2);
+    Engine::ShaderVertex * gamma_  = new Engine::ShaderVertex(125.1, 275.2);
 };
 
 Engine::Instance* Engine::Instance::create_instance()
