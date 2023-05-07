@@ -29,5 +29,10 @@ public:
         derived->destroy_impl(std::forward<Args>(args)...);
         derived->initialize_impl(std::forward<Args>(args)...);
     }
+
+    template <typename... Args> void set_uniform(Args&&... args)
+    {
+        static_cast<Derived*>(this)->set_uniform_impl(std::forward<Args>(args)...);
+    }
 };
 }

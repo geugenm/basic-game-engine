@@ -13,7 +13,8 @@ namespace SDLEngine
 class OpenGLShader : public AbstractEngine::IShader<OpenGLShader>
 {
 public:
-    void initialize_impl(GLenum shaderType, const std::string& shaderSource)
+    template <typename... Args>
+    void initialize_impl(GLenum shaderType, const std::string& shaderSource, Args&&... args)
     {
         shader_id_ = glCreateShader(shaderType);
         GL::listen_opengl_errors();
@@ -29,7 +30,7 @@ public:
         GL::listen_opengl_errors();
     }
 
-    void compile_impl()
+    template <typename... Args> void compile_impl(Args&&... args)
     {
         glCompileShader(shader_id_);
         GL::listen_opengl_errors();
@@ -52,7 +53,7 @@ public:
         }
     }
 
-    void destroy_impl()
+    template <typename... Args> void destroy_impl(Args&&... args)
     {
         if (shader_id_ != 0)
         {
@@ -63,8 +64,42 @@ public:
         }
     }
 
+    template <typename... Args> void set_uniform_impl(Args&&... args)
+    {
+
+    }
+
+    [[nodiscard]] GLuint get_shader_id() const
+    {
+        return shader_id_;
+    }
+
+protected:
+    void set_shader_id(GLuint shaderId)
+    {
+        shader_id_ = shaderId;
+    }
+
+    GLuint & access_shader_id() {
+        return shader_id_;
+    }
+
 private:
     GLuint shader_id_{0};
 };
+
+
+
+
+class CustomOpenGLShader : public OpenGLShader
+{
+public:
+    template <typename... Args>
+    void set_uniform_impl(const std::string& name, Args&&... args)
+    {
+
+    }
+};
+
 
 } // namespace SDLEngine
