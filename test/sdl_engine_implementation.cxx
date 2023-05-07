@@ -1,10 +1,11 @@
-#include <gtest/gtest.h>
 #include <SDL.h>
-#include <opengl_functions.hxx>
 #include <glad/glad.h>
+#include <gtest/gtest.h>
+#include <opengl_functions.hxx>
 
 // Helper function to create a shader program
-GLuint createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource) {
+GLuint createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource)
+{
     // Create vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
@@ -28,7 +29,8 @@ GLuint createShaderProgram(const char* vertexShaderSource, const char* fragmentS
     return shaderProgram;
 }
 
-TEST(ShaderTest, ShaderOutput) {
+TEST(ShaderTest, ShaderOutput)
+{
     // Initialize SDL and create an OpenGL ES 3.2 context
     GL::init_sdl();
     SDL_Init(SDL_INIT_VIDEO);
@@ -36,14 +38,14 @@ TEST(ShaderTest, ShaderOutput) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    SDL_Window* window = GL::create_window("Test", 800, 600);
+    SDL_Window* window    = GL::create_window("Test", 800, 450);
     SDL_GLContext context = GL::create_opengl_context(window);
 
     GL::load_opengl_functions();
     GL::is_opengl_version_supported();
 
     // Set up OpenGL viewport
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, 800, 450);
 
     // Create a shader program with the provided GLSL code
     // You'll need to provide a simple vertex shader for this test
@@ -293,17 +295,10 @@ TEST(ShaderTest, ShaderOutput) {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    GLfloat vertices[] = {
-        -1.0f, -1.0f, 0.0f, 0.0f,
-        1.0f, -1.0f, 1.0f, 0.0f,
-        1.0f,  1.0f, 1.0f, 1.0f,
-        -1.0f,  1.0f, 0.0f, 1.0f
-    };
+    GLfloat vertices[] = {-1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  -1.0f, 1.0f, 0.0f,
+                          1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 1.0f,  0.0f, 1.0f};
 
-    GLuint indices[] = {
-        0, 1, 2,
-        0, 2, 3
-    };
+    GLuint indices[] = {0, 1, 2, 0, 2, 3};
 
     GLuint VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -319,15 +314,15 @@ TEST(ShaderTest, ShaderOutput) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
 
     // Texture Coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)(2 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+                          (GLvoid*)(2 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
-
 
     bool running = true;
     SDL_Event event;
@@ -337,34 +332,51 @@ TEST(ShaderTest, ShaderOutput) {
 
     // Check vertex shader compilation status
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
+    if (!success)
+    {
         glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
         std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
     // Check fragment shader compilation status
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
+    if (!success)
+    {
         glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
         std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
     // Check shader program linking status
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
+    if (!success)
+    {
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
 
-
+    float mouseClickX = 0.0f;
+    float mouseClickY = 0.0f;
 
     while (running)
     {
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_EVENT_QUIT)
             {
                 running = false;
+            }
+
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+            {
+                mouseClickX = event.button.x;
+                mouseClickY = event.button.y;
+            }
+
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
+            {
+                mouseClickX = 0.f;
+                mouseClickY = 0.f;
             }
         }
 
@@ -372,7 +384,7 @@ TEST(ShaderTest, ShaderOutput) {
         glUseProgram(shaderProgram);
 
         GLint resolutionUniformLocation = glGetUniformLocation(shaderProgram, "iResolution");
-        glUniform2f(resolutionUniformLocation, 800.0f, 600.0f);
+        glUniform2f(resolutionUniformLocation, 800.0f, 450.0f);
 
         GLint timeUniformLocation = glGetUniformLocation(shaderProgram, "iTime");
         glUniform1f(timeUniformLocation, SDL_GetTicks() / 1000.0f);
@@ -380,7 +392,7 @@ TEST(ShaderTest, ShaderOutput) {
         GLint mouseUniformLocation = glGetUniformLocation(shaderProgram, "iMouse");
         float mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
-        glUniform4f(mouseUniformLocation, mouseX, mouseY, 0.0, 0.0);
+        glUniform4f(mouseUniformLocation, mouseX, -mouseY + 450.f, mouseClickX, mouseClickY - 450.f);
 
         // Render quad
         glBindVertexArray(VAO);
@@ -388,14 +400,7 @@ TEST(ShaderTest, ShaderOutput) {
         glBindVertexArray(0);
 
         SDL_GL_SwapWindow(window);
-
     }
-
-                    // Render the shader to a texture
-    // Set up framebuffer, texture, and render the shader output
-
-    // Check the output against expected results
-    // Read the rendered texture data and perform assertions
 
     // Clean up
     glDeleteProgram(shaderProgram);
