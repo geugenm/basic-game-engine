@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 set(SOURCES
-        misc/dll_reloader.cxx
+        misc/sdl_dll_reloader.hxx
         render/opengl_functions.cxx
         )
 

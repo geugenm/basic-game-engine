@@ -80,26 +80,6 @@ bool GL::is_opengl_version_supported()
     return true;
 }
 
-std::string GL::read_shader_file(const std::filesystem::path& filePath)
-{
-    if (!std::filesystem::exists(filePath))
-    {
-        throw std::runtime_error("File not found: " + filePath.string());
-    }
-
-    std::ifstream shaderFile(filePath);
-    if (!shaderFile.is_open())
-    {
-        throw std::runtime_error("Failed to open shader file: " + filePath.string());
-    }
-
-    std::stringstream shaderStream;
-    shaderStream << shaderFile.rdbuf();
-    shaderFile.close();
-
-    return shaderStream.str();
-}
-
 void GL::opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
                                GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -124,7 +104,7 @@ void GL::listen_opengl_errors()
 
 GLuint GL::load_shader(GLenum type, const std::string& source)
 {
-    GLuint shader = glCreateShader(type);
+    GLuint shader   = glCreateShader(type);
     const char* src = source.c_str();
     glShaderSource(shader, 1, &src, nullptr);
     glCompileShader(shader);
@@ -133,7 +113,8 @@ GLuint GL::load_shader(GLenum type, const std::string& source)
 
 std::string GL::read_file(const std::filesystem::path& file_path)
 {
-    if (!exists(file_path)) {
+    if (!exists(file_path))
+    {
         throw std::invalid_argument("File " + file_path.string() + " is not found");
     }
     std::ifstream file(file_path);

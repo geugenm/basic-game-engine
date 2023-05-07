@@ -1,8 +1,9 @@
 #pragma once
 
-class IDLLReloader
+namespace Engine
 {
-public:
+struct IDLLReloader
+{
     virtual ~IDLLReloader() = default;
 
     virtual void set_target_library_path(const char* path) = 0;
@@ -18,3 +19,5 @@ public:
 
 extern "C" IDLLReloader* create_dll_reloader();
 extern "C" void destroy_dll_reloader(IDLLReloader* reloader);
+
+} // namespace Engine

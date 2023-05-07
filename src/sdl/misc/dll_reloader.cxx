@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <iostream>
 
+namespace Engine
+{
 class SDLDLLReloader : public IDLLReloader
 {
 public:
@@ -41,29 +43,30 @@ public:
 
     void reset() override {}
 
+private:
     [[nodiscard]] SDL_FunctionPointer get_sdl_function_pointer(const std::string_view& method_name)
     {
-        void* gameHandle = SDL_LoadObject(new_library_path_.c_str());
+        void* game_handle = SDL_LoadObject(new_library_path_.c_str());
 
-        if (gameHandle == nullptr)
+        if (game_handle == nullptr)
         {
             throw std::runtime_error("Error: failed to load dynamic library: " +
                                      new_library_path_.string() + ", " + SDL_GetError());
         }
 
-        SDL_FunctionPointer createGameFuncPtr = SDL_LoadFunction(gameHandle, method_name.data());
+        SDL_FunctionPointer create_game_func_ptr =
+            SDL_LoadFunction(game_handle, method_name.data());
 
-        if (createGameFuncPtr == nullptr)
+        if (create_game_func_ptr == nullptr)
         {
             throw std::runtime_error("Error: failed to load function 'create_application' from "
                                      "dynamic library: " +
                                      new_library_path_.string() + ", " + SDL_GetError());
         }
 
-        return createGameFuncPtr;
+        return create_game_func_ptr;
     }
 
-private:
     std::filesystem::path target_library_path_;
 
     std::filesystem::path new_library_path_;
@@ -84,3 +87,5 @@ void destroy_dll_reloader(IDLLReloader* reloader)
     }
     delete reloader;
 }
+
+} // namespace Engine

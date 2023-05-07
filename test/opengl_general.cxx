@@ -26,8 +26,8 @@ SDL_Window* CreateWindow()
 
     constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-    SDL_Window* window =
-        SDL_CreateWindow("(opengl-compile-test) Test OPenGL SDL3 Window", kWindowHeight, kWindowWidth, flags);
+    SDL_Window* window = SDL_CreateWindow("(opengl-compile-test) Test OPenGL SDL3 Window",
+                                          kWindowHeight, kWindowWidth, flags);
     if (!window)
     {
         std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;

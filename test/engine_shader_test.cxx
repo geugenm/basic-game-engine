@@ -1,6 +1,6 @@
 #include "engine.hxx"
 #include "opengl_functions.hxx"
-#include "render/abstract_declarations.hxx"
+#include "render/declarations.hxx"
 #include <gtest/gtest.h>
 
 class MyEngine : public Engine::Instance
