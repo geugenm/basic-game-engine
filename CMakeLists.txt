@@ -71,21 +71,27 @@ target_include_directories(sdl-engine PUBLIC
 # Enable/disable building tests
 option(BUILD_TESTS "Build tests" ON)
 if (BUILD_TESTS)
+    function(add_test_executable target_name source_file)
+        add_executable(${target_name} ${source_file})
+        target_link_libraries(${target_name} PRIVATE GTest::GTest)
+    endfunction()
+
     enable_testing()
-    add_executable(Test_SDL_Static_Compilation test/sdl_general.cxx)
-    target_link_libraries(Test_SDL_Static_Compilation PRIVATE GTest::GTest SDL3::SDL3-static)
 
-    add_executable(Test_SDL_Shared_Compilation test/sdl_general.cxx)
-    target_link_libraries(Test_SDL_Shared_Compilation PRIVATE GTest::GTest SDL3::SDL3-shared)
+    add_test_executable(Test_SDL_Static_Compilation test/sdl_general.cxx)
+    target_link_libraries(Test_SDL_Static_Compilation PRIVATE SDL3::SDL3-static)
 
-    add_executable(Test_OpenGL_Init test/opengl_general.cxx)
-    target_link_libraries(Test_OpenGL_Init PRIVATE opengl-glad GTest::GTest SDL3::SDL3-shared)
+    add_test_executable(Test_SDL_Shared_Compilation test/sdl_general.cxx)
+    target_link_libraries(Test_SDL_Shared_Compilation PRIVATE SDL3::SDL3-shared)
 
-    add_executable(Test_Engine_Shaders_SDL test/engine_shader_compilation_runtime.cxx)
-    target_link_libraries(Test_Engine_Shaders_SDL PRIVATE sdl-engine GTest::GTest)
+    add_test_executable(Test_OpenGL_Init test/opengl_general.cxx)
+    target_link_libraries(Test_OpenGL_Init PRIVATE opengl-glad SDL3::SDL3-shared)
 
-    add_executable(Test_SDL_Engine_Shaders_SDL test/sdl_engine_shader.cxx)
-    target_link_libraries(Test_SDL_Engine_Shaders_SDL PRIVATE sdl-engine GTest::GTest)
+    add_test_executable(Test_Engine_Shaders_SDL test/self_engine_triangle_shader.cxx)
+    target_link_libraries(Test_Engine_Shaders_SDL PRIVATE sdl-engine)
+
+    add_test_executable(Test_SDL_Engine_Shaders_SDL test/sdl_opengl_shader.cxx)
+    target_link_libraries(Test_SDL_Engine_Shaders_SDL PRIVATE sdl-engine)
 endif ()
 
 # Print build information
