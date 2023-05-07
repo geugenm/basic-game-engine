@@ -37,59 +37,7 @@ public:
             SDL_Quit();
             FAIL();
         }
-
-        GLuint vertexShader =
-            GL::load_shader(GL_VERTEX_SHADER, GL::read_file("vertex_shader.glsl"));
-        GLuint fragmentShader =
-            GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file("fragment_shader.glsl"));
-
-        program_id_ = glCreateProgram();
-        GL::listen_opengl_errors();
-
-        glAttachShader(program_id_, vertexShader);
-        GL::listen_opengl_errors();
-
-        glAttachShader(program_id_, fragmentShader);
-        GL::listen_opengl_errors();
-
-        glLinkProgram(program_id_);
-        GL::listen_opengl_errors();
-
-
-        GLfloat vertices[] = {-0.5f, -0.5f, 0.5f, -0.5f, 0.0f, 0.5f};
-
-        glGenVertexArrays(1, &VAO_);
-        GL::listen_opengl_errors();
-
-        glGenBuffers(1, &VBO_);
-        GL::listen_opengl_errors();
-
-        glBindVertexArray(VAO_);
-        GL::listen_opengl_errors();
-
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-        GL::listen_opengl_errors();
-
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        GL::listen_opengl_errors();
-
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
-        GL::listen_opengl_errors();
-
-        glEnableVertexAttribArray(0);
-        GL::listen_opengl_errors();
-
-
-        glBindVertexArray(0);
-        GL::listen_opengl_errors();
-
-
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        GL::listen_opengl_errors();
-
-
+        
         init_shaders();
         init_buffers();
     }
