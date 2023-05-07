@@ -31,4 +31,8 @@ void GLAPIENTRY opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLe
 
 void listen_opengl_errors();
 
+GLuint load_shader(GLenum type, const std::string& source);
+
+std::string read_file(const std::filesystem::path& file_path);
+
 } // namespace GL

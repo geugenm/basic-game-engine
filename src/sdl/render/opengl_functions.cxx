@@ -121,3 +121,23 @@ void GL::listen_opengl_errors()
 
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 }
+
+GLuint GL::load_shader(GLenum type, const std::string& source)
+{
+    GLuint shader = glCreateShader(type);
+    const char* src = source.c_str();
+    glShaderSource(shader, 1, &src, nullptr);
+    glCompileShader(shader);
+    return shader;
+}
+
+std::string GL::read_file(const std::filesystem::path& file_path)
+{
+    if (!exists(file_path)) {
+        throw std::invalid_argument("File " + file_path.string() + " is not found");
+    }
+    std::ifstream file(file_path);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}

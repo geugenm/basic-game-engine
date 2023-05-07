@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.25)
 
 set(SOURCES
         misc/dll_reloader.cxx
-        render/shader.cxx
-        render/shader_vertex.cxx
         render/opengl_functions.cxx
         )
 
