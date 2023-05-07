@@ -37,26 +37,17 @@ public:
             SDL_Quit();
             FAIL();
         }
-        
+
         init_shaders();
         init_buffers();
     }
 
-    template <typename... Args> void render_impl(GLfloat * vertices, Args&&... args)
+    template <typename... Args> void render_impl(const GLfloat vertices[], long vertices_size, Args&&... args)
     {
-        GLfloat vertices1[] = {
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-        };
-
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
         GL::listen_opengl_errors();
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_DYNAMIC_DRAW);
         GL::listen_opengl_errors();
 
         // Re-bind the VAO after updating the vertex buffer
@@ -199,7 +190,7 @@ TEST(TriangleTest, BasicInterpolation)
             static_cast<float>(rand() % 1000) / 1000 - 0.5f,
         };
 
-        MyEngine::Instance::instance().render(vertices);
+        MyEngine::Instance::instance().render(vertices, sizeof(vertices));
     }
 
 cleanup:
