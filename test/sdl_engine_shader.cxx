@@ -1,16 +1,56 @@
 #include <glad/glad.h>
-#include <sdl_shader.hxx>
 #include <gtest/gtest.h>
+#include <opengl_functions.hxx>
+#include <sdl_shader.hxx>
 
-class OpenGLShaderTest : public ::testing::Test {
+class OpenGLShaderTest : public ::testing::Test
+{
+public:
+    OpenGLShaderTest()
+    {
+        if (!GL::init_sdl())
+        {
+            throw std::runtime_error("Failed to init sdl.");
+        }
+
+        window_ = GL::create_window("", 100, 200);
+
+        if (!window_)
+        {
+            SDL_Quit();
+            throw std::runtime_error("Failed to init window.");
+        }
+
+        context_ = GL::create_opengl_context(window_);
+        if (!context_)
+        {
+            SDL_DestroyWindow(window_);
+            SDL_Quit();
+            throw std::runtime_error("Failed to init create OpenGL context.");
+        }
+
+        if (!GL::load_opengl_functions() || !GL::is_opengl_version_supported())
+        {
+            SDL_GL_DeleteContext(context_);
+            SDL_DestroyWindow(window_);
+            SDL_Quit();
+            throw std::runtime_error("Failed to load opengl functions or opengl version is not supported.");
+        }
+    }
+
 protected:
     SDLEngine::OpenGLShader shader;
+
+    SDL_Window * window_ = nullptr;
+
+    SDL_GLContext context_;
 };
 
-TEST_F(OpenGLShaderTest, InitializationSuccess) {
-    GLenum shaderType = GL_VERTEX_SHADER;
+TEST_F(OpenGLShaderTest, InitializationSuccess)
+{
+    GLenum shaderType        = GL_VERTEX_SHADER;
     std::string shaderSource = R"(
-        #version 330 core
+        #version 320 core
         layout (location = 0) in vec3 aPos;
         void main() {
             gl_Position = vec4(aPos, 1.0);
@@ -20,8 +60,9 @@ TEST_F(OpenGLShaderTest, InitializationSuccess) {
     ASSERT_NO_THROW(shader.initialize_impl(shaderType, shaderSource));
 }
 
-TEST_F(OpenGLShaderTest, InitializationFailure) {
-    GLenum shaderType = GL_INVALID_ENUM;
+TEST_F(OpenGLShaderTest, InitializationFailure)
+{
+    GLenum shaderType        = GL_INVALID_ENUM;
     std::string shaderSource = R"(
         #version 330 core
         layout (location = 0) in vec3 aPos;
@@ -33,8 +74,9 @@ TEST_F(OpenGLShaderTest, InitializationFailure) {
     ASSERT_THROW(shader.initialize_impl(shaderType, shaderSource), std::runtime_error);
 }
 
-TEST_F(OpenGLShaderTest, CompilationSuccess) {
-    GLenum shaderType = GL_VERTEX_SHADER;
+TEST_F(OpenGLShaderTest, CompilationSuccess)
+{
+    GLenum shaderType        = GL_VERTEX_SHADER;
     std::string shaderSource = R"(
         #version 330 core
         layout (location = 0) in vec3 aPos;
@@ -47,8 +89,9 @@ TEST_F(OpenGLShaderTest, CompilationSuccess) {
     ASSERT_NO_THROW(shader.compile_impl());
 }
 
-TEST_F(OpenGLShaderTest, CompilationFailure) {
-    GLenum shaderType = GL_VERTEX_SHADER;
+TEST_F(OpenGLShaderTest, CompilationFailure)
+{
+    GLenum shaderType        = GL_VERTEX_SHADER;
     std::string shaderSource = R"(
         #version 330 core
         layout (location = 0) in vec3 aPos;
@@ -61,8 +104,9 @@ TEST_F(OpenGLShaderTest, CompilationFailure) {
     ASSERT_THROW(shader.compile_impl(), std::runtime_error);
 }
 
-TEST_F(OpenGLShaderTest, Destruction) {
-    GLenum shaderType = GL_VERTEX_SHADER;
+TEST_F(OpenGLShaderTest, Destruction)
+{
+    GLenum shaderType        = GL_VERTEX_SHADER;
     std::string shaderSource = R"(
         #version 330 core
         layout (location = 0) in vec3 aPos;
@@ -76,7 +120,8 @@ TEST_F(OpenGLShaderTest, Destruction) {
     ASSERT_NO_THROW(shader.destroy_impl());
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
