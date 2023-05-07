@@ -44,7 +44,7 @@ public:
 
     template <typename Container, typename... Args,
               typename std::enable_if<!std::is_same<Container, GLfloat*>::value, int>::type = 0>
-    void render_impl(const Container& vertices, const void* = nullptr, Args&&... args)
+    void render_impl(const Container& vertices, const void* container_determinant = nullptr, Args&&... args)
     {
         render_impl(vertices.data(), vertices.size() * sizeof(typename Container::value_type),
                     std::forward<Args>(args)...);
@@ -77,6 +77,11 @@ public:
         GL::listen_opengl_errors();
 
         glUseProgram(program_id_);
+        GL::listen_opengl_errors();
+
+        GLint color_location = glGetUniformLocation(program_id_, "my_color");
+        float color[4] = {1.0f, 0.0f, 0.0f, 1.0f}; // Set the desired color (e.g., red)
+        glUniform4fv(color_location, 1, color);
         GL::listen_opengl_errors();
 
         glBindVertexArray(VAO_);
