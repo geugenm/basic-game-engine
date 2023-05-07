@@ -38,39 +38,34 @@ public:
             FAIL();
         }
 
-        init_shaders();
+        compile_shaders();
         init_buffers();
     }
 
-    template <typename Container, typename... Args,
-              typename std::enable_if<!std::is_same<Container, GLfloat*>::value, int>::type = 0>
-    void render_impl(const Container& vertices, const void* container_determinant = nullptr, Args&&... args)
+    void shader_change_daemon()
     {
-        render_impl(vertices.data(), vertices.size() * sizeof(typename Container::value_type),
-                    std::forward<Args>(args)...);
+        static std::string vertex_shader_path            = "vertex_shader.glsl";
+        static std::string fragment_shader_path          = "fragment_shader.glsl";
+        static std::time_t vertex_shader_last_modified   = 0;
+        static std::time_t fragment_shader_last_modified = 0;
+
+        bool vertex_shader_changed =
+            GL::has_shader_file_changed(vertex_shader_path, vertex_shader_last_modified);
+        bool fragment_shader_changed =
+            GL::has_shader_file_changed(fragment_shader_path, fragment_shader_last_modified);
+
+        if (vertex_shader_changed || fragment_shader_changed)
+        {
+            glDeleteProgram(program_id_);
+
+            compile_shaders();
+        }
     }
 
     template <typename... Args>
     void render_impl(const GLfloat vertices[], long vertices_size, Args&&... args)
     {
-        static std::string vertex_shader_path = "vertex_shader.glsl";
-        static std::string fragment_shader_path = "fragment_shader.glsl";
-        static std::time_t vertex_shader_last_modified = 0;
-        static std::time_t fragment_shader_last_modified = 0;
-
-        // Check if the shader files have changed
-        bool vertex_shader_changed = GL::has_shader_file_changed(vertex_shader_path, vertex_shader_last_modified);
-        bool fragment_shader_changed = GL::has_shader_file_changed(fragment_shader_path, fragment_shader_last_modified);
-
-        // Recompile the shader program if the files have changed
-        if (vertex_shader_changed || fragment_shader_changed)
-        {
-            // Clean up the existing shader program
-            glDeleteProgram(program_id_);
-
-            // Recompile the shaders and create a new shader program
-            init_shaders();
-        }
+        shader_change_daemon();
 
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
@@ -96,11 +91,6 @@ public:
         GL::listen_opengl_errors();
 
         glUseProgram(program_id_);
-        GL::listen_opengl_errors();
-
-        GLint color_location = glGetUniformLocation(program_id_, "my_color");
-        float color[4] = {-1.0, -1.0, -1.0, -1.0};
-        glUniform4fv(color_location, 1, color);
         GL::listen_opengl_errors();
 
         glBindVertexArray(VAO_);
@@ -139,7 +129,7 @@ private:
 
     GLuint VBO_, VAO_;
 
-    void init_shaders()
+    void compile_shaders()
     {
         GLuint vertexShader =
             GL::load_shader(GL_VERTEX_SHADER, GL::read_file("vertex_shader.glsl"));
@@ -209,16 +199,9 @@ TEST(TriangleTest, BasicInterpolation)
             }
         }
 
-        GLfloat vertices[] = {
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
-        };
+        auto vertices = GL::parse_vertices_from_shader("vertex_shader.glsl");
 
-        MyEngine::Instance::instance().render(vertices, sizeof(vertices));
+        MyEngine::Instance::instance().render(vertices.data(), vertices.size());
     }
 
 cleanup:

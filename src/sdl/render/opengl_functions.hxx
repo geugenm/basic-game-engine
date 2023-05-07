@@ -2,7 +2,7 @@
 
 #include <filesystem>
 #include <string>
-
+#include <vector>
 
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
@@ -37,5 +37,7 @@ GLuint load_shader(GLenum type, const std::string& source);
 std::string read_file(const std::filesystem::path& file_path);
 
 bool has_shader_file_changed(const std::string& file_path, std::time_t& last_modified_time);
+
+std::vector<GLfloat> parse_vertices_from_shader(const std::string& shader_path);
 
 } // namespace GL

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <sys/stat.h>
+#include <regex>
 
 #include <glad/glad.h>
 
@@ -142,4 +143,30 @@ bool GL::has_shader_file_changed(const std::string& file_path, time_t& last_modi
     }
 
     return false;
+}
+
+std::vector<GLfloat> GL::parse_vertices_from_shader(const std::string& shader_path)
+{
+    std::ifstream file(shader_path);
+    std::stringstream buf;
+    buf << file.rdbuf();
+    std::string shader_src = buf.str();
+
+    std::regex vertex_regex(R"(\s*const\s+vec2\s+triangle_vertices\[\d\]\s*=\s*vec2\[\]\s*\()");
+
+    std::smatch vertex_match;
+    std::vector<GLfloat> vertices;
+
+    if (std::regex_search(shader_src, vertex_match, vertex_regex)) {
+        std::string vertex_str = vertex_match.suffix().str();
+        std::regex value_regex(R"(-?\d+(\.\d+)?f)");
+
+        std::smatch value_match;
+        while (std::regex_search(vertex_str, value_match, value_regex)) {
+            vertices.push_back(std::stof(value_match.str()));
+            vertex_str = value_match.suffix().str();
+        }
+    }
+
+    return vertices;
 }
