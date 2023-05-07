@@ -44,15 +44,13 @@ public:
 
     void shader_change_daemon()
     {
-        static std::string vertex_shader_path            = "vertex_shader.glsl";
-        static std::string fragment_shader_path          = "fragment_shader.glsl";
         static std::time_t vertex_shader_last_modified   = 0;
         static std::time_t fragment_shader_last_modified = 0;
 
         bool vertex_shader_changed =
-            GL::has_shader_file_changed(vertex_shader_path, vertex_shader_last_modified);
+            GL::has_shader_file_changed(k_vertex_shader_path_.data(), vertex_shader_last_modified);
         bool fragment_shader_changed =
-            GL::has_shader_file_changed(fragment_shader_path, fragment_shader_last_modified);
+            GL::has_shader_file_changed(k_fragment_shader_path_.data(), fragment_shader_last_modified);
 
         if (vertex_shader_changed || fragment_shader_changed)
         {
@@ -127,14 +125,17 @@ private:
     SDL_GLContext context_ = nullptr;
     GLuint program_id_     = 0;
 
+    static constexpr std::string_view k_vertex_shader_path_     = "vertex_shader.glsl";
+    static constexpr std::string_view k_fragment_shader_path_   = "fragment_shader.glsl";
+
     GLuint VBO_, VAO_;
 
     void compile_shaders()
     {
         GLuint vertexShader =
-            GL::load_shader(GL_VERTEX_SHADER, GL::read_file("vertex_shader.glsl"));
+            GL::load_shader(GL_VERTEX_SHADER, GL::read_file(k_vertex_shader_path_));
         GLuint fragmentShader =
-            GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file("fragment_shader.glsl"));
+            GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file(k_fragment_shader_path_));
 
         program_id_ = glCreateProgram();
         GL::listen_opengl_errors();
