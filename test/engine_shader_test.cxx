@@ -42,7 +42,16 @@ public:
         init_buffers();
     }
 
-    template <typename... Args> void render_impl(const GLfloat vertices[], long vertices_size, Args&&... args)
+    template <typename Container, typename... Args,
+              typename std::enable_if<!std::is_same<Container, GLfloat*>::value, int>::type = 0>
+    void render_impl(const Container& vertices, const void* = nullptr, Args&&... args)
+    {
+        render_impl(vertices.data(), vertices.size() * sizeof(typename Container::value_type),
+                    std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    void render_impl(const GLfloat vertices[], long vertices_size, Args&&... args)
     {
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
@@ -62,7 +71,6 @@ public:
 
         glBindVertexArray(0);
         GL::listen_opengl_errors();
-
 
         // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
@@ -94,7 +102,6 @@ public:
 
         glDeleteProgram(program_id_);
         GL::listen_opengl_errors();
-
 
         SDL_GL_DeleteContext(context_);
         SDL_DestroyWindow(window_);
@@ -141,20 +148,17 @@ private:
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
-
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
         GL::listen_opengl_errors();
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
         GL::listen_opengl_errors();
 
-
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
         GL::listen_opengl_errors();
 
         glEnableVertexAttribArray(0);
         GL::listen_opengl_errors();
-
 
         glBindVertexArray(0);
         GL::listen_opengl_errors();
