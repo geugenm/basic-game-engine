@@ -1,25 +1,29 @@
-#include "../src/sdl/opengl_functions.hxx"
-#include "abstract_engine.hxx"
-#include "render/declarations.hxx"
-#include <gtest/gtest.h>
+#pragma once
 
-class MyEngine : public Engine::Instance<MyEngine>
+#include "opengl_functions.hxx"
+#include <abstract_engine.hxx>
+
+#include <render/shader.hxx>
+#include <glad/glad.h>
+
+namespace Engine
+{
+
+class SDLEngine : public Engine::Instance<SDLEngine>
 {
 public:
-    ~MyEngine() override = default;
-
     template <typename... Args> void initialize_impl(Args&&... args)
     {
         if (!GL::init_sdl())
         {
-            FAIL();
+            return ;
         }
 
         window_ = GL::create_window("Test", 1000, 1000);
         if (!window_)
         {
             SDL_Quit();
-            FAIL();
+            return ;
         }
 
         context_ = GL::create_opengl_context(window_);
@@ -27,7 +31,7 @@ public:
         {
             SDL_DestroyWindow(window_);
             SDL_Quit();
-            FAIL();
+            return ;
         }
 
         if (!GL::load_opengl_functions() || !GL::is_opengl_version_supported())
@@ -35,11 +39,10 @@ public:
             SDL_GL_DeleteContext(context_);
             SDL_DestroyWindow(window_);
             SDL_Quit();
-            FAIL();
+            return ;
         }
 
         compile_shaders();
-        init_buffers();
     }
 
     void shader_change_daemon()
@@ -131,87 +134,9 @@ private:
     SDL_GLContext context_ = nullptr;
     GLuint program_id_     = 0;
 
-    static constexpr std::string_view k_vertex_shader_path_     = "vertex_shader.glsl";
-    static constexpr std::string_view k_fragment_shader_path_   = "fragment_shader.glsl";
-
     GLuint VBO_, VAO_;
 
-    void compile_shaders()
-    {
-        GLuint vertexShader =
-            GL::load_shader(GL_VERTEX_SHADER, GL::read_file(k_vertex_shader_path_));
-        GLuint fragmentShader =
-            GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file(k_fragment_shader_path_));
-
-        program_id_ = glCreateProgram();
-        GL::listen_opengl_errors();
-
-        glAttachShader(program_id_, vertexShader);
-        GL::listen_opengl_errors();
-
-        glAttachShader(program_id_, fragmentShader);
-        GL::listen_opengl_errors();
-
-        glLinkProgram(program_id_);
-        GL::listen_opengl_errors();
-    }
-
-    void init_buffers()
-    {
-        glGenVertexArrays(1, &VAO_);
-        GL::listen_opengl_errors();
-
-        glGenBuffers(1, &VBO_);
-        GL::listen_opengl_errors();
-
-        glBindVertexArray(VAO_);
-        GL::listen_opengl_errors();
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-        GL::listen_opengl_errors();
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
-        GL::listen_opengl_errors();
-
-        glEnableVertexAttribArray(0);
-        GL::listen_opengl_errors();
-
-        glBindVertexArray(0);
-        GL::listen_opengl_errors();
-    }
+    void compile_shaders();
 };
 
-template <> Engine::Instance<MyEngine>* MyEngine::Instance::create_instance()
-{
-    return new MyEngine();
-}
-
-TEST(TriangleTest, BasicInterpolation)
-{
-    MyEngine::Instance::instance().initialize();
-
-    SDL_Event event;
-    while (true)
-    {
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_EVENT_QUIT)
-            {
-                goto cleanup;
-            }
-        }
-
-        auto vertices = GL::parse_vertices_from_shader("vertex_shader.glsl");
-
-        MyEngine::Instance::instance().render(vertices.data(), vertices.size());
-    }
-
-cleanup:
-    MyEngine::Instance::instance().destroy();
-}
-
-auto main(int argc, char** argv) -> int
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+} // namespace Engine

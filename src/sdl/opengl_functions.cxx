@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <regex>
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 bool GL::init_sdl()
 {
