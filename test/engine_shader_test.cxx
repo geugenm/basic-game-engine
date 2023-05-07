@@ -53,6 +53,25 @@ public:
     template <typename... Args>
     void render_impl(const GLfloat vertices[], long vertices_size, Args&&... args)
     {
+        static std::string vertex_shader_path = "vertex_shader.glsl";
+        static std::string fragment_shader_path = "fragment_shader.glsl";
+        static std::time_t vertex_shader_last_modified = 0;
+        static std::time_t fragment_shader_last_modified = 0;
+
+        // Check if the shader files have changed
+        bool vertex_shader_changed = GL::has_shader_file_changed(vertex_shader_path, vertex_shader_last_modified);
+        bool fragment_shader_changed = GL::has_shader_file_changed(fragment_shader_path, fragment_shader_last_modified);
+
+        // Recompile the shader program if the files have changed
+        if (vertex_shader_changed || fragment_shader_changed)
+        {
+            // Clean up the existing shader program
+            glDeleteProgram(program_id_);
+
+            // Recompile the shaders and create a new shader program
+            init_shaders();
+        }
+
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
         GL::listen_opengl_errors();
@@ -80,7 +99,7 @@ public:
         GL::listen_opengl_errors();
 
         GLint color_location = glGetUniformLocation(program_id_, "my_color");
-        float color[4] = {1.0f, 0.0f, 0.0f, 1.0f}; // Set the desired color (e.g., red)
+        float color[4] = {-1.0, -1.0, -1.0, -1.0};
         glUniform4fv(color_location, 1, color);
         GL::listen_opengl_errors();
 

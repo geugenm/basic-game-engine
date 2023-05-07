@@ -1,9 +1,11 @@
 #include "opengl_functions.hxx"
 
 #include <fstream>
+#include <iostream>
 
 #include <sstream>
 #include <stdexcept>
+#include <sys/stat.h>
 
 #include <glad/glad.h>
 
@@ -121,4 +123,23 @@ std::string GL::read_file(const std::filesystem::path& file_path)
     std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
+}
+
+bool GL::has_shader_file_changed(const std::string& file_path, time_t& last_modified_time)
+{
+    struct stat file_stat
+    {
+    };
+    if (stat(file_path.c_str(), &file_stat) != 0)
+    {
+        return false;
+    }
+
+    if (file_stat.st_mtime > last_modified_time)
+    {
+        last_modified_time = file_stat.st_mtime;
+        return true;
+    }
+
+    return false;
 }
