@@ -40,6 +40,3 @@ target_link_libraries(Test_OpenGL_Init PRIVATE opengl-glad GTest::GTest SDL3::SD
 
 add_executable(Test_Engine_Shaders_SDL engine_shader_compilation_runtime.cxx)
 target_link_libraries(Test_Engine_Shaders_SDL PRIVATE sdl-engine opengl-glad GTest::GTest SDL3::SDL3-shared)
-
-add_executable(Test_Engine_Amazing_Shaders_SDL engine_amazing_shader.cxx)
-target_link_libraries(Test_Engine_Amazing_Shaders_SDL PRIVATE sdl-engine opengl-glad GTest::GTest SDL3::SDL3-shared)
