@@ -90,8 +90,11 @@ if (BUILD_TESTS)
     add_test_executable(Test_Engine_Shaders_SDL test/self_engine_triangle_shader.cxx)
     target_link_libraries(Test_Engine_Shaders_SDL PRIVATE sdl-engine)
 
-    add_test_executable(Test_SDL_Engine_Shaders_SDL test/sdl_opengl_shader.cxx)
-    target_link_libraries(Test_SDL_Engine_Shaders_SDL PRIVATE sdl-engine)
+    add_test_executable(Test_OpenGL_Engine_Shaders test/sdl_opengl_shader.cxx)
+    target_link_libraries(Test_OpenGL_Engine_Shaders PRIVATE sdl-engine)
+
+    add_test_executable(Test_SDL_Engine test/sdl_engine_implementation.cxx)
+    target_link_libraries(Test_SDL_Engine PRIVATE sdl-engine)
 endif ()
 
 # Print build information

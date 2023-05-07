@@ -25,9 +25,7 @@ public:
 
     template <typename... Args> void reload(Args&&... args)
     {
-        auto* derived = static_cast<Derived*>(this);
-        derived->destroy_impl(std::forward<Args>(args)...);
-        derived->initialize_impl(std::forward<Args>(args)...);
+        static_cast<Derived*>(this)->reload_impl(std::forward<Args>(args)...);
     }
 
     template <typename... Args> void set_uniform(Args&&... args)
