@@ -1,11 +1,13 @@
 #pragma once
 
+#include <iostream>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace Engine
 {
-class Instance
+template <typename Derived> class Instance
 {
 public:
     virtual ~Instance() = default;
@@ -16,15 +18,25 @@ public:
     static Instance& instance()
     {
         static std::once_flag init_flag;
-        std::call_once(init_flag, [&]() { instance_.reset(create_instance()); });
+        std::call_once(init_flag,
+                       [&]() { instance_.reset(static_cast<Derived*>(create_instance())); });
         return *instance_;
     }
 
-    virtual void initialize(){};
+    template <typename... Args> void initialize(Args&&... args)
+    {
+        static_cast<Derived*>(this)->initialize_impl(std::forward<Args>(args)...);
+    }
 
-    virtual void render(){};
+    template <typename... Args> void render(Args&&... args)
+    {
+        static_cast<Derived*>(this)->render_impl(std::forward<Args>(args)...);
+    }
 
-    virtual void destroy(){};
+    template <typename... Args> void destroy(Args&&... args)
+    {
+        static_cast<Derived*>(this)->destroy_impl(std::forward<Args>(args)...);
+    }
 
 protected:
     Instance() = default;
@@ -35,5 +47,6 @@ private:
     static std::unique_ptr<Instance> instance_;
 };
 
-std::unique_ptr<Instance> Instance::instance_ = nullptr;
+template <typename Derived>
+std::unique_ptr<Instance<Derived>> Instance<Derived>::instance_ = nullptr;
 } // namespace Engine
