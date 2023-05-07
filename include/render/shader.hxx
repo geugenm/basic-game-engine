@@ -2,7 +2,7 @@
 
 #include <utility>
 
-namespace Engine {
+namespace AbstractEngine {
 template <typename Derived> class IShader
 {
 public:

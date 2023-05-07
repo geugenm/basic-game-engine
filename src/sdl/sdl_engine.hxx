@@ -3,13 +3,12 @@
 #include "opengl_functions.hxx"
 #include <abstract_engine.hxx>
 
-#include <render/shader.hxx>
 #include <glad/glad.h>
 
-namespace Engine
+namespace SDLEngine
 {
 
-class SDLEngine : public Engine::Instance<SDLEngine>
+class Instance : public Engine::Instance<Instance>
 {
 public:
     template <typename... Args> void initialize_impl(Args&&... args)
@@ -45,29 +44,10 @@ public:
         compile_shaders();
     }
 
-    void shader_change_daemon()
-    {
-        static std::time_t vertex_shader_last_modified   = 0;
-        static std::time_t fragment_shader_last_modified = 0;
-
-        bool vertex_shader_changed =
-            GL::has_shader_file_changed(k_vertex_shader_path_.data(), vertex_shader_last_modified);
-        bool fragment_shader_changed =
-            GL::has_shader_file_changed(k_fragment_shader_path_.data(), fragment_shader_last_modified);
-
-        if (vertex_shader_changed || fragment_shader_changed)
-        {
-            glDeleteProgram(program_id_);
-
-            compile_shaders();
-        }
-    }
 
     template <typename... Args>
     void render_impl(const GLfloat vertices[], long vertices_size, Args&&... args)
     {
-        shader_change_daemon();
-
         GLint mousePosUniformLoc = glGetUniformLocation(program_id_, "u_mousePos");
         float mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);

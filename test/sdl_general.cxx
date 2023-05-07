@@ -1,17 +1,7 @@
-/**
- * @file sdl_compilation.cxx
- * @brief Contains compilation verifying tests for SDL library.
- */
-
 #include <SDL3/SDL.h>
 #include <gtest/gtest.h>
 #include <iostream>
 
-/**
- * @brief Tests the SDL version.
- *
- * Checks that the compiled version of SDL matches the linked version.
- */
 TEST(SDLTest, SDLVersion)
 {
     SDL_version compiled_version = {0, 0, 0};
@@ -34,12 +24,6 @@ TEST(SDLTest, SDLVersion)
     EXPECT_EQ(compiled_version_str.str(), linked_version_str.str());
 }
 
-/**
- * @brief Tests the SDL initialization.
- *
- * Checks that SDL initializes correctly by creating a window and renderer,
- * and then destroying them.
- */
 TEST(SDLTest, SDLInitialization)
 {
     constexpr uint16_t kWindowHeight = 120;

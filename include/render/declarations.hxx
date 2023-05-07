@@ -4,7 +4,7 @@
 #include <array>
 #include <vector>
 
-namespace Engine
+namespace AbstractEngine
 {
 template <typename T> using Vertices2D                     = std::vector<Vertex2D<T>>;
 template <typename T, std::size_t N> using Vertices2DFixed = std::array<Vertex2D<T>, N>;
