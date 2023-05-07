@@ -44,35 +44,59 @@ public:
             GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file("fragment_shader.glsl"));
 
         program_id_ = glCreateProgram();
+        GL::listen_opengl_errors();
+
         glAttachShader(program_id_, vertexShader);
+        GL::listen_opengl_errors();
+
         glAttachShader(program_id_, fragmentShader);
+        GL::listen_opengl_errors();
+
         glLinkProgram(program_id_);
+        GL::listen_opengl_errors();
+
 
         GLfloat vertices[] = {-0.5f, -0.5f, 0.5f, -0.5f, 0.0f, 0.5f};
 
         glGenVertexArrays(1, &VAO_);
+        GL::listen_opengl_errors();
+
         glGenBuffers(1, &VBO_);
+        GL::listen_opengl_errors();
+
         glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        GL::listen_opengl_errors();
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        GL::listen_opengl_errors();
+
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
+        GL::listen_opengl_errors();
+
         glEnableVertexAttribArray(0);
+        GL::listen_opengl_errors();
+
 
         glBindVertexArray(0);
+        GL::listen_opengl_errors();
+
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GL::listen_opengl_errors();
+
 
         init_shaders();
         init_buffers();
     }
 
-    template <typename... Args>
-    void render_impl(Args&&... args)
+    template <typename... Args> void render_impl(GLfloat * vertices, Args&&... args)
     {
-        // Generate new triangle vertices
-        GLfloat vertices[] = {
+        GLfloat vertices1[] = {
             static_cast<float>(rand() % 1000) / 1000 - 0.5f,
             static_cast<float>(rand() % 1000) / 1000 - 0.5f,
             static_cast<float>(rand() % 1000) / 1000 - 0.5f,
@@ -83,25 +107,55 @@ public:
 
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+        GL::listen_opengl_errors();
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_DYNAMIC_DRAW);
+        GL::listen_opengl_errors();
+
+        // Re-bind the VAO after updating the vertex buffer
+        glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
+        GL::listen_opengl_errors();
+
+        glEnableVertexAttribArray(0);
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(0);
+        GL::listen_opengl_errors();
+
 
         // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
+        GL::listen_opengl_errors();
 
         glUseProgram(program_id_);
+        GL::listen_opengl_errors();
+
         glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        GL::listen_opengl_errors();
+
         glBindVertexArray(0);
+        GL::listen_opengl_errors();
 
         SDL_GL_SwapWindow(window_);
+        GL::listen_opengl_errors();
     }
-
 
     template <typename... Args> void destroy_impl(Args&&... args)
     {
         glDeleteVertexArrays(1, &VAO_);
+        GL::listen_opengl_errors();
+
         glDeleteBuffers(1, &VBO_);
+        GL::listen_opengl_errors();
+
         glDeleteProgram(program_id_);
+        GL::listen_opengl_errors();
+
 
         SDL_GL_DeleteContext(context_);
         SDL_DestroyWindow(window_);
@@ -123,9 +177,16 @@ private:
             GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file("fragment_shader.glsl"));
 
         program_id_ = glCreateProgram();
+        GL::listen_opengl_errors();
+
         glAttachShader(program_id_, vertexShader);
+        GL::listen_opengl_errors();
+
         glAttachShader(program_id_, fragmentShader);
+        GL::listen_opengl_errors();
+
         glLinkProgram(program_id_);
+        GL::listen_opengl_errors();
     }
 
     void init_buffers()
@@ -133,20 +194,35 @@ private:
         GLfloat vertices[] = {-0.5f, -0.5f, 0.5f, -0.5f, 0.0f, 0.5f};
 
         glGenVertexArrays(1, &VAO_);
+        GL::listen_opengl_errors();
+
         glGenBuffers(1, &VBO_);
+        GL::listen_opengl_errors();
+
         glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        GL::listen_opengl_errors();
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        GL::listen_opengl_errors();
+
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
+        GL::listen_opengl_errors();
+
         glEnableVertexAttribArray(0);
+        GL::listen_opengl_errors();
+
 
         glBindVertexArray(0);
+        GL::listen_opengl_errors();
     }
 };
 
-template<> Engine::Instance<MyEngine>* MyEngine::Instance::create_instance()
+template <> Engine::Instance<MyEngine>* MyEngine::Instance::create_instance()
 {
     return new MyEngine();
 }
@@ -154,10 +230,31 @@ template<> Engine::Instance<MyEngine>* MyEngine::Instance::create_instance()
 TEST(TriangleTest, BasicInterpolation)
 {
     MyEngine::Instance::instance().initialize();
+
+    SDL_Event event;
     while (true)
     {
-        MyEngine::Instance::instance().render();
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_EVENT_QUIT)
+            {
+                goto cleanup;
+            }
+        }
+
+        GLfloat vertices[] = {
+            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
+            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
+            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
+            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
+            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
+            static_cast<float>(rand() % 1000) / 1000 - 0.5f,
+        };
+
+        MyEngine::Instance::instance().render(vertices);
     }
+
+cleanup:
     MyEngine::Instance::instance().destroy();
 }
 
