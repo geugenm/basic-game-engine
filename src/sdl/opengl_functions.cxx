@@ -3,10 +3,10 @@
 #include <fstream>
 #include <iostream>
 
+#include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <sys/stat.h>
-#include <regex>
 
 #include "glad/glad.h"
 
@@ -114,13 +114,15 @@ GLuint GL::load_shader(GLenum type, const std::string& source)
     return shader;
 }
 
-std::string GL::read_file(const std::filesystem::path& file_path)
+std::string GL::read_file(const std::string& file_path)
 {
-    if (!exists(file_path))
+    std::ifstream file(file_path, std::ios::binary);
+
+    if (!file.is_open())
     {
-        throw std::invalid_argument("File " + file_path.string() + " is not found");
+        throw std::runtime_error("Failed to open " + std::filesystem::path(file_path).string());
     }
-    std::ifstream file(file_path);
+
     std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
@@ -157,12 +159,14 @@ std::vector<GLfloat> GL::parse_vertices_from_shader(const std::string& shader_pa
     std::smatch vertex_match;
     std::vector<GLfloat> vertices;
 
-    if (std::regex_search(shader_src, vertex_match, vertex_regex)) {
+    if (std::regex_search(shader_src, vertex_match, vertex_regex))
+    {
         std::string vertex_str = vertex_match.suffix().str();
         std::regex value_regex(R"(-?\d+(\.\d+)?f)");
 
         std::smatch value_match;
-        while (std::regex_search(vertex_str, value_match, value_regex)) {
+        while (std::regex_search(vertex_str, value_match, value_regex))
+        {
             vertices.push_back(std::stof(value_match.str()));
             vertex_str = value_match.suffix().str();
         }

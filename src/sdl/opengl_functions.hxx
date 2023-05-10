@@ -32,7 +32,7 @@ void listen_opengl_errors();
 
 GLuint load_shader(GLenum type, const std::string& source);
 
-std::string read_file(const std::filesystem::path& file_path);
+std::string read_file(const std::string& file_path);
 
 bool has_shader_file_changed(const std::string& file_path, std::time_t& last_modified_time);
 
