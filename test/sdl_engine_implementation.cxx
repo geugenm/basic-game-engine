@@ -5,7 +5,9 @@
 #include <SDL.h>
 #include <gtest/gtest.h>
 
-// Helper function to create a shader program
+constexpr int k_window_width  = 450;
+constexpr int k_window_height = 800;
+
 GLuint createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource)
 {
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -17,8 +19,10 @@ GLuint createShaderProgram(const char* vertexShaderSource, const char* fragmentS
     glCompileShader(fragmentShader);
 
     GLuint shaderProgram = glCreateProgram();
+
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
+
     glLinkProgram(shaderProgram);
 
     glDeleteShader(vertexShader);
@@ -31,15 +35,17 @@ void set_uniforms(const GLuint& shader_program, const Uniform<float, float, floa
 {
     const auto [mouse_x, mouse_y, mouse_click_x, mouse_click_y] = uniform.values;
 
+    const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
+
     GLint resolutionUniformLocation = glGetUniformLocation(shader_program, "iResolution");
-    glUniform2f(resolutionUniformLocation, 800.0f, 450.0f);
+    glUniform2f(resolutionUniformLocation, k_window_width, k_window_height);
 
     GLint timeUniformLocation = glGetUniformLocation(shader_program, "iTime");
-    glUniform1f(timeUniformLocation, static_cast<float>(SDL_GetTicks()) / 1000.0f);
+    glUniform1f(timeUniformLocation, time);
 
     GLint mouseUniformLocation = glGetUniformLocation(shader_program, "iMouse");
-    glUniform4f(mouseUniformLocation, mouse_x, -mouse_y + 450.f, mouse_click_x,
-                mouse_click_y - 450.f);
+    glUniform4f(mouseUniformLocation, mouse_x, mouse_y, mouse_click_x,
+                mouse_click_y);
 }
 
 TEST(ShaderTest, ShaderOutput)
@@ -50,13 +56,17 @@ TEST(ShaderTest, ShaderOutput)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    SDL_Window* window    = GL::create_window("Test", 800, 450);
+    SDL_Window* window    = GL::create_window("Test", k_window_height, k_window_width);
     SDL_GLContext context = GL::create_opengl_context(window);
 
     GL::load_opengl_functions();
     GL::is_opengl_version_supported();
 
-    glViewport(0, 0, 800, 450);
+    glDebugMessageCallback(GL::opengl_debug_callback, nullptr);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+    glViewport(0, 0, k_window_width, k_window_height);
+    GL::listen_opengl_errors();
 
     const std::string vertexShaderSource =
         GL::read_file("../../test/shaders/light_figures_rgb_vertex.glsl");
@@ -135,11 +145,6 @@ TEST(ShaderTest, ShaderOutput)
 
     // Check shader program linking status
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
 
     float mouseClickX = 0.0f;
     float mouseClickY = 0.0f;
@@ -178,7 +183,7 @@ TEST(ShaderTest, ShaderOutput)
 
         // Render quad
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
 
         SDL_GL_SwapWindow(window);
