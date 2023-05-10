@@ -1,6 +1,5 @@
 #include "../src/sdl/opengl_functions.hxx"
 #include "abstract_engine.hxx"
-#include "render/declarations.hxx"
 #include <gtest/gtest.h>
 
 class MyEngine : public Engine::Instance<MyEngine>
@@ -55,6 +54,7 @@ public:
         if (vertex_shader_changed || fragment_shader_changed)
         {
             glDeleteProgram(program_id_);
+            GL::listen_opengl_errors();
 
             compile_shaders();
         }
@@ -65,11 +65,13 @@ public:
     {
         shader_change_daemon();
 
-        GLint mousePosUniformLoc = glGetUniformLocation(program_id_, "u_mousePos");
-        float mouseX, mouseY;
-        SDL_GetMouseState(&mouseX, &mouseY);
-        glUniform2f(mousePosUniformLoc, mouseX, mouseY);
-
+//        GLint mousePosUniformLoc = glGetUniformLocation(program_id_, "u_mousePos");
+//        GL::listen_opengl_errors();
+//
+//        float mouseX, mouseY;
+//        SDL_GetMouseState(&mouseX, &mouseY);
+//        glUniform2f(mousePosUniformLoc, mouseX, mouseY);
+//        GL::listen_opengl_errors();
 
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
@@ -131,17 +133,17 @@ private:
     SDL_GLContext context_ = nullptr;
     GLuint program_id_     = 0;
 
-    static constexpr std::string_view k_vertex_shader_path_     = "vertex_shader.glsl";
-    static constexpr std::string_view k_fragment_shader_path_   = "fragment_shader.glsl";
+    static constexpr std::string_view k_vertex_shader_path_     = "../../test/shaders/triangle_vertex.glsl";
+    static constexpr std::string_view k_fragment_shader_path_   = "../../test/shaders/triangle_fragment.glsl";
 
     GLuint VBO_, VAO_;
 
     void compile_shaders()
     {
         GLuint vertexShader =
-            GL::load_shader(GL_VERTEX_SHADER, GL::read_file(k_vertex_shader_path_));
+            GL::load_shader(GL_VERTEX_SHADER, GL::read_file(k_vertex_shader_path_.data()));
         GLuint fragmentShader =
-            GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file(k_fragment_shader_path_));
+            GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file(k_fragment_shader_path_.data()));
 
         program_id_ = glCreateProgram();
         GL::listen_opengl_errors();
@@ -201,7 +203,7 @@ TEST(TriangleTest, BasicInterpolation)
             }
         }
 
-        auto vertices = GL::parse_vertices_from_shader("vertex_shader.glsl");
+        auto vertices = GL::parse_vertices_from_shader("../../test/shaders/triangle_vertex.glsl");
 
         MyEngine::Instance::instance().render(vertices.data(), vertices.size());
     }

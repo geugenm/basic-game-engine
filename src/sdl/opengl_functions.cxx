@@ -108,9 +108,15 @@ void GL::listen_opengl_errors()
 GLuint GL::load_shader(GLenum type, const std::string& source)
 {
     GLuint shader   = glCreateShader(type);
+    GL::listen_opengl_errors();
+
     const char* src = source.c_str();
     glShaderSource(shader, 1, &src, nullptr);
+    GL::listen_opengl_errors();
+
     glCompileShader(shader);
+    GL::listen_opengl_errors();
+
     return shader;
 }
 
