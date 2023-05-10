@@ -5,8 +5,8 @@
 #include <SDL.h>
 #include <gtest/gtest.h>
 
-constexpr int k_window_width  = 800;
-constexpr int k_window_height = 450;
+constexpr int k_window_width  = 1040;
+constexpr int k_window_height = 585;
 
 void set_uniforms(const GLuint& shader_program, const Uniform<float, float, float, float>& uniform)
 {
@@ -21,8 +21,8 @@ void set_uniforms(const GLuint& shader_program, const Uniform<float, float, floa
     glUniform1f(timeUniformLocation, time);
 
     GLint mouseUniformLocation = glGetUniformLocation(shader_program, "iMouse");
-    glUniform4f(mouseUniformLocation, mouse_x, mouse_y, mouse_click_x,
-                mouse_click_y);
+    glUniform4f(mouseUniformLocation, mouse_x, -mouse_y + k_window_height, mouse_click_x,
+                mouse_click_y - k_window_height);
 }
 
 bool check_shader_compile_status(GLuint shader) {
