@@ -65,13 +65,10 @@ public:
     {
         shader_change_daemon();
 
-//        GLint mousePosUniformLoc = glGetUniformLocation(program_id_, "u_mousePos");
-//        GL::listen_opengl_errors();
-//
-//        float mouseX, mouseY;
-//        SDL_GetMouseState(&mouseX, &mouseY);
-//        glUniform2f(mousePosUniformLoc, mouseX, mouseY);
-//        GL::listen_opengl_errors();
+        const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
+        GLint timeLoc = glGetUniformLocation(program_id_, "time");
+        glUniform1f(timeLoc, time);
+
 
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
