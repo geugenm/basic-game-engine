@@ -1,32 +1,45 @@
+#include "glad/glad.h"
+#include "opengl_functions.hxx"
+#include "render/uniform.hxx"
+
 #include <SDL.h>
-#include <glad/glad.h>
 #include <gtest/gtest.h>
-#include <opengl_functions.hxx>
 
 // Helper function to create a shader program
 GLuint createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource)
 {
-    // Create vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
     glCompileShader(vertexShader);
 
-    // Create fragment shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
     glCompileShader(fragmentShader);
 
-    // Create shader program
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
 
-    // Clean up shaders
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
     return shaderProgram;
+}
+
+void set_uniforms(const GLuint& shader_program, const Uniform<float, float, float, float>& uniform)
+{
+    const auto [mouse_x, mouse_y, mouse_click_x, mouse_click_y] = uniform.values;
+
+    GLint resolutionUniformLocation = glGetUniformLocation(shader_program, "iResolution");
+    glUniform2f(resolutionUniformLocation, 800.0f, 450.0f);
+
+    GLint timeUniformLocation = glGetUniformLocation(shader_program, "iTime");
+    glUniform1f(timeUniformLocation, static_cast<float>(SDL_GetTicks()) / 1000.0f);
+
+    GLint mouseUniformLocation = glGetUniformLocation(shader_program, "iMouse");
+    glUniform4f(mouseUniformLocation, mouse_x, -mouse_y + 450.f, mouse_click_x,
+                mouse_click_y - 450.f);
 }
 
 TEST(ShaderTest, ShaderOutput)
@@ -70,7 +83,7 @@ TEST(ShaderTest, ShaderOutput)
     glDeleteShader(fragmentShader);
 
     GLfloat vertices[] = {-1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  -1.0f, 1.0f, 0.0f,
-                          1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 1.0f,  0.0f, 1.0f};
+                          1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 1.0f,  0.0f, 0.0f};
 
     GLuint indices[] = {0, 1, 2, 0, 2, 3};
 
@@ -157,17 +170,11 @@ TEST(ShaderTest, ShaderOutput)
         // Set uniforms
         glUseProgram(shaderProgram);
 
-        GLint resolutionUniformLocation = glGetUniformLocation(shaderProgram, "iResolution");
-        glUniform2f(resolutionUniformLocation, 800.0f, 450.0f);
-
-        GLint timeUniformLocation = glGetUniformLocation(shaderProgram, "iTime");
-        glUniform1f(timeUniformLocation, SDL_GetTicks() / 1000.0f);
-
-        GLint mouseUniformLocation = glGetUniformLocation(shaderProgram, "iMouse");
         float mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
-        glUniform4f(mouseUniformLocation, mouseX, -mouseY + 450.f, mouseClickX,
-                    mouseClickY - 450.f);
+
+        set_uniforms(shaderProgram,
+                     Uniform<float, float, float, float>(mouseX, mouseY, mouseClickX, mouseClickY));
 
         // Render quad
         glBindVertexArray(VAO);
