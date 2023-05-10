@@ -25,6 +25,31 @@ void set_uniforms(const GLuint& shader_program, const Uniform<float, float, floa
                 mouse_click_y);
 }
 
+bool check_shader_compile_status(GLuint shader) {
+    GLint success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        GLchar infoLog[512];
+        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+        std::cerr << "Shader compilation failed: " << infoLog << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool check_program_link_status(GLuint program) {
+    GLint success;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        GLchar infoLog[512];
+        glGetProgramInfoLog(program, 512, nullptr, infoLog);
+        std::cerr << "Program linking failed: " << infoLog << std::endl;
+        return false;
+    }
+    return true;
+}
+
+
 TEST(ShaderTest, ShaderOutput)
 {
     GL::init_sdl();
@@ -56,15 +81,24 @@ TEST(ShaderTest, ShaderOutput)
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertex_shader, nullptr);
     glCompileShader(vertexShader);
+    if (!check_shader_compile_status(vertexShader)) {
+        FAIL();
+    }
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragment_shader, nullptr);
     glCompileShader(fragmentShader);
+    if (!check_shader_compile_status(fragmentShader)) {
+        FAIL();
+    }
 
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
+    if (!check_program_link_status(shaderProgram)) {
+        FAIL();
+    }
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -100,28 +134,6 @@ TEST(ShaderTest, ShaderOutput)
 
     bool running = true;
     SDL_Event event;
-
-    GLint success;
-    GLchar infoLog[512];
-
-    // Check vertex shader compilation status
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // Check fragment shader compilation status
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // Check shader program linking status
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 
     float mouseClickX = 0.0f;
     float mouseClickY = 0.0f;
