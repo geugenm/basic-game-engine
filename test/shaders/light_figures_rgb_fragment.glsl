@@ -12,15 +12,13 @@ uniform vec4 iMouse;
 
 #define pi 3.141592564
 
-// Scene definition is kinda inspired by .obj file formatting but idk if I'll keep it
-
-vec3 materials[] = vec3[](
+const vec3 materials[] = vec3[](
 vec3(1.000, 1.000, 1.000), // white
 vec3(1.000, 0.067, 0.157), // red
 vec3(0.027, 0.945, 0.259), // green
 vec3(0.318, 0.553, 0.992));// blue
 
-vec2 points[] = vec2[](
+const vec2 points[] = vec2[](
 vec2(.1, -.25),
 vec2(.3, -.25),
 vec2(.1, -.05),
@@ -38,8 +36,8 @@ vec2(-.05, -.15),
 vec2(0, -.1),
 vec2(-.1, -.1));
 
-int segmentCount = 15;
-ivec3 segments[] = ivec3[](
+const int segmentCount = 15;
+const ivec3 segments[15] = ivec3[](
 ivec3(0, 1, 1), // ivec3(a,b,c)
 ivec3(0, 2, 1), // a = endpoint a index
 ivec3(1, 3, 1), // b = endpoint b index
