@@ -8,29 +8,6 @@
 constexpr int k_window_width  = 450;
 constexpr int k_window_height = 800;
 
-GLuint createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource)
-{
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-    glCompileShader(vertexShader);
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-    glCompileShader(fragmentShader);
-
-    GLuint shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return shaderProgram;
-}
-
 void set_uniforms(const GLuint& shader_program, const Uniform<float, float, float, float>& uniform)
 {
     const auto [mouse_x, mouse_y, mouse_click_x, mouse_click_y] = uniform.values;
