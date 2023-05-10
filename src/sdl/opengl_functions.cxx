@@ -20,7 +20,7 @@ bool GL::init_sdl()
     return true;
 }
 
-SDL_Window* GL::create_window(const char* window_title, const int& height, const int& width)
+SDL_Window* GL::create_window(const char* window_title, const int& width, const int& height)
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, kOpenGLMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, kOpenGLMinorVersion);
@@ -28,7 +28,7 @@ SDL_Window* GL::create_window(const char* window_title, const int& height, const
 
     constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-    SDL_Window* window = SDL_CreateWindow(window_title, height, width, flags);
+    SDL_Window* window = SDL_CreateWindow(window_title, width, height, flags);
     if (!window)
     {
         std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;

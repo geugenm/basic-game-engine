@@ -5,8 +5,8 @@
 #include <SDL.h>
 #include <gtest/gtest.h>
 
-constexpr int k_window_width  = 450;
-constexpr int k_window_height = 800;
+constexpr int k_window_width  = 800;
+constexpr int k_window_height = 450;
 
 void set_uniforms(const GLuint& shader_program, const Uniform<float, float, float, float>& uniform)
 {
@@ -58,7 +58,7 @@ TEST(ShaderTest, ShaderOutput)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    SDL_Window* window    = GL::create_window("Test", k_window_height, k_window_width);
+    SDL_Window* window    = GL::create_window("Test", k_window_width, k_window_height);
     SDL_GLContext context = GL::create_opengl_context(window);
 
     GL::load_opengl_functions();
