@@ -150,60 +150,59 @@ vec3 ACESFilm(vec3 x) {
 #define lightFalloff 2.
 void main() {
     vec2 fragCoord = gl_FragCoord.xy;
-    vec3 col;
-    vec2 p = (2.*fragCoord-iResolution.xy-.5)/iResolution.x;
-    float rand = IGN(ivec2(fragCoord.xy));
+    vec3 color;
+    vec2 uv = (2.*fragCoord-iResolution.xy-.5)/iResolution.x;
+    float randomValue = IGN(ivec2(fragCoord.xy));
 
-    vec3 spot;
-    vec3 gi;
+    vec3 spotlight;
+    vec3 globalIllumination;
 
-    vec2 lightPos = vec2(sin(iTime*.5)*.75, cos(iTime*.25)*.25+.25);
+    vec2 lightPosition = vec2(sin(iTime*.5)*.75, cos(iTime*.25)*.25+.25);
 
-    vec2 lightDir = normalize(vec2(sin(iTime*1.5), -1));
+    vec2 lightDirection = normalize(vec2(sin(iTime*1.5), -1));
     if (iMouse.z > 0.){
-        lightPos = vec2(2, -2)*iMouse.zw/iResolution.x-vec2(1., .56);
-        lightDir = normalize(2.*iMouse.xy/iResolution.x-vec2(1., .561)-lightPos);
+        lightPosition = vec2(2, -2)*iMouse.zw/iResolution.x-vec2(1., .56);
+        lightDirection = normalize(2.*iMouse.xy/iResolution.x-vec2(1., .561)-lightPosition);
     }
-    float lightRad = .005;
+    const float lightRadius = .005;
 
-    if (sceneIntersect(p, normalize(lightPos-p)).w > distance(p, lightPos)) {
-        spot = vec3(max((.5*float(dot(normalize(p-lightPos), lightDir))-.5)/lightRad+1., 0.));
+    if (sceneIntersect(uv, normalize(lightPosition-uv)).w > distance(uv, lightPosition)) {
+        spotlight = vec3(max((.5*float(dot(normalize(uv-lightPosition), lightDirection))-.5)/lightRadius+1., 0.));
     }
 
-    vec2 hit;
+    vec2 intersectionPoint;
     for (int i=0; i<samples; i++) {
-        vec2 ro = lightPos;
-        float rot = .08*pi*((float(i)+rand)/float(samples)-.5) + atan(lightDir.y, lightDir.x);
-        vec2 rd = vec2(cos(rot), sin(rot));
-        vec2 lightDirSampled = rd;
+        vec2 rayOrigin = lightPosition;
+        float rotation = .08*pi*((float(i)+randomValue)/float(samples)-.5) + atan(lightDirection.y, lightDirection.x);
+        vec2 rayDirection = vec2(cos(rotation), sin(rotation));
+        vec2 lightDirectionSampled = rayDirection;
 
-        float d = sceneIntersect(ro, rd).w;
-        hit = ro + rd*d;
-        vec2 nor = sceneNormal(hit - rd*.01);
+        float distanceToIntersection = sceneIntersect(rayOrigin, rayDirection).w;
+        intersectionPoint = rayOrigin + rayDirection*distanceToIntersection;
+        vec2 normal = sceneNormal(intersectionPoint - rayDirection*.01);
 
-        ro = p;
-        rd = normalize(hit-p);
+        rayOrigin = uv;
+        rayDirection = normalize(intersectionPoint-uv);
 
-        // Circle arc for bounce light falloff just beause I thought it looked better than inverse square law :p
-        float hitDist = min(distance(p, hit)/lightFalloff, 1.);
+        float intersectionDistance = min(distance(uv, intersectionPoint)/lightFalloff, 1.);
 
-        vec4 lightRay = sceneIntersect(ro, rd);
-        d = lightRay.w;
+        vec4 lightRay = sceneIntersect(rayOrigin, rayDirection);
+        distanceToIntersection = lightRay.w;
 
-        if (d + .01 > distance(p, hit)) {
-            gi += 1./float(samples) * lightRay.rgb * clamp(dot(-rd, nor), 0., 1.) * (1.-sqrt(2.*hitDist-hitDist*hitDist))
-            * (sceneDist(p).w > .005 ? 1. : dot(sceneNormal(p), lightDirSampled)*.5+.5);
+        if (distanceToIntersection + .01 > distance(uv, intersectionPoint)) {
+            globalIllumination += 1./float(samples) * lightRay.rgb * clamp(dot(-rayDirection, normal), 0., 1.) * (1.-sqrt(2.*intersectionDistance-intersectionDistance*intersectionDistance))
+            * (sceneDist(uv).w > .005 ? 1. : dot(sceneNormal(uv), lightDirectionSampled)*.5+.5);
         }
     }
 
-    vec4 scene = sceneDist(p);
-    col = spot*.5 + gi*1.;
-    col *= scene.w > .005 ? vec3(.25) : 3.*scene.rgb;
+    vec4 scene = sceneDist(uv);
+    color = spotlight*.5 + globalIllumination*1.;
+    color *= scene.w > .005 ? vec3(.25) : 3.*scene.rgb;
 
     // Tonemapping
+    color = ACESFilm(color);
+    color = pow(color, vec3(1./2.2));
 
-    col = ACESFilm(col);
-    col = pow(col, vec3(1./2.2));
-
-    fragColor = vec4(col, 1);
+    fragColor = vec4(color, 1);
 }
+
