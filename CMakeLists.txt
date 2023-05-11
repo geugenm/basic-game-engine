@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.25)
 project(project.basic_game_engine VERSION 1.0.0 LANGUAGES CXX C)
 
-message(STATUS "Configuring Basic_Game_Engine")
+message(STATUS "Configuring ${PROJECT_NAME}...")
 
 # Set default build type to Release if not specified
 if (NOT CMAKE_BUILD_TYPE)
@@ -80,23 +80,23 @@ if (BUILD_TESTS)
 
     enable_testing()
 
-    add_test_executable(Test_SDL_Static_Compilation test/sdl_general.cxx)
-    target_link_libraries(Test_SDL_Static_Compilation PRIVATE SDL3::SDL3-static)
+    add_test_executable(test_sdl_static_compilation test/sdl_general.cxx)
+    target_link_libraries(test_sdl_static_compilation PRIVATE SDL3::SDL3-static)
 
-    add_test_executable(Test_SDL_Shared_Compilation test/sdl_general.cxx)
-    target_link_libraries(Test_SDL_Shared_Compilation PRIVATE SDL3::SDL3-shared)
+    add_test_executable(test_sdl_shared_compilation test/sdl_general.cxx)
+    target_link_libraries(test_sdl_shared_compilation PRIVATE SDL3::SDL3-shared)
 
-    add_test_executable(Test_OpenGL_Init test/opengl_general.cxx)
-    target_link_libraries(Test_OpenGL_Init PRIVATE opengl-glad SDL3::SDL3-shared)
+    add_test_executable(test_opengl_init test/opengl_general.cxx)
+    target_link_libraries(test_opengl_init PRIVATE opengl-glad SDL3::SDL3-shared)
 
-    add_test_executable(Test_Engine_Shaders_SDL test/self_engine_triangle_shader.cxx)
-    target_link_libraries(Test_Engine_Shaders_SDL PRIVATE sdl-engine)
+    add_test_executable(test_engine_shaders_sdl test/abstract_engine_triangle.cxx)
+    target_link_libraries(test_engine_shaders_sdl PRIVATE sdl-engine)
 
-    add_test_executable(Test_OpenGL_Engine_Shaders test/sdl_opengl_shader.cxx)
-    target_link_libraries(Test_OpenGL_Engine_Shaders PRIVATE sdl-engine)
+    add_test_executable(test_opengl_engine_shaders test/sdl_opengl_shader.cxx)
+    target_link_libraries(test_opengl_engine_shaders PRIVATE sdl-engine)
 
-    add_test_executable(Test_SDL_Engine test/sdl_engine_implementation.cxx)
-    target_link_libraries(Test_SDL_Engine PRIVATE sdl-engine)
+    add_test_executable(test_complex_light_shader test/complex_light_shader.cxx)
+    target_link_libraries(test_complex_light_shader PRIVATE sdl-engine)
 
     set(NON_CPP_EXTENSIONS glsl)
 
