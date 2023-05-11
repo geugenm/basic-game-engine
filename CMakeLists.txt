@@ -1,6 +1,6 @@
 # Set minimum CMake version and project details
 cmake_minimum_required(VERSION 3.25)
-project(Basic_Game_Engine VERSION 1.0.0 LANGUAGES CXX C)
+project(project.basic_game_engine VERSION 1.0.0 LANGUAGES CXX C)
 
 message(STATUS "Configuring Basic_Game_Engine")
 
@@ -98,11 +98,11 @@ if (BUILD_TESTS)
     add_test_executable(Test_SDL_Engine test/sdl_engine_implementation.cxx)
     target_link_libraries(Test_SDL_Engine PRIVATE sdl-engine)
 
-    set(TEST_SUPPLEMENTARIES_EXTENSIONS glsl)
+    set(NON_CPP_EXTENSIONS glsl)
 
-    foreach(EXTENSION ${TEST_SUPPLEMENTARIES_EXTENSIONS})
-        file(GLOB_RECURSE TEST_SUPPLEMENTARIES "*.${EXTENSION}")
-        foreach(TEST_SUPPLEMENTARIES ${NON_CPP_FILES})
+    foreach(EXTENSION ${NON_CPP_EXTENSIONS})
+        file(GLOB_RECURSE NON_CPP_FILES "test/*.${EXTENSION}")
+        foreach(NON_CPP_FILE ${NON_CPP_FILES})
             file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR}/test ${NON_CPP_FILE})
             configure_file(${NON_CPP_FILE} "${CMAKE_BINARY_DIR}/test/${REL_PATH}" COPYONLY)
         endforeach()
