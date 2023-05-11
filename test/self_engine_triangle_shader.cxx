@@ -130,8 +130,8 @@ private:
     SDL_GLContext context_ = nullptr;
     GLuint program_id_     = 0;
 
-    static constexpr std::string_view k_vertex_shader_path_     = "../../test/shaders/triangle_vertex.glsl";
-    static constexpr std::string_view k_fragment_shader_path_   = "../../test/shaders/triangle_fragment.glsl";
+    static constexpr std::string_view k_vertex_shader_path_     = "shaders/triangle_vertex.glsl";
+    static constexpr std::string_view k_fragment_shader_path_   = "shaders/triangle_fragment.glsl";
 
     GLuint VBO_, VAO_;
 

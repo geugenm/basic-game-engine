@@ -73,6 +73,8 @@ option(BUILD_TESTS "Build tests" ON)
 if (BUILD_TESTS)
     function(add_test_executable target_name source_file)
         add_executable(${target_name} ${source_file})
+        set_target_properties(${target_name} PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test")
         target_link_libraries(${target_name} PRIVATE GTest::GTest)
     endfunction()
 
@@ -95,6 +97,16 @@ if (BUILD_TESTS)
 
     add_test_executable(Test_SDL_Engine test/sdl_engine_implementation.cxx)
     target_link_libraries(Test_SDL_Engine PRIVATE sdl-engine)
+
+    set(TEST_SUPPLEMENTARIES_EXTENSIONS glsl)
+
+    foreach(EXTENSION ${TEST_SUPPLEMENTARIES_EXTENSIONS})
+        file(GLOB_RECURSE TEST_SUPPLEMENTARIES "*.${EXTENSION}")
+        foreach(TEST_SUPPLEMENTARIES ${NON_CPP_FILES})
+            file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR}/test ${NON_CPP_FILE})
+            configure_file(${NON_CPP_FILE} "${CMAKE_BINARY_DIR}/test/${REL_PATH}" COPYONLY)
+        endforeach()
+    endforeach()
 endif ()
 
 # Print build information
