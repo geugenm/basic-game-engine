@@ -11,7 +11,7 @@ CPMAddPackage(
         "SDL_VIRTUAL_JOYSTICK OFF"
         "SDL_HIDAPI_JOYSTICK OFF"
         "SDL_HAPTIC OFF"
-        "SDL_JOYSTICK OFF"
+        "SDL_JOYSTICK ON"
         "SDL_CCACHE OFF"
         "SDL_WAYLAND OFF"
         "SDL_WAYLAND_LIBDECOR OFF"

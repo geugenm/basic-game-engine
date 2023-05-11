@@ -98,6 +98,9 @@ if (BUILD_TESTS)
     add_test_executable(test_complex_light_shader test/complex_light_shader.cxx)
     target_link_libraries(test_complex_light_shader PRIVATE sdl-engine)
 
+    add_test_executable(test_imgui test/imgui_general.cxx)
+    target_link_libraries(test_imgui PRIVATE imgui)
+
     set(NON_CPP_EXTENSIONS glsl)
 
     foreach(EXTENSION ${NON_CPP_EXTENSIONS})

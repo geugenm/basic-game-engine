@@ -4,26 +4,31 @@ CPMAddPackage(
         NAME imgui
         GITHUB_REPOSITORY ocornut/imgui
         GIT_TAG v1.88
+        DOWNLOAD_ONLY True
 )
 
+
 if (imgui_ADDED)
-  add_library(imgui STATIC
-          ${imgui_SOURCE_DIR}/imgui.cpp
-          ${imgui_SOURCE_DIR}/imgui_demo.cpp # optionally comment this out
-          ${imgui_SOURCE_DIR}/imgui_draw.cpp
-          ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-          ${imgui_SOURCE_DIR}/imgui_tables.cpp
-          )
-  target_include_directories(imgui INTERFACE ${imgui_SOURCE_DIR})
-  target_compile_definitions(imgui PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS) # optional imgui setting
-  set_target_properties(imgui PROPERTIES FOLDER third-party) # optoinal IDE dir
-
-
-  add_library(imgui_sdl STATIC
-          ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl.cpp
-          ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer.cpp
+  add_library(imgui STATIC)
+  target_sources(imgui PRIVATE
+          "${imgui_SOURCE_DIR}/imgui.cpp"
+          "${imgui_SOURCE_DIR}/imgui_demo.cpp"
+          "${imgui_SOURCE_DIR}/imgui_draw.cpp"
+          "${imgui_SOURCE_DIR}/imgui_tables.cpp"
+          "${imgui_SOURCE_DIR}/imgui_widgets.cpp"
           )
 
-  target_link_libraries(imgui_sdl PRIVATE imgui SDL)
-  target_include_directories(imgui_sdl INTERFACE ${imgui_SOURCE_DIR}/backends)
+  target_include_directories(imgui PUBLIC "${imgui_SOURCE_DIR}")
+  target_include_directories(imgui PUBLIC "${imgui_SOURCE_DIR}/backends")
+
+
+  target_sources(imgui PRIVATE
+          "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
+          "${imgui_SOURCE_DIR}/backends/imgui_impl_sdl.cpp"
+          )
+  find_package(SDL2 REQUIRED)
+  target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
+  target_link_libraries(imgui PUBLIC opengl-glad)
+  target_link_libraries(imgui PUBLIC SDL2::SDL2)
 endif ()
+
