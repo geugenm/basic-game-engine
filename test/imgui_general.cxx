@@ -9,7 +9,6 @@
 
 #include <stdexcept>
 
-// Function prototypes
 void init_sdl();
 void init_opengl(SDL_Window *window);
 void init_imgui(SDL_Window *window, SDL_GLContext gl_context);
@@ -37,7 +36,6 @@ int main(int argc, char *argv[]) {
         init_opengl(window);
         init_imgui(window, gl_context);
 
-        // Main loop
         bool running = true;
         SDL_Event event;
 
@@ -53,7 +51,6 @@ int main(int argc, char *argv[]) {
             ImGui_ImplSDL2_NewFrame(window);
             ImGui::NewFrame();
 
-            // ImGui test window
             ImGui::ShowDemoWindow();
 
             ImGui::Render();
@@ -66,10 +63,10 @@ int main(int argc, char *argv[]) {
         cleanup(window, gl_context);
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 void init_sdl() {
@@ -93,12 +90,11 @@ void init_opengl(SDL_Window *window) {
 void init_imgui(SDL_Window *window, SDL_GLContext gl_context) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
 
     ImGui::StyleColorsDark();
 
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 130");
+    ImGui_ImplOpenGL3_Init("#version 330 core");
 }
 
 void cleanup(SDL_Window *window, SDL_GLContext gl_context) {
