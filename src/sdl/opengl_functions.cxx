@@ -71,7 +71,10 @@ bool GL::is_opengl_version_supported()
 {
     int major, minor;
     glGetIntegerv(GL_MAJOR_VERSION, &major);
+    GL::listen_opengl_errors();
+
     glGetIntegerv(GL_MINOR_VERSION, &minor);
+    GL::listen_opengl_errors();
 
     if (major < kOpenGLMajorVersion ||
         (major == kOpenGLMajorVersion && minor < kOpenGLMinorVersion))
@@ -98,6 +101,7 @@ void GL::opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum sev
 void GL::listen_opengl_errors()
 {
     glEnable(GL_DEBUG_OUTPUT);
+
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
     glDebugMessageCallback(opengl_debug_callback, nullptr);
@@ -107,7 +111,7 @@ void GL::listen_opengl_errors()
 
 GLuint GL::load_shader(GLenum type, const std::string& source)
 {
-    GLuint shader   = glCreateShader(type);
+    GLuint shader = glCreateShader(type);
     GL::listen_opengl_errors();
 
     const char* src = source.c_str();
@@ -120,7 +124,7 @@ GLuint GL::load_shader(GLenum type, const std::string& source)
     return shader;
 }
 
-std::string GL::read_file(const std::string& file_path)
+std::string GL::get_file_content(const std::string& file_path)
 {
     std::ifstream file(file_path, std::ios::binary);
 
@@ -179,4 +183,106 @@ std::vector<GLfloat> GL::parse_vertices_from_shader(const std::string& shader_pa
     }
 
     return vertices;
+}
+
+GLuint GL::link_shader_program(GLuint& shader)
+{
+    GLuint program_id = glCreateProgram();
+    GL::listen_opengl_errors();
+
+    if (0 == program_id)
+    {
+        std::cerr << "failed to create gl program";
+        throw std::runtime_error("can't link shader");
+    }
+
+    glAttachShader(program_id, shader);
+    GL::listen_opengl_errors();
+
+    glLinkProgram(program_id);
+    GL::listen_opengl_errors();
+
+    GLint linked_status = 0;
+    glGetProgramiv(program_id, GL_LINK_STATUS, &linked_status);
+    GL::listen_opengl_errors();
+
+    if (linked_status == 0)
+    {
+        GLint infoLen = 0;
+        glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &infoLen);
+        GL::listen_opengl_errors();
+
+        std::vector<char> infoLog(static_cast<size_t>(infoLen));
+        glGetProgramInfoLog(program_id, infoLen, nullptr, infoLog.data());
+        GL::listen_opengl_errors();
+
+        std::cerr << "Error linking program:\n" << infoLog.data();
+        glDeleteProgram(program_id);
+        GL::listen_opengl_errors();
+
+        return 0;
+    }
+    return program_id;
+}
+
+void GL::destroy_shader(GLuint program_id)
+{
+    glDeleteShader(program_id);
+    GL::listen_opengl_errors();
+}
+
+void GL::use_shader(GLuint program_id)
+{
+    glUseProgram(program_id);
+    GL::listen_opengl_errors();
+}
+
+int GL::get_uniform_location(const GLuint& program_id, const char* uniform_name)
+{
+    const int location = glGetUniformLocation(program_id, uniform_name);
+    GL::listen_opengl_errors();
+
+    constexpr int uniform_not_found = -1;
+
+    if (location == uniform_not_found)
+    {
+        throw std::invalid_argument("Uniform " + std::string(uniform_name) + " was not found");
+    }
+
+    return location;
+}
+
+GLuint GL::compile_shader(const GLenum& shader_type, const char* shader_content)
+{
+    GLuint shader_id = glCreateShader(shader_type);
+    GL::listen_opengl_errors();
+
+    glShaderSource(shader_id, 1, &shader_content, nullptr);
+    GL::listen_opengl_errors();
+
+    glCompileShader(shader_id);
+    GL::listen_opengl_errors();
+
+    GLint compiled_status = 0;
+    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compiled_status);
+    GL::listen_opengl_errors();
+
+    if (compiled_status == 0)
+    {
+        GLint info_len = 0;
+        glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_len);
+        GL::listen_opengl_errors();
+
+        std::vector<char> info_chars(static_cast<size_t>(info_len));
+        glGetShaderInfoLog(shader_id, info_len, nullptr, info_chars.data());
+        GL::listen_opengl_errors();
+
+        glDeleteShader(shader_id);
+        GL::listen_opengl_errors();
+
+        std::string shader_type_name = shader_type == GL_VERTEX_SHADER ? "vertex" : "fragment";
+        std::cerr << "Error compiling shader(vertex)\n" << info_chars.data();
+        return 0;
+    }
+    return shader_id;
 }

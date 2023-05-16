@@ -71,11 +71,11 @@ TEST(ShaderTest, ShaderOutput)
     GL::listen_opengl_errors();
 
     const std::string vertexShaderSource =
-        GL::read_file("shaders/light_figures_rgb_vertex.glsl");
+        GL::get_file_content("shaders/light_figures_rgb_vertex.glsl");
     const char* vertex_shader = vertexShaderSource.data();
 
     const std::string fragmentShaderSource =
-        GL::read_file("shaders/light_figures_rgb_fragment.glsl");
+        GL::get_file_content("shaders/light_figures_rgb_fragment.glsl");
     const char* fragment_shader = fragmentShaderSource.data();
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);

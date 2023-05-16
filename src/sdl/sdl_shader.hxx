@@ -1,149 +1,157 @@
 #pragma once
 
+#include <functional>
 #include <glad/glad.h>
+#include <iostream>
 #include <memory>
 #include <render/shader.hxx>
 #include <stdexcept>
-#include <functional>
 
 #include "opengl_functions.hxx"
 
-namespace SDLEngine
+namespace SDL
 {
 
 class OpenGLShader : public AbstractEngine::IShader<OpenGLShader>
 {
 public:
     template <typename... Args>
-    void initialize_impl(GLenum shader_type, const char* shader_content, Args&&... args)
+    void initialize_impl(const std::filesystem::path& vertex_path,
+                         const std::filesystem::path& fragment_path,
+                         const std::vector<std::tuple<GLuint, const GLchar*>>& attributes,
+                         Args&&... args)
     {
-        type_ = shader_type;
-        id_ = glCreateShader(shader_type);
-        GL::listen_opengl_errors();
+        const std::string vertex_content   = GL::get_file_content(vertex_path);
+        const std::string fragment_content = GL::get_file_content(fragment_path);
 
-        if (id_ == 0)
-        {
-            throw std::runtime_error("Failed to create OpenGL shader");
-        }
+        vertex_source_   = vertex_path;
+        fragment_source_ = fragment_path;
 
-        const char* source = shader_content;
-
-        glShaderSource(id_, 1, &source, nullptr);
-        GL::listen_opengl_errors();
+        compile_impl(vertex_content.data(), fragment_content.data());
+        link_impl();
+        init_buffer();
     }
 
     template <typename... Args>
-    void initialize_impl(GLenum shader_type, const std::filesystem::path& shader_path,
-                         Args&&... args)
+    void reload_impl(const std::vector<std::tuple<GLuint, const GLchar*>>& attributes,
+                     Args&&... args)
     {
-        source_ = shader_path;
-        const std::string shader_content = GL::read_file(shader_path);
-        initialize_impl(shader_type, shader_content.data());
-    }
-
-    template <typename... Args> void reload_impl(Args&&... args)
-    {
-        if (source_.empty())
+        if (!exists(vertex_source_))
         {
-            throw std::invalid_argument("Can't reload shader, source was not defined. Shader was "
-                                        "initialized via raw code.");
+            throw std::invalid_argument("Can't reload shader, shader file was not found: " +
+                                        vertex_source_.string());
         }
 
-        compile_impl();
-    }
-
-    template <typename... Args> void compile_impl(Args&&... args)
-    {
-        glCompileShader(id_);
-        GL::listen_opengl_errors();
-
-        GLint compileStatus;
-        glGetShaderiv(id_, GL_COMPILE_STATUS, &compileStatus);
-        GL::listen_opengl_errors();
-
-        if (compileStatus == GL_FALSE)
+        if (!exists(fragment_source_))
         {
-            GLint infoLogLength;
-            glGetShaderiv(id_, GL_INFO_LOG_LENGTH, &infoLogLength);
-            GL::listen_opengl_errors();
-
-            std::unique_ptr<char[]> infoLog(new char[static_cast<unsigned long>(infoLogLength)]);
-            glGetShaderInfoLog(id_, infoLogLength, nullptr, infoLog.get());
-            GL::listen_opengl_errors();
-
-            throw std::runtime_error("Shader compilation failed: " + std::string(infoLog.get()));
+            throw std::invalid_argument("Can't reload shader, shader file was not found: " +
+                                        fragment_source_.string());
         }
+
+        initialize_impl(vertex_source_, fragment_source_, attributes);
     }
 
     template <typename... Args> void destroy_impl(Args&&... args)
     {
-        if (id_ != 0)
+        if (program_id_ == 0)
         {
-            glDeleteShader(id_);
-            GL::listen_opengl_errors();
-
-            id_ = 0;
+            std::cerr << "Failed to destroy shader: The program id is 0";
+            return;
         }
+
+        GL::destroy_shader(program_id_);
+        glDeleteProgram(program_id_);
+        GL::listen_opengl_errors();
     }
 
     template <typename... Args, typename T>
-    void set_uniform_impl(const std::string& name, const T& value,
-                          const std::function<void(GLint, const T&)>& uniform_setter,
-                          Args&&... args)
+    void set_uniform_impl(const std::string& name, const T& value, Args&&... args)
     {
     }
 
-    [[nodiscard]] GLuint get_shader_id() const
+    void use(GLfloat * vertices)
     {
-        return id_;
+        // Update the vertex buffer with the new vertices
+        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
+        GL::listen_opengl_errors();
+        glBufferData(GL_ARRAY_BUFFER, sizeof (vertices), vertices, GL_DYNAMIC_DRAW);
+        GL::listen_opengl_errors();
+
+        // Re-bind the VAO after updating the vertex buffer
+        glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
+        GL::listen_opengl_errors();
+
+        glEnableVertexAttribArray(0);
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(0);
+        GL::listen_opengl_errors();
+
+        // Clear the screen and draw the new triangle
+        glClear(GL_COLOR_BUFFER_BIT);
+        GL::listen_opengl_errors();
+
+        GL::use_shader(program_id_);
+
+        glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(0);
+        GL::listen_opengl_errors();
     }
 
-protected:
-    void set_shader_id(GLuint shaderId)
-    {
-        id_ = shaderId;
-    }
+    void init_buffer() {
+        glGenVertexArrays(1, &VAO_);
+        GL::listen_opengl_errors();
 
-    GLuint& access_shader_id()
-    {
-        return id_;
+        glGenBuffers(1, &VBO_);
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
+        GL::listen_opengl_errors();
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
+        GL::listen_opengl_errors();
+
+        glEnableVertexAttribArray(0);
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(0);
+        GL::listen_opengl_errors();
     }
 
 private:
-    GLuint id_{0};
-    GLenum type_;
-
-    std::filesystem::path source_;
-};
-
-class OpenGLVertexShader : public OpenGLShader
-{
-public:
-    template <typename... Args> void initialize_impl(const char* shader_content, Args&&... args)
+    template <typename... Args>
+    void compile_impl(const char* vertex_content, const char* fragment_content, Args&&... args)
     {
-        OpenGLShader::initialize_impl(GL_VERTEX_SHADER, shader_content);
+        vertex_shader_   = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
+        fragment_shader_ = GL::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
     }
 
     template <typename... Args>
-    void initialize_impl(const std::filesystem::path& shader_path, Args&&... args)
+    void link_impl(Args&&... args)
     {
-        OpenGLShader::initialize_impl(GL_VERTEX_SHADER, shader_path);
+        program_id_ = GL::link_shader_program(vertex_shader_);
+        program_id_ = GL::link_shader_program(fragment_shader_);
     }
+
+    GLuint vertex_shader_{};
+    GLuint fragment_shader_{};
+    GLuint program_id_{};
+
+    std::filesystem::path vertex_source_;
+    std::filesystem::path fragment_source_;
+
+    GLuint VBO_, VAO_, UBO_;
 };
 
-class OpenGLFragmentShader : public OpenGLShader
-{
-public:
-    template <typename... Args> void initialize_impl(const char* shader_content, Args&&... args)
-    {
-        OpenGLShader::initialize_impl(GL_FRAGMENT_SHADER, shader_content);
-    }
-
-    template <typename... Args>
-    void initialize_impl(const std::filesystem::path& shader_path, Args&&... args)
-    {
-        OpenGLShader::initialize_impl(GL_FRAGMENT_SHADER, shader_path);
-    }
-};
-
-} // namespace SDLEngine
+} // namespace SDL

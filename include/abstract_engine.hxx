@@ -24,7 +24,10 @@ public:
 
     template <typename... Args> void initialize(Args&&... args)
     {
-        static_cast<Derived*>(this)->initialize_impl(std::forward<Args>(args)...);
+        if (!is_initialized_) {
+            static_cast<Derived*>(this)->initialize_impl(std::forward<Args>(args)...);
+            is_initialized_ = true;
+        }
     }
 
     template <typename... Args> void render(Args&&... args)
@@ -35,6 +38,11 @@ public:
     template <typename... Args> void destroy(Args&&... args)
     {
         static_cast<Derived*>(this)->destroy_impl(std::forward<Args>(args)...);
+        is_initialized_ = false;
+    }
+
+    [[nodiscard]] bool is_initialized() const {
+        return is_initialized_;
     }
 
 protected:
@@ -44,6 +52,8 @@ protected:
 
 private:
     static std::unique_ptr<Instance> instance_;
+
+    bool is_initialized_ = false;
 };
 
 template <typename Derived>

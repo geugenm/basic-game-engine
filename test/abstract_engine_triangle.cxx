@@ -138,9 +138,9 @@ private:
     void compile_shaders()
     {
         GLuint vertexShader =
-            GL::load_shader(GL_VERTEX_SHADER, GL::read_file(k_vertex_shader_path_.data()));
+            GL::load_shader(GL_VERTEX_SHADER, GL::get_file_content(k_vertex_shader_path_.data()));
         GLuint fragmentShader =
-            GL::load_shader(GL_FRAGMENT_SHADER, GL::read_file(k_fragment_shader_path_.data()));
+            GL::load_shader(GL_FRAGMENT_SHADER, GL::get_file_content(k_fragment_shader_path_.data()));
 
         program_id_ = glCreateProgram();
         GL::listen_opengl_errors();
