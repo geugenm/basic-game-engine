@@ -38,14 +38,4 @@ bool has_shader_file_changed(const std::string& file_path, std::time_t& last_mod
 
 std::vector<GLfloat> parse_vertices_from_shader(const std::string& shader_path);
 
-GLuint compile_shader(const GLenum & shader_type, const char * shader_content);
-
-GLuint link_shader_program(GLuint & shader);
-
-void destroy_shader(GLuint program_id);
-
-void use_shader(GLuint program_id);
-
-int get_uniform_location(const GLuint & program_id, const char * uniform_name);
-
 } // namespace GL

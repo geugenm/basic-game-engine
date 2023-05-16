@@ -11,14 +11,7 @@ TEST(SDLEngineTest, Init)
 
     SDL::OpenGLShader shader;
     shader.initialize_impl("shaders/simple_vertex.glsl",
-                           "shaders/simple_fragment.glsl",
-                           {{0, "a_position"}});
-
-    GLfloat vertices[] = {
-        -0.5f, -0.5f, 0.0f, // bottom-left
-        0.5f, -0.5f, 0.0f, // bottom-right
-        0.0f,  0.5f, 0.0f  // top-center
-    };
+                           "shaders/simple_fragment.glsl");
 
 
     SDL_Event event;
@@ -32,7 +25,7 @@ TEST(SDLEngineTest, Init)
             }
         }
 
-        shader.use(vertices);
+        shader.render();
 
         SDL::Engine::Instance::instance().render();
     }

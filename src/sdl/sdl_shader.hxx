@@ -17,24 +17,151 @@ class OpenGLShader : public AbstractEngine::IShader<OpenGLShader>
 public:
     template <typename... Args>
     void initialize_impl(const std::filesystem::path& vertex_path,
-                         const std::filesystem::path& fragment_path,
-                         const std::vector<std::tuple<GLuint, const GLchar*>>& attributes,
-                         Args&&... args)
+                         const std::filesystem::path& fragment_path, Args&&... args)
     {
-        const std::string vertex_content   = GL::get_file_content(vertex_path);
-        const std::string fragment_content = GL::get_file_content(fragment_path);
+        const std::string vertex_file_content   = GL::get_file_content(vertex_path);
+        const std::string fragment_file_content = GL::get_file_content(fragment_path);
+
+        const GLchar* vertex_content   = vertex_file_content.data();
+        const GLchar* fragment_content = fragment_file_content.data();
 
         vertex_source_   = vertex_path;
         fragment_source_ = fragment_path;
 
-        compile_impl(vertex_content.data(), fragment_content.data());
-        link_impl();
-        init_buffer();
+        vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
+        GL::listen_opengl_errors();
+        glShaderSource(vertex_shader_, 1, &vertex_content, nullptr);
+        GL::listen_opengl_errors();
+
+        glCompileShader(vertex_shader_);
+        GL::listen_opengl_errors();
+
+
+        GLint success;
+        GLchar infoLog[512];
+        glGetShaderiv(vertex_shader_, GL_COMPILE_STATUS, &success);
+        GL::listen_opengl_errors();
+
+        if (!success)
+        {
+            glGetShaderInfoLog(vertex_shader_, 512, nullptr, infoLog);
+            GL::listen_opengl_errors();
+
+            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        }
+        // Fragment shader
+        fragment_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
+        GL::listen_opengl_errors();
+
+        glShaderSource(fragment_shader_, 1, &fragment_content, nullptr);
+        GL::listen_opengl_errors();
+
+        glCompileShader(fragment_shader_);
+        GL::listen_opengl_errors();
+
+        // Check for compile time errors
+        glGetShaderiv(fragment_shader_, GL_COMPILE_STATUS, &success);
+        GL::listen_opengl_errors();
+
+        if (!success)
+        {
+            glGetShaderInfoLog(fragment_shader_, 512, nullptr, infoLog);
+            GL::listen_opengl_errors();
+
+            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        }
+        // Link shaders
+        program_id_ = glCreateProgram();
+        GL::listen_opengl_errors();
+
+        glAttachShader(program_id_, vertex_shader_);
+        GL::listen_opengl_errors();
+
+        glAttachShader(program_id_, fragment_shader_);
+        GL::listen_opengl_errors();
+
+        glLinkProgram(program_id_);
+        GL::listen_opengl_errors();
+
+        // Check for linking errors
+        glGetProgramiv(program_id_, GL_LINK_STATUS, &success);
+        GL::listen_opengl_errors();
+
+        if (!success)
+        {
+            glGetProgramInfoLog(program_id_, 512, nullptr, infoLog);
+            GL::listen_opengl_errors();
+
+            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        }
+        glDeleteShader(vertex_shader_);
+        GL::listen_opengl_errors();
+
+        glDeleteShader(fragment_shader_);
+        GL::listen_opengl_errors();
+
+
+        glGenVertexArrays(1, &VAO_);
+        GL::listen_opengl_errors();
+
+        glGenBuffers(1, &VBO_);
+        GL::listen_opengl_errors();
+
+        glGenBuffers(1, &EBO_);
+        GL::listen_opengl_errors();
+
+        // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute
+        // pointer(s).
+        glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
+
+        GLfloat vertices[] = {
+            0.5f,  0.5f,  0.0f, // Top Right
+            0.5f,  -0.5f, 0.0f, // Bottom Right
+            -0.5f, -0.5f, 0.0f, // Bottom Left
+            -0.5f, 0.5f,  0.0f  // Top Left
+        };
+        GLuint indices[] = {
+            // Note that we start from 0!
+            0, 1, 3, // First Triangle
+            1, 2, 3  // Second Triangle
+        };
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
+        GL::listen_opengl_errors();
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        GL::listen_opengl_errors();
+
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
+        GL::listen_opengl_errors();
+
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+        GL::listen_opengl_errors();
+
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+        GL::listen_opengl_errors();
+
+        glEnableVertexAttribArray(0);
+        GL::listen_opengl_errors();
+
+
+        glBindBuffer(
+            GL_ARRAY_BUFFER,
+            0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
+                // the currently bound vertex buffer object so afterwards we can safely unbind
+
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(0);
+        GL::listen_opengl_errors();
+
     }
 
-    template <typename... Args>
-    void reload_impl(const std::vector<std::tuple<GLuint, const GLchar*>>& attributes,
-                     Args&&... args)
+    template <typename... Args> void reload_impl(Args&&... args)
     {
         if (!exists(vertex_source_))
         {
@@ -47,8 +174,6 @@ public:
             throw std::invalid_argument("Can't reload shader, shader file was not found: " +
                                         fragment_source_.string());
         }
-
-        initialize_impl(vertex_source_, fragment_source_, attributes);
     }
 
     template <typename... Args> void destroy_impl(Args&&... args)
@@ -59,99 +184,54 @@ public:
             return;
         }
 
-        GL::destroy_shader(program_id_);
+        glDeleteVertexArrays(1, &VAO_);
+        GL::listen_opengl_errors();
+
+        glDeleteBuffers(1, &VBO_);
+        GL::listen_opengl_errors();
+
+        glDeleteBuffers(1, &EBO_);
+        GL::listen_opengl_errors();
+
         glDeleteProgram(program_id_);
         GL::listen_opengl_errors();
     }
 
-    template <typename... Args, typename T>
-    void set_uniform_impl(const std::string& name, const T& value, Args&&... args)
+    void render()
     {
-    }
-
-    void use(GLfloat * vertices)
-    {
-        // Update the vertex buffer with the new vertices
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-        GL::listen_opengl_errors();
-        glBufferData(GL_ARRAY_BUFFER, sizeof (vertices), vertices, GL_DYNAMIC_DRAW);
+        // Clear the colorbuffer
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         GL::listen_opengl_errors();
 
-        // Re-bind the VAO after updating the vertex buffer
-        glBindVertexArray(VAO_);
-        GL::listen_opengl_errors();
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
-        GL::listen_opengl_errors();
-
-        glEnableVertexAttribArray(0);
-        GL::listen_opengl_errors();
-
-        glBindVertexArray(0);
-        GL::listen_opengl_errors();
-
-        // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
         GL::listen_opengl_errors();
 
-        GL::use_shader(program_id_);
 
-        glBindVertexArray(VAO_);
-        GL::listen_opengl_errors();
-
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        GL::listen_opengl_errors();
-
-        glBindVertexArray(0);
-        GL::listen_opengl_errors();
-    }
-
-    void init_buffer() {
-        glGenVertexArrays(1, &VAO_);
-        GL::listen_opengl_errors();
-
-        glGenBuffers(1, &VBO_);
+        // Draw our first triangle
+        glUseProgram(program_id_);
         GL::listen_opengl_errors();
 
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-        GL::listen_opengl_errors();
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
-        GL::listen_opengl_errors();
-
-        glEnableVertexAttribArray(0);
+        // glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         GL::listen_opengl_errors();
 
         glBindVertexArray(0);
         GL::listen_opengl_errors();
+
     }
 
 private:
-    template <typename... Args>
-    void compile_impl(const char* vertex_content, const char* fragment_content, Args&&... args)
-    {
-        vertex_shader_   = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
-        fragment_shader_ = GL::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
-    }
-
-    template <typename... Args>
-    void link_impl(Args&&... args)
-    {
-        program_id_ = GL::link_shader_program(vertex_shader_);
-        program_id_ = GL::link_shader_program(fragment_shader_);
-    }
-
-    GLuint vertex_shader_{};
-    GLuint fragment_shader_{};
+    GLuint vertex_shader_;
+    GLuint fragment_shader_;
     GLuint program_id_{};
 
     std::filesystem::path vertex_source_;
     std::filesystem::path fragment_source_;
 
-    GLuint VBO_, VAO_, UBO_;
+    GLuint VBO_, VAO_, EBO_;
 };
 
 } // namespace SDL
