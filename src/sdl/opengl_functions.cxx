@@ -22,8 +22,8 @@ bool GL::init_sdl()
 
 SDL_Window* GL::create_window(const char* window_title, const int& width, const int& height)
 {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, kOpenGLMajorVersion);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, kOpenGLMinorVersion);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, k_opengl_major_version);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, k_opengl_minor_version);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
@@ -76,8 +76,8 @@ bool GL::is_opengl_version_supported()
     glGetIntegerv(GL_MINOR_VERSION, &minor);
     GL::listen_opengl_errors();
 
-    if (major < kOpenGLMajorVersion ||
-        (major == kOpenGLMajorVersion && minor < kOpenGLMinorVersion))
+    if (major < k_opengl_major_version ||
+        (major == k_opengl_major_version && minor < k_opengl_minor_version))
     {
         std::cerr << "Unsupported OpenGL version" << std::endl;
         return false;
@@ -183,4 +183,32 @@ std::vector<GLfloat> GL::parse_vertices_from_shader(const std::string& shader_pa
     }
 
     return vertices;
+}
+
+GLuint GL::compile_shader(GLenum shader_type, const GLchar* shader_content)
+{
+    GLenum result_shader = glCreateShader(shader_type);
+    GL::listen_opengl_errors();
+
+    glShaderSource(result_shader, 1, &shader_content, nullptr);
+    GL::listen_opengl_errors();
+
+    glCompileShader(result_shader);
+    GL::listen_opengl_errors();
+
+    GLint success;
+    glGetShaderiv(result_shader, GL_COMPILE_STATUS, &success);
+    GL::listen_opengl_errors();
+
+    if (!success)
+    {
+        GLchar info_log[k_info_log_size];
+        glGetShaderInfoLog(result_shader, 512, nullptr, info_log);
+        GL::listen_opengl_errors();
+
+        std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n" << info_log << std::endl;
+        throw std::runtime_error("Failed to compile shader");
+    }
+
+    return result_shader;
 }

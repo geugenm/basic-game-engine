@@ -22,20 +22,21 @@ public:
         const std::string vertex_file_content   = GL::get_file_content(vertex_path);
         const std::string fragment_file_content = GL::get_file_content(fragment_path);
 
-//        const GLchar* vertex_content   = vertex_file_content.data();
-//        const GLchar* fragment_content = fragment_file_content.data();
-        const GLchar* vertex_content = "#version 330 core\n"
-                                             "layout (location = 0) in vec3 position;\n"
-                                             "void main()\n"
-                                             "{\n"
-                                             "gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-                                             "}\0";
+        //        const GLchar* vertex_content   = vertex_file_content.data();
+        //        const GLchar* fragment_content = fragment_file_content.data();
+        const GLchar* vertex_content =
+            "#version 330 core\n"
+            "layout (location = 0) in vec3 position;\n"
+            "void main()\n"
+            "{\n"
+            "gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
+            "}\0";
         const GLchar* fragment_content = "#version 330 core\n"
-                                             "out vec4 color;\n"
-                                             "void main()\n"
-                                             "{\n"
-                                             "color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                             "}\n\0";
+                                         "out vec4 color;\n"
+                                         "void main()\n"
+                                         "{\n"
+                                         "color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                         "}\n\0";
 
         vertex_source_   = vertex_path;
         fragment_source_ = fragment_path;
@@ -113,50 +114,12 @@ private:
     template <typename... Args>
     void compile_impl(const GLchar* vertex_content, const GLchar* fragment_content, Args&&... args)
     {
-        vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
-        GL::listen_opengl_errors();
-        glShaderSource(vertex_shader_, 1, &vertex_content, nullptr);
-        GL::listen_opengl_errors();
-
-        glCompileShader(vertex_shader_);
-        GL::listen_opengl_errors();
-
-
-        glGetShaderiv(vertex_shader_, GL_COMPILE_STATUS, &success_);
-        GL::listen_opengl_errors();
-
-        if (!success_)
-        {
-            glGetShaderInfoLog(vertex_shader_, 512, nullptr, info_log_);
-            GL::listen_opengl_errors();
-
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << info_log_ << std::endl;
-        }
-        // Fragment shader
-        fragment_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
-        GL::listen_opengl_errors();
-
-        glShaderSource(fragment_shader_, 1, &fragment_content, nullptr);
-        GL::listen_opengl_errors();
-
-        glCompileShader(fragment_shader_);
-        GL::listen_opengl_errors();
-
-        // Check for compile time errors
-        glGetShaderiv(fragment_shader_, GL_COMPILE_STATUS, &success_);
-        GL::listen_opengl_errors();
-
-        if (!success_)
-        {
-            glGetShaderInfoLog(fragment_shader_, 512, nullptr, info_log_);
-            GL::listen_opengl_errors();
-
-            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << info_log_ << std::endl;
-        }
+        vertex_shader_   = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
+        fragment_shader_ = GL::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
     }
 
-    template <typename... Args>
-    void link_impl(Args&&... args) {
+    template <typename... Args> void link_impl(Args&&... args)
+    {
         program_id_ = glCreateProgram();
         GL::listen_opengl_errors();
 
@@ -170,19 +133,21 @@ private:
         GL::listen_opengl_errors();
 
         // Check for linking errors
-        glGetProgramiv(program_id_, GL_LINK_STATUS, &success_);
-        GL::listen_opengl_errors();
-
-        if (!success_)
-        {
-            glGetProgramInfoLog(program_id_, 512, nullptr, info_log_);
-            GL::listen_opengl_errors();
-
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log_ << std::endl;
-        }
+        //        glGetProgramiv(program_id_, GL_LINK_STATUS, &success_);
+        //        GL::listen_opengl_errors();
+        //
+        //        if (!success_)
+        //        {
+        //            glGetProgramInfoLog(program_id_, 512, nullptr, info_log_);
+        //            GL::listen_opengl_errors();
+        //
+        //            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log_ <<
+        //            std::endl;
+        //        }
     }
 
-    void delete_shaders() {
+    void delete_shaders()
+    {
         glDeleteShader(vertex_shader_);
         GL::listen_opengl_errors();
 
@@ -190,7 +155,8 @@ private:
         GL::listen_opengl_errors();
     }
 
-    void generate_buffers() {
+    void generate_buffers()
+    {
         glGenVertexArrays(1, &VAO_);
         GL::listen_opengl_errors();
 
@@ -201,7 +167,8 @@ private:
         GL::listen_opengl_errors();
     }
 
-    void bind_buffer() {
+    void bind_buffer()
+    {
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
@@ -254,10 +221,6 @@ private:
     std::filesystem::path fragment_source_;
 
     GLuint VBO_, VAO_, EBO_;
-
-    static constexpr uint32_t k_info_log_size = 512;
-    GLint success_;
-    GLchar info_log_[k_info_log_size];
 };
 
 } // namespace SDL

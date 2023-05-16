@@ -10,8 +10,9 @@
 namespace GL
 {
 
-constexpr uint16_t kOpenGLMajorVersion = 3;
-constexpr uint16_t kOpenGLMinorVersion = 2;
+constexpr uint16_t k_opengl_major_version = 3;
+constexpr uint16_t k_opengl_minor_version = 2;
+constexpr uint32_t k_info_log_size        = 512;
 
 bool init_sdl();
 
@@ -37,5 +38,7 @@ std::string get_file_content(const std::string& file_path);
 bool has_shader_file_changed(const std::string& file_path, std::time_t& last_modified_time);
 
 std::vector<GLfloat> parse_vertices_from_shader(const std::string& shader_path);
+
+GLuint compile_shader(GLenum shader_type, const GLchar* shader_content);
 
 } // namespace GL
