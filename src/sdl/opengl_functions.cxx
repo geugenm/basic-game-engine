@@ -212,3 +212,42 @@ GLuint GL::compile_shader(GLenum shader_type, const GLchar* shader_content)
 
     return result_shader;
 }
+
+void GL::link_program(GLuint program)
+{
+    glLinkProgram(program);
+    GL::listen_opengl_errors();
+
+    GLint success;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    GL::listen_opengl_errors();
+
+    if (!success)
+    {
+        GLchar info_log[k_info_log_size];
+        glGetProgramInfoLog(program, 512, nullptr, info_log);
+        GL::listen_opengl_errors();
+
+        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log << std::endl;
+        throw std::runtime_error("Failed to link shader");
+    }
+}
+
+GLuint GL::create_program()
+{
+    GLuint program = glCreateProgram();
+    GL::listen_opengl_errors();
+
+    if (program == 0)
+    {
+        throw std::runtime_error("Failed to create OpenGL program");
+    }
+
+    return program;
+}
+
+void GL::attach_shader(GLuint program, GLuint shader)
+{
+    glAttachShader(program, shader);
+    GL::listen_opengl_errors();
+}

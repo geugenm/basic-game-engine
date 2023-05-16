@@ -88,21 +88,18 @@ public:
 
     void render()
     {
-        // Clear the colorbuffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         GL::listen_opengl_errors();
 
         glClear(GL_COLOR_BUFFER_BIT);
         GL::listen_opengl_errors();
 
-        // Draw our first triangle
         glUseProgram(program_id_);
         GL::listen_opengl_errors();
 
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
-        // glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         GL::listen_opengl_errors();
 
@@ -120,30 +117,12 @@ private:
 
     template <typename... Args> void link_impl(Args&&... args)
     {
-        program_id_ = glCreateProgram();
-        GL::listen_opengl_errors();
+        program_id_ = GL::create_program();
 
-        glAttachShader(program_id_, vertex_shader_);
-        GL::listen_opengl_errors();
+        GL::attach_shader(program_id_, vertex_shader_);
+        GL::attach_shader(program_id_, fragment_shader_);
 
-        glAttachShader(program_id_, fragment_shader_);
-        GL::listen_opengl_errors();
-
-        glLinkProgram(program_id_);
-        GL::listen_opengl_errors();
-
-        // Check for linking errors
-        //        glGetProgramiv(program_id_, GL_LINK_STATUS, &success_);
-        //        GL::listen_opengl_errors();
-        //
-        //        if (!success_)
-        //        {
-        //            glGetProgramInfoLog(program_id_, 512, nullptr, info_log_);
-        //            GL::listen_opengl_errors();
-        //
-        //            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log_ <<
-        //            std::endl;
-        //        }
+        GL::link_program(program_id_);
     }
 
     void delete_shaders()
@@ -204,8 +183,7 @@ private:
 
         glBindBuffer(
             GL_ARRAY_BUFFER,
-            0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
-                // the currently bound vertex buffer object so afterwards we can safely unbind
+            0);
 
         GL::listen_opengl_errors();
 

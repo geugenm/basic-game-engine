@@ -41,4 +41,10 @@ std::vector<GLfloat> parse_vertices_from_shader(const std::string& shader_path);
 
 GLuint compile_shader(GLenum shader_type, const GLchar* shader_content);
 
+GLuint create_program();
+
+void attach_shader(GLuint program, GLuint shader);
+
+void link_program(GLuint program);
+
 } // namespace GL
