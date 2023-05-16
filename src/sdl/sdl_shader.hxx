@@ -22,54 +22,25 @@ public:
         const std::string vertex_file_content   = GL::get_file_content(vertex_path);
         const std::string fragment_file_content = GL::get_file_content(fragment_path);
 
-        const GLchar* vertex_content   = vertex_file_content.data();
-        const GLchar* fragment_content = fragment_file_content.data();
+//        const GLchar* vertex_content   = vertex_file_content.data();
+//        const GLchar* fragment_content = fragment_file_content.data();
+        const GLchar* vertex_content = "#version 330 core\n"
+                                             "layout (location = 0) in vec3 position;\n"
+                                             "void main()\n"
+                                             "{\n"
+                                             "gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
+                                             "}\0";
+        const GLchar* fragment_content = "#version 330 core\n"
+                                             "out vec4 color;\n"
+                                             "void main()\n"
+                                             "{\n"
+                                             "color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                             "}\n\0";
 
         vertex_source_   = vertex_path;
         fragment_source_ = fragment_path;
 
-        vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
-        GL::listen_opengl_errors();
-        glShaderSource(vertex_shader_, 1, &vertex_content, nullptr);
-        GL::listen_opengl_errors();
-
-        glCompileShader(vertex_shader_);
-        GL::listen_opengl_errors();
-
-
-        GLint success;
-        GLchar infoLog[512];
-        glGetShaderiv(vertex_shader_, GL_COMPILE_STATUS, &success);
-        GL::listen_opengl_errors();
-
-        if (!success)
-        {
-            glGetShaderInfoLog(vertex_shader_, 512, nullptr, infoLog);
-            GL::listen_opengl_errors();
-
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-        }
-        // Fragment shader
-        fragment_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
-        GL::listen_opengl_errors();
-
-        glShaderSource(fragment_shader_, 1, &fragment_content, nullptr);
-        GL::listen_opengl_errors();
-
-        glCompileShader(fragment_shader_);
-        GL::listen_opengl_errors();
-
-        // Check for compile time errors
-        glGetShaderiv(fragment_shader_, GL_COMPILE_STATUS, &success);
-        GL::listen_opengl_errors();
-
-        if (!success)
-        {
-            glGetShaderInfoLog(fragment_shader_, 512, nullptr, infoLog);
-            GL::listen_opengl_errors();
-
-            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-        }
+        compile_impl(vertex_content, fragment_content);
         // Link shaders
         program_id_ = glCreateProgram();
         GL::listen_opengl_errors();
@@ -84,22 +55,21 @@ public:
         GL::listen_opengl_errors();
 
         // Check for linking errors
-        glGetProgramiv(program_id_, GL_LINK_STATUS, &success);
+        glGetProgramiv(program_id_, GL_LINK_STATUS, &success_);
         GL::listen_opengl_errors();
 
-        if (!success)
+        if (!success_)
         {
-            glGetProgramInfoLog(program_id_, 512, nullptr, infoLog);
+            glGetProgramInfoLog(program_id_, 512, nullptr, info_log_);
             GL::listen_opengl_errors();
 
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log_ << std::endl;
         }
         glDeleteShader(vertex_shader_);
         GL::listen_opengl_errors();
 
         glDeleteShader(fragment_shader_);
         GL::listen_opengl_errors();
-
 
         glGenVertexArrays(1, &VAO_);
         GL::listen_opengl_errors();
@@ -114,7 +84,6 @@ public:
         // pointer(s).
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
-
 
         GLfloat vertices[] = {
             0.5f,  0.5f,  0.0f, // Top Right
@@ -134,20 +103,17 @@ public:
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
         GL::listen_opengl_errors();
 
-
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
         GL::listen_opengl_errors();
 
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
         GL::listen_opengl_errors();
 
-
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
         GL::listen_opengl_errors();
 
         glEnableVertexAttribArray(0);
         GL::listen_opengl_errors();
-
 
         glBindBuffer(
             GL_ARRAY_BUFFER,
@@ -158,7 +124,6 @@ public:
 
         glBindVertexArray(0);
         GL::listen_opengl_errors();
-
     }
 
     template <typename... Args> void reload_impl(Args&&... args)
@@ -206,7 +171,6 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
         GL::listen_opengl_errors();
 
-
         // Draw our first triangle
         glUseProgram(program_id_);
         GL::listen_opengl_errors();
@@ -220,10 +184,54 @@ public:
 
         glBindVertexArray(0);
         GL::listen_opengl_errors();
-
     }
 
 private:
+    template <typename... Args>
+    void compile_impl(const GLchar* vertex_content, const GLchar* fragment_content, Args&&... args)
+    {
+        vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
+        GL::listen_opengl_errors();
+        glShaderSource(vertex_shader_, 1, &vertex_content, nullptr);
+        GL::listen_opengl_errors();
+
+        glCompileShader(vertex_shader_);
+        GL::listen_opengl_errors();
+
+
+        glGetShaderiv(vertex_shader_, GL_COMPILE_STATUS, &success_);
+        GL::listen_opengl_errors();
+
+        if (!success_)
+        {
+            glGetShaderInfoLog(vertex_shader_, 512, nullptr, info_log_);
+            GL::listen_opengl_errors();
+
+            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << info_log_ << std::endl;
+        }
+        // Fragment shader
+        fragment_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
+        GL::listen_opengl_errors();
+
+        glShaderSource(fragment_shader_, 1, &fragment_content, nullptr);
+        GL::listen_opengl_errors();
+
+        glCompileShader(fragment_shader_);
+        GL::listen_opengl_errors();
+
+        // Check for compile time errors
+        glGetShaderiv(fragment_shader_, GL_COMPILE_STATUS, &success_);
+        GL::listen_opengl_errors();
+
+        if (!success_)
+        {
+            glGetShaderInfoLog(fragment_shader_, 512, nullptr, info_log_);
+            GL::listen_opengl_errors();
+
+            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << info_log_ << std::endl;
+        }
+    }
+
     GLuint vertex_shader_;
     GLuint fragment_shader_;
     GLuint program_id_{};
@@ -232,6 +240,10 @@ private:
     std::filesystem::path fragment_source_;
 
     GLuint VBO_, VAO_, EBO_;
+
+    static constexpr uint32_t k_info_log_size = 512;
+    GLint success_;
+    GLchar info_log_[k_info_log_size];
 };
 
 } // namespace SDL
