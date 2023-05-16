@@ -15,9 +15,8 @@ namespace SDL
 class OpenGLShader : public AbstractEngine::IShader<OpenGLShader>
 {
 public:
-    template <typename... Args>
     void initialize_impl(const std::filesystem::path& vertex_path,
-                         const std::filesystem::path& fragment_path, Args&&... args)
+                         const std::filesystem::path& fragment_path)
     {
         const std::string vertex_file_content   = GL::get_file_content(vertex_path);
         const std::string fragment_file_content = GL::get_file_content(fragment_path);
@@ -50,7 +49,7 @@ public:
         bind_buffer();
     }
 
-    template <typename... Args> void reload_impl(Args&&... args)
+    void reload_impl()
     {
         if (!exists(vertex_source_))
         {
@@ -65,7 +64,7 @@ public:
         }
     }
 
-    template <typename... Args> void destroy_impl(Args&&... args)
+    void destroy_impl()
     {
         if (program_id_ == 0)
         {
@@ -108,14 +107,13 @@ public:
     }
 
 private:
-    template <typename... Args>
-    void compile_impl(const GLchar* vertex_content, const GLchar* fragment_content, Args&&... args)
+    void compile_impl(const GLchar* vertex_content, const GLchar* fragment_content)
     {
         vertex_shader_   = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
         fragment_shader_ = GL::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
     }
 
-    template <typename... Args> void link_impl(Args&&... args)
+    void link_impl()
     {
         program_id_ = GL::create_program();
 
@@ -144,17 +142,26 @@ private:
         GL::listen_opengl_errors();
 
         GLfloat vertices[] = {
-            0.5f,  0.5f,  0.0f, // Top Right
-            0.5f,  -0.5f, 0.0f, // Bottom Right
-            -0.5f, -0.5f, 0.0f, // Bottom Left
-            -0.5f, 0.5f,  0.0f  // Top Left
-            -0.5f, 0.5f,  0.0f  // Top Left
+            0.5f,
+            0.5f,
+            0.0f, // Top Right
+            0.5f,
+            -0.5f,
+            0.0f, // Bottom Right
+            -0.5f,
+            -0.5f,
+            0.0f, // Bottom Left
+            -0.5f,
+            0.5f,
+            0.0f // Top Left
+                - 0.5f,
+            0.5f,
+            0.0f // Top Left
         };
         GLuint indices[] = {
             // Note that we start from 0!
-            0, 1, 3, // First Triangle
-            1, 2, 3,
-            1, 4, 6// Second Triangle
+            0, 1, 3,         // First Triangle
+            1, 2, 3, 1, 4, 6 // Second Triangle
         };
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
