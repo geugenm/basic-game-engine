@@ -47,4 +47,10 @@ void attach_shader(GLuint program, GLuint shader);
 
 void link_program(GLuint program);
 
+void delete_shader(GLuint shader);
+
+void generate_vertex_array(GLsizei n, GLuint *arrays);
+
+void generate_buffer_object_name(GLsizei n, GLuint *arrays);
+
 } // namespace GL

@@ -127,23 +127,15 @@ private:
 
     void delete_shaders()
     {
-        glDeleteShader(vertex_shader_);
-        GL::listen_opengl_errors();
-
-        glDeleteShader(fragment_shader_);
-        GL::listen_opengl_errors();
+        GL::delete_shader(vertex_shader_);
+        GL::delete_shader(fragment_shader_);
     }
 
     void generate_buffers()
     {
-        glGenVertexArrays(1, &VAO_);
-        GL::listen_opengl_errors();
-
-        glGenBuffers(1, &VBO_);
-        GL::listen_opengl_errors();
-
-        glGenBuffers(1, &EBO_);
-        GL::listen_opengl_errors();
+        GL::generate_vertex_array(1, &VAO_);
+        GL::generate_buffer_object_name(1, &VBO_);
+        GL::generate_buffer_object_name(1, &EBO_);
     }
 
     void bind_buffer()
@@ -156,34 +148,34 @@ private:
             0.5f,  -0.5f, 0.0f, // Bottom Right
             -0.5f, -0.5f, 0.0f, // Bottom Left
             -0.5f, 0.5f,  0.0f  // Top Left
+            -0.5f, 0.5f,  0.0f  // Top Left
         };
         GLuint indices[] = {
             // Note that we start from 0!
             0, 1, 3, // First Triangle
-            1, 2, 3  // Second Triangle
+            1, 2, 3,
+            1, 4, 6// Second Triangle
         };
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
         GL::listen_opengl_errors();
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
         GL::listen_opengl_errors();
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
         GL::listen_opengl_errors();
 
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
         GL::listen_opengl_errors();
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
         GL::listen_opengl_errors();
 
         glEnableVertexAttribArray(0);
         GL::listen_opengl_errors();
 
-        glBindBuffer(
-            GL_ARRAY_BUFFER,
-            0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         GL::listen_opengl_errors();
 

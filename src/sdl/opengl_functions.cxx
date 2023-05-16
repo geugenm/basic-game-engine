@@ -251,3 +251,21 @@ void GL::attach_shader(GLuint program, GLuint shader)
     glAttachShader(program, shader);
     GL::listen_opengl_errors();
 }
+
+void GL::delete_shader(GLuint shader)
+{
+    glDeleteShader(shader);
+    GL::listen_opengl_errors();
+}
+
+void GL::generate_vertex_array(GLsizei n, GLuint* arrays)
+{
+    glGenVertexArrays(n, arrays);
+    GL::listen_opengl_errors();
+}
+
+void GL::generate_buffer_object_name(GLsizei n, GLuint* arrays)
+{
+    glGenBuffers(n, arrays);
+    GL::listen_opengl_errors();
+}
