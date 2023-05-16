@@ -41,89 +41,12 @@ public:
         fragment_source_ = fragment_path;
 
         compile_impl(vertex_content, fragment_content);
-        // Link shaders
-        program_id_ = glCreateProgram();
-        GL::listen_opengl_errors();
+        link_impl();
 
-        glAttachShader(program_id_, vertex_shader_);
-        GL::listen_opengl_errors();
+        delete_shaders();
 
-        glAttachShader(program_id_, fragment_shader_);
-        GL::listen_opengl_errors();
-
-        glLinkProgram(program_id_);
-        GL::listen_opengl_errors();
-
-        // Check for linking errors
-        glGetProgramiv(program_id_, GL_LINK_STATUS, &success_);
-        GL::listen_opengl_errors();
-
-        if (!success_)
-        {
-            glGetProgramInfoLog(program_id_, 512, nullptr, info_log_);
-            GL::listen_opengl_errors();
-
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log_ << std::endl;
-        }
-        glDeleteShader(vertex_shader_);
-        GL::listen_opengl_errors();
-
-        glDeleteShader(fragment_shader_);
-        GL::listen_opengl_errors();
-
-        glGenVertexArrays(1, &VAO_);
-        GL::listen_opengl_errors();
-
-        glGenBuffers(1, &VBO_);
-        GL::listen_opengl_errors();
-
-        glGenBuffers(1, &EBO_);
-        GL::listen_opengl_errors();
-
-        // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute
-        // pointer(s).
-        glBindVertexArray(VAO_);
-        GL::listen_opengl_errors();
-
-        GLfloat vertices[] = {
-            0.5f,  0.5f,  0.0f, // Top Right
-            0.5f,  -0.5f, 0.0f, // Bottom Right
-            -0.5f, -0.5f, 0.0f, // Bottom Left
-            -0.5f, 0.5f,  0.0f  // Top Left
-        };
-        GLuint indices[] = {
-            // Note that we start from 0!
-            0, 1, 3, // First Triangle
-            1, 2, 3  // Second Triangle
-        };
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
-        GL::listen_opengl_errors();
-
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        GL::listen_opengl_errors();
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
-        GL::listen_opengl_errors();
-
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-        GL::listen_opengl_errors();
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-        GL::listen_opengl_errors();
-
-        glEnableVertexAttribArray(0);
-        GL::listen_opengl_errors();
-
-        glBindBuffer(
-            GL_ARRAY_BUFFER,
-            0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
-                // the currently bound vertex buffer object so afterwards we can safely unbind
-
-        GL::listen_opengl_errors();
-
-        glBindVertexArray(0);
-        GL::listen_opengl_errors();
+        generate_buffers();
+        bind_buffer();
     }
 
     template <typename... Args> void reload_impl(Args&&... args)
@@ -230,6 +153,97 @@ private:
 
             std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << info_log_ << std::endl;
         }
+    }
+
+    template <typename... Args>
+    void link_impl(Args&&... args) {
+        program_id_ = glCreateProgram();
+        GL::listen_opengl_errors();
+
+        glAttachShader(program_id_, vertex_shader_);
+        GL::listen_opengl_errors();
+
+        glAttachShader(program_id_, fragment_shader_);
+        GL::listen_opengl_errors();
+
+        glLinkProgram(program_id_);
+        GL::listen_opengl_errors();
+
+        // Check for linking errors
+        glGetProgramiv(program_id_, GL_LINK_STATUS, &success_);
+        GL::listen_opengl_errors();
+
+        if (!success_)
+        {
+            glGetProgramInfoLog(program_id_, 512, nullptr, info_log_);
+            GL::listen_opengl_errors();
+
+            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log_ << std::endl;
+        }
+    }
+
+    void delete_shaders() {
+        glDeleteShader(vertex_shader_);
+        GL::listen_opengl_errors();
+
+        glDeleteShader(fragment_shader_);
+        GL::listen_opengl_errors();
+    }
+
+    void generate_buffers() {
+        glGenVertexArrays(1, &VAO_);
+        GL::listen_opengl_errors();
+
+        glGenBuffers(1, &VBO_);
+        GL::listen_opengl_errors();
+
+        glGenBuffers(1, &EBO_);
+        GL::listen_opengl_errors();
+    }
+
+    void bind_buffer() {
+        glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
+        GLfloat vertices[] = {
+            0.5f,  0.5f,  0.0f, // Top Right
+            0.5f,  -0.5f, 0.0f, // Bottom Right
+            -0.5f, -0.5f, 0.0f, // Bottom Left
+            -0.5f, 0.5f,  0.0f  // Top Left
+        };
+        GLuint indices[] = {
+            // Note that we start from 0!
+            0, 1, 3, // First Triangle
+            1, 2, 3  // Second Triangle
+        };
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
+        GL::listen_opengl_errors();
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        GL::listen_opengl_errors();
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
+        GL::listen_opengl_errors();
+
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+        GL::listen_opengl_errors();
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+        GL::listen_opengl_errors();
+
+        glEnableVertexAttribArray(0);
+        GL::listen_opengl_errors();
+
+        glBindBuffer(
+            GL_ARRAY_BUFFER,
+            0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
+                // the currently bound vertex buffer object so afterwards we can safely unbind
+
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(0);
+        GL::listen_opengl_errors();
     }
 
     GLuint vertex_shader_;
