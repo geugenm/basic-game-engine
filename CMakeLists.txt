@@ -109,14 +109,11 @@ if (BUILD_TESTS)
     add_test_executable(test_complex_light_shader test/test_complex_light_fragment_shader.cxx)
     target_link_libraries(test_complex_light_shader PRIVATE sdl-engine)
 
-    add_test_executable(test_sdl_engine test/test_sdl_engine.cxx)
-    target_link_libraries(test_sdl_engine PRIVATE sdl-engine glm::glm)
+    add_test_executable(test_opengl_texture test/test_opengl_texture.cxx)
+    target_link_libraries(test_opengl_texture PRIVATE sdl-engine glm::glm)
 
     add_test_executable(test_imgui test/test_imgui_general.cxx)
     target_link_libraries(test_imgui PRIVATE imgui-engine)
-
-    add_test_executable(test_opengl_texture test/test_opengl_texture.cxx)
-    target_link_libraries(test_opengl_texture PRIVATE sdl-engine)
 
     set(NON_CPP_EXTENSIONS glsl png)
 
