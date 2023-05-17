@@ -25,12 +25,12 @@ struct Triangle2D
 {
     Triangle2D()
     {
-        v[0] = Vector2f();
-        v[1] = Vector2f();
-        v[2] = Vector2f();
+        _vertices[0] = Vector2f();
+        _vertices[1] = Vector2f();
+        _vertices[2] = Vector2f();
     }
 
-    Vector2f v[3];
+    Vector2f _vertices[3];
 };
 
 class OpenGLShader : public AbstractEngine::IShader<OpenGLShader>
@@ -39,19 +39,19 @@ public:
     void initialize_impl(const std::filesystem::path& vertex_path,
                          const std::filesystem::path& fragment_path)
     {
-        vertex_source_   = vertex_path;
-        fragment_source_ = fragment_path;
+        vertex_shader_path_ = vertex_path;
+        fragment_shader_path = fragment_path;
 
-        create_shader();
+        compile_and_link();
     }
 
-    void create_shader() {
-        const std::string vertex_file_content   = GL::get_file_content(vertex_source_);
-        const std::string fragment_file_content = GL::get_file_content(fragment_source_);
+    void compile_and_link()
+    {
+        const std::string vertex_file_content   = GL::get_file_content(vertex_shader_path_);
+        const std::string fragment_file_content = GL::get_file_content(fragment_shader_path);
 
         const GLchar* vertex_content   = vertex_file_content.data();
         const GLchar* fragment_content = fragment_file_content.data();
-
 
         compile_impl(vertex_content, fragment_content);
         link_impl();
@@ -64,24 +64,24 @@ public:
 
     void reload_impl()
     {
-        if (!exists(vertex_source_))
+        if (!exists(vertex_shader_path_))
         {
             throw std::invalid_argument("Can't reload shader, shader file was not found: " +
-                                        vertex_source_.string());
+                                        vertex_shader_path_.string());
         }
 
-        if (!exists(fragment_source_))
+        if (!exists(fragment_shader_path))
         {
             throw std::invalid_argument("Can't reload shader, shader file was not found: " +
-                                        fragment_source_.string());
+                                        fragment_shader_path.string());
         }
 
-        create_shader();
+        compile_and_link();
     }
 
     void destroy_impl()
     {
-        if (program_id_ == 0)
+        if (shader_program_id_ == 0)
         {
             std::cerr << "Failed to destroy shader: The program id is 0";
             return;
@@ -96,7 +96,7 @@ public:
         glDeleteBuffers(1, &EBO_);
         GL::listen_opengl_errors();
 
-        glDeleteProgram(program_id_);
+        glDeleteProgram(shader_program_id_);
         GL::listen_opengl_errors();
     }
 
@@ -108,7 +108,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
         GL::listen_opengl_errors();
 
-        glUseProgram(program_id_);
+        glUseProgram(shader_program_id_);
         GL::listen_opengl_errors();
 
         glBindVertexArray(VAO_);
@@ -124,24 +124,24 @@ public:
 private:
     void compile_impl(const GLchar* vertex_content, const GLchar* fragment_content)
     {
-        vertex_shader_   = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
-        fragment_shader_ = GL::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
+        vertex_shader_id_ = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
+        fragment_shader_id_ = GL::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
     }
 
     void link_impl()
     {
-        program_id_ = GL::create_program();
+        shader_program_id_ = GL::create_program();
 
-        GL::attach_shader(program_id_, vertex_shader_);
-        GL::attach_shader(program_id_, fragment_shader_);
+        GL::attach_shader(shader_program_id_, vertex_shader_id_);
+        GL::attach_shader(shader_program_id_, fragment_shader_id_);
 
-        GL::link_shader_program(program_id_);
+        GL::link_shader_program(shader_program_id_);
     }
 
     void delete_shaders()
     {
-        GL::delete_shader(vertex_shader_);
-        GL::delete_shader(fragment_shader_);
+        GL::delete_shader(vertex_shader_id_);
+        GL::delete_shader(fragment_shader_id_);
     }
 
     void generate_buffers()
@@ -157,9 +157,9 @@ private:
         GL::listen_opengl_errors();
 
         Triangle2D vertices;
-        vertices.v[0]                = Vector2f{0.f, 0.2f};
-        vertices.v[1]                = Vector2f{0.5f,  -0.5f};
-        vertices.v[2]                = Vector2f{-0.5f, -0.5f};
+        vertices._vertices[0] = Vector2f{0.f, 0.2f};
+        vertices._vertices[1] = Vector2f{0.5f, -0.5f};
+        vertices._vertices[2] = Vector2f{-0.5f, -0.5f};
 
         constexpr GLuint indices[] = {
             0, 1, 3, // First Triangle
@@ -169,7 +169,8 @@ private:
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
         GL::listen_opengl_errors();
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices.v), vertices.v, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices._vertices), vertices._vertices,
+                     GL_STREAM_DRAW);
         GL::listen_opengl_errors();
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
@@ -192,12 +193,12 @@ private:
         GL::listen_opengl_errors();
     }
 
-    GLuint vertex_shader_;
-    GLuint fragment_shader_;
-    GLuint program_id_{};
+    GLuint vertex_shader_id_;
+    GLuint fragment_shader_id_;
+    GLuint shader_program_id_{};
 
-    std::filesystem::path vertex_source_;
-    std::filesystem::path fragment_source_;
+    std::filesystem::path vertex_shader_path_;
+    std::filesystem::path fragment_shader_path;
 
     GLuint VBO_, VAO_, EBO_;
 };
