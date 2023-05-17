@@ -213,7 +213,7 @@ GLuint GL::compile_shader(GLenum shader_type, const GLchar* shader_content)
     return result_shader;
 }
 
-void GL::link_program(GLuint program)
+void GL::link_shader_program(GLuint program)
 {
     glLinkProgram(program);
     GL::listen_opengl_errors();

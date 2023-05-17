@@ -12,6 +12,27 @@
 namespace SDL
 {
 
+struct Vertex
+{
+    Vertex() : x(0.f), y(0.f) {}
+
+    Vertex(const GLfloat& x, const GLfloat y) : x(x), y(y) {}
+    GLfloat x;
+    GLfloat y;
+};
+
+struct Triangle
+{
+    Triangle()
+    {
+        v[0] = Vertex();
+        v[1] = Vertex();
+        v[2] = Vertex();
+    }
+
+    Vertex v[3];
+};
+
 class OpenGLShader : public AbstractEngine::IShader<OpenGLShader>
 {
 public:
@@ -99,7 +120,7 @@ public:
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         GL::listen_opengl_errors();
 
         glBindVertexArray(0);
@@ -120,7 +141,7 @@ private:
         GL::attach_shader(program_id_, vertex_shader_);
         GL::attach_shader(program_id_, fragment_shader_);
 
-        GL::link_program(program_id_);
+        GL::link_shader_program(program_id_);
     }
 
     void delete_shaders()
@@ -141,33 +162,30 @@ private:
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
-        GLfloat vertices[] = {
-            0.5f,
-            0.5f,
-            0.0f, // Top Right
-            0.5f,
-            -0.5f,
-            0.0f, // Bottom Right
-            -0.5f,
-            -0.5f,
-            0.0f, // Bottom Left
-            -0.5f,
-            0.5f,
-            0.0f // Top Left
-                - 0.5f,
-            0.5f,
-            0.0f // Top Left
-        };
-        GLuint indices[] = {
-            // Note that we start from 0!
-            0, 1, 3,         // First Triangle
-            1, 2, 3, 1, 4, 6 // Second Triangle
+        Triangle vertices;
+        vertices.v[0]                = Vertex{0.5f, 0.5f};
+        vertices.v[1]                = Vertex{0.5f,  -0.5f};
+        vertices.v[2]                = Vertex{-0.5f, -0.5f};
+//        constexpr GLfloat vertices[] = {
+//            0.5f,  0.5f,
+//            0.0f, // Top Right
+//            0.5f,  -0.5f,
+//            0.0f, // Bottom Right
+//            -0.5f, -0.5f,
+//            0.0f, // Bottom Left
+//            -0.5f, 0.5f,
+//            0.0f  // Top Left
+//        };
+
+        constexpr GLuint indices[] = {
+            0, 1, 3, // First Triangle
+            1, 0, 3  // Second Triangle
         };
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
         GL::listen_opengl_errors();
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices.v), vertices.v, GL_STREAM_DRAW);
         GL::listen_opengl_errors();
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
@@ -176,7 +194,7 @@ private:
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
         GL::listen_opengl_errors();
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
         GL::listen_opengl_errors();
 
         glEnableVertexAttribArray(0);

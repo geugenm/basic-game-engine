@@ -45,7 +45,7 @@ GLuint create_program();
 
 void attach_shader(GLuint program, GLuint shader);
 
-void link_program(GLuint program);
+void link_shader_program(GLuint program);
 
 void delete_shader(GLuint shader);
 
