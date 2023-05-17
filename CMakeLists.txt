@@ -91,34 +91,34 @@ if (BUILD_TESTS)
 
     enable_testing()
 
-    add_test_executable(test_sdl_static_compilation test/sdl_general.cxx)
+    add_test_executable(test_sdl_static_compilation test/test_sdl_general.cxx)
     target_link_libraries(test_sdl_static_compilation PRIVATE SDL3::SDL3-static)
 
-    add_test_executable(test_sdl_shared_compilation test/sdl_general.cxx)
+    add_test_executable(test_sdl_shared_compilation test/test_sdl_general.cxx)
     target_link_libraries(test_sdl_shared_compilation PRIVATE SDL3::SDL3-shared)
 
-    add_test_executable(test_opengl_init test/opengl_general.cxx)
+    add_test_executable(test_opengl_init test/test_opengl_general.cxx)
     target_link_libraries(test_opengl_init PRIVATE opengl-glad SDL3::SDL3-shared)
 
-    add_test_executable(test_engine_shaders_sdl test/abstract_engine_triangle.cxx)
+    add_test_executable(test_engine_shaders_sdl test/test_abstract_engine_triangle.cxx)
     target_link_libraries(test_engine_shaders_sdl PRIVATE sdl-engine)
 
-    add_test_executable(test_opengl_engine_shaders test/sdl_opengl_shader.cxx)
+    add_test_executable(test_opengl_engine_shaders test/test_sdl_opengl_shader.cxx)
     target_link_libraries(test_opengl_engine_shaders PRIVATE sdl-engine)
 
-    add_test_executable(test_complex_light_shader test/complex_light_shader.cxx)
+    add_test_executable(test_complex_light_shader test/test_complex_light_fragment_shader.cxx)
     target_link_libraries(test_complex_light_shader PRIVATE sdl-engine)
 
-    add_test_executable(test_sdl_engine test/sdl_engine.cxx)
+    add_test_executable(test_sdl_engine test/test_sdl_engine.cxx)
     target_link_libraries(test_sdl_engine PRIVATE sdl-engine)
 
-    add_test_executable(test_imgui test/imgui_general.cxx)
+    add_test_executable(test_imgui test/test_imgui_general.cxx)
     target_link_libraries(test_imgui PRIVATE imgui-engine)
 
     add_test_executable(test_opengl_texture test/test_opengl_texture.cxx)
     target_link_libraries(test_opengl_texture PRIVATE sdl-engine)
 
-    set(NON_CPP_EXTENSIONS glsl)
+    set(NON_CPP_EXTENSIONS glsl png)
 
     foreach (EXTENSION ${NON_CPP_EXTENSIONS})
         file(GLOB_RECURSE NON_CPP_FILES "test/*.${EXTENSION}")

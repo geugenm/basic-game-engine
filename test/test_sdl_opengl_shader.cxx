@@ -39,7 +39,7 @@ public:
     }
 
 protected:
-    SDL::OpenGLShader shader;
+    SDL::OpenGLShader<SDL::SomeShader> shader;
 
     SDL_Window * window_ = nullptr;
 
