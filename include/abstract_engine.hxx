@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <mutex>
+#include <iostream>
 #include <utility>
 
 namespace Engine
@@ -24,19 +25,30 @@ public:
 
     template <typename... Args> void initialize(Args&&... args)
     {
-        if (!is_initialized_) {
-            static_cast<Derived*>(this)->initialize_impl(std::forward<Args>(args)...);
-            is_initialized_ = true;
+        if (is_initialized_) {
+            std::cerr << "WARNING: The engine is already initialized";
+            return ;
         }
+        static_cast<Derived*>(this)->initialize_impl(std::forward<Args>(args)...);
+        is_initialized_ = true;
     }
 
     template <typename... Args> void render(Args&&... args)
     {
+        if (!is_initialized_) {
+            std::cerr << "WARNING: The engine is not initialized. Use initialize(...) before calling render(...)";
+            return ;
+        }
         static_cast<Derived*>(this)->render_impl(std::forward<Args>(args)...);
     }
 
     template <typename... Args> void destroy(Args&&... args)
     {
+        if (!is_initialized_) {
+            std::cerr << "WARNING: The engine is already destroyed";
+            return;
+        }
+
         static_cast<Derived*>(this)->destroy_impl(std::forward<Args>(args)...);
         is_initialized_ = false;
     }

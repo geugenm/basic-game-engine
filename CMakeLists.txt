@@ -27,6 +27,17 @@ get_property(_allTargets GLOBAL PROPERTY GlobalTargetList)
 message(STATUS "GlobalTargetList: ${_allTargets}")
 
 
+# Set up include directories for engine and OpenGL
+add_library(engine-includes INTERFACE)
+target_include_directories(engine-includes INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
+        )
+
+add_library(opengl-includes INTERFACE)
+target_include_directories(opengl-includes INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/opengl
+        )
+
 
 
 add_library(imgui-engine)
@@ -40,20 +51,9 @@ target_sources(imgui-engine PRIVATE
 target_compile_definitions(imgui-engine PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
 target_link_libraries(imgui-engine PRIVATE opengl-glad)
 target_link_libraries(imgui-engine PRIVATE SDL3::SDL3-shared)
+target_link_libraries(imgui-engine PUBLIC engine-includes)
+target_link_libraries(imgui-engine PUBLIC opengl-includes)
 target_link_libraries(imgui-engine PUBLIC imgui)
-
-
-
-# Set up include directories for engine and OpenGL
-add_library(engine-includes INTERFACE)
-target_include_directories(engine-includes INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
-        )
-
-add_library(opengl-includes INTERFACE)
-target_include_directories(opengl-includes INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/opengl
-        )
 
 
 
