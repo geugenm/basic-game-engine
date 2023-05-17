@@ -19,16 +19,5 @@ if (imgui_ADDED)
           )
 
   target_include_directories(imgui PUBLIC "${imgui_SOURCE_DIR}")
-  target_include_directories(imgui PUBLIC "${imgui_SOURCE_DIR}/backends")
-
-
-  target_sources(imgui PRIVATE
-          "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
-          "${imgui_SOURCE_DIR}/backends/imgui_impl_sdl.cpp"
-          )
-  find_package(SDL2 REQUIRED)
-  target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-  target_link_libraries(imgui PUBLIC opengl-glad)
-  target_link_libraries(imgui PUBLIC SDL2::SDL2)
 endif ()
 

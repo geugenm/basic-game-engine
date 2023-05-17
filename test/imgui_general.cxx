@@ -1,11 +1,11 @@
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <imgui.h>
 #include <iostream>
 
 #include <glad/glad.h>
 
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_sdl.h>
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl.h"
 
 #include <stdexcept>
 
@@ -19,10 +19,8 @@ int main(int argc, char *argv[]) {
         init_sdl();
 
         SDL_Window *window = SDL_CreateWindow("OpenGL 3.0 SDL ImGui Test",
-                                              SDL_WINDOWPOS_UNDEFINED,
-                                              SDL_WINDOWPOS_UNDEFINED,
                                               1280, 720,
-                                              SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+                                              SDL_WINDOW_OPENGL);
         if (!window) {
             throw std::runtime_error("Failed to create window");
         }
@@ -42,7 +40,7 @@ int main(int argc, char *argv[]) {
         while (running) {
             while (SDL_PollEvent(&event)) {
                 ImGui_ImplSDL2_ProcessEvent(&event);
-                if (event.type == SDL_QUIT) {
+                if (event.type == SDL_EVENT_QUIT) {
                     running = false;
                 }
             }
@@ -70,7 +68,7 @@ int main(int argc, char *argv[]) {
 }
 
 void init_sdl() {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         throw std::runtime_error("Failed to initialize SDL");
     }
 }

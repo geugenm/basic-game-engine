@@ -12,25 +12,25 @@
 namespace SDL
 {
 
-struct Vertex
+struct Vector2f
 {
-    Vertex() : x(0.f), y(0.f) {}
+    Vector2f() : x(0.f), y(0.f) {}
 
-    Vertex(const GLfloat& x, const GLfloat y) : x(x), y(y) {}
+    Vector2f(const GLfloat& x, const GLfloat y) : x(x), y(y) {}
     GLfloat x;
     GLfloat y;
 };
 
-struct Triangle
+struct Triangle2D
 {
-    Triangle()
+    Triangle2D()
     {
-        v[0] = Vertex();
-        v[1] = Vertex();
-        v[2] = Vertex();
+        v[0] = Vector2f();
+        v[1] = Vector2f();
+        v[2] = Vector2f();
     }
 
-    Vertex v[3];
+    Vector2f v[3];
 };
 
 class OpenGLShader : public AbstractEngine::IShader<OpenGLShader>
@@ -39,27 +39,19 @@ public:
     void initialize_impl(const std::filesystem::path& vertex_path,
                          const std::filesystem::path& fragment_path)
     {
-        const std::string vertex_file_content   = GL::get_file_content(vertex_path);
-        const std::string fragment_file_content = GL::get_file_content(fragment_path);
-
-        //        const GLchar* vertex_content   = vertex_file_content.data();
-        //        const GLchar* fragment_content = fragment_file_content.data();
-        const GLchar* vertex_content =
-            "#version 330 core\n"
-            "layout (location = 0) in vec3 position;\n"
-            "void main()\n"
-            "{\n"
-            "gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-            "}\0";
-        const GLchar* fragment_content = "#version 330 core\n"
-                                         "out vec4 color;\n"
-                                         "void main()\n"
-                                         "{\n"
-                                         "color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                         "}\n\0";
-
         vertex_source_   = vertex_path;
         fragment_source_ = fragment_path;
+
+        create_shader();
+    }
+
+    void create_shader() {
+        const std::string vertex_file_content   = GL::get_file_content(vertex_source_);
+        const std::string fragment_file_content = GL::get_file_content(fragment_source_);
+
+        const GLchar* vertex_content   = vertex_file_content.data();
+        const GLchar* fragment_content = fragment_file_content.data();
+
 
         compile_impl(vertex_content, fragment_content);
         link_impl();
@@ -83,6 +75,8 @@ public:
             throw std::invalid_argument("Can't reload shader, shader file was not found: " +
                                         fragment_source_.string());
         }
+
+        create_shader();
     }
 
     void destroy_impl()
@@ -120,7 +114,7 @@ public:
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
         GL::listen_opengl_errors();
 
         glBindVertexArray(0);
@@ -162,20 +156,10 @@ private:
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
-        Triangle vertices;
-        vertices.v[0]                = Vertex{0.5f, 0.5f};
-        vertices.v[1]                = Vertex{0.5f,  -0.5f};
-        vertices.v[2]                = Vertex{-0.5f, -0.5f};
-//        constexpr GLfloat vertices[] = {
-//            0.5f,  0.5f,
-//            0.0f, // Top Right
-//            0.5f,  -0.5f,
-//            0.0f, // Bottom Right
-//            -0.5f, -0.5f,
-//            0.0f, // Bottom Left
-//            -0.5f, 0.5f,
-//            0.0f  // Top Left
-//        };
+        Triangle2D vertices;
+        vertices.v[0]                = Vector2f{0.f, 0.2f};
+        vertices.v[1]                = Vector2f{0.5f,  -0.5f};
+        vertices.v[2]                = Vector2f{-0.5f, -0.5f};
 
         constexpr GLuint indices[] = {
             0, 1, 3, // First Triangle

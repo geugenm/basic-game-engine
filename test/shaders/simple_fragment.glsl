@@ -1,7 +1,6 @@
-#ifdef GL_ES
-precision mediump float;
-#endif
+#version 330 core
+out vec4 color;
 void main()
 {
-    gl_FragColor = vec4(1, 1, 0 ,1);
+    color = vec4(1.0f, 0.5f, 0.2f, 1.0f);
 }

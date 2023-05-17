@@ -29,6 +29,21 @@ message(STATUS "GlobalTargetList: ${_allTargets}")
 
 
 
+add_library(imgui_extended)
+target_include_directories(imgui_extended PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/imgui/backends")
+
+target_sources(imgui_extended PRIVATE
+        "${CMAKE_CURRENT_LIST_DIR}/src/imgui/backends/imgui_impl_opengl3.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/imgui/backends/imgui_impl_sdl.cpp"
+        )
+target_compile_definitions(imgui_extended PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
+target_link_libraries(imgui_extended PRIVATE opengl-glad)
+target_link_libraries(imgui_extended PRIVATE SDL3::SDL3-shared)
+target_link_libraries(imgui_extended PUBLIC imgui)
+
+
+
+
 # Set up include directories for engine and OpenGL
 add_library(engine-includes INTERFACE)
 target_include_directories(engine-includes INTERFACE
@@ -102,7 +117,7 @@ if (BUILD_TESTS)
     target_link_libraries(test_sdl_engine PRIVATE sdl-engine)
 
     add_test_executable(test_imgui test/imgui_general.cxx)
-    target_link_libraries(test_imgui PRIVATE imgui)
+    target_link_libraries(test_imgui PRIVATE imgui_extended SDL3::SDL3-shared opengl-glad)
 
     set(NON_CPP_EXTENSIONS glsl)
 
