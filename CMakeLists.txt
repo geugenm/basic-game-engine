@@ -39,7 +39,6 @@ target_include_directories(opengl-includes INTERFACE
         )
 
 
-
 add_library(imgui-engine)
 target_include_directories(imgui-engine PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/imgui")
 
@@ -49,13 +48,11 @@ target_sources(imgui-engine PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/src/imgui/imgui_backends/imgui_impl_sdl.cpp"
         )
 target_compile_definitions(imgui-engine PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(imgui-engine PRIVATE opengl-glad)
-target_link_libraries(imgui-engine PRIVATE SDL3::SDL3-shared)
-target_link_libraries(imgui-engine PUBLIC engine-includes)
-target_link_libraries(imgui-engine PUBLIC opengl-includes)
-target_link_libraries(imgui-engine PUBLIC imgui)
-
-
+target_link_libraries(imgui-engine PUBLIC opengl-glad
+        SDL3::SDL3-shared
+        engine-includes
+        opengl-includes
+        imgui)
 
 
 # Add OpenGL glad library
@@ -66,21 +63,20 @@ target_sources(opengl-glad
 target_link_libraries(opengl-glad PUBLIC opengl-includes)
 
 
-
-
 add_library(sdl-engine)
 target_sources(sdl-engine PRIVATE
         src/sdl/misc/dll_reloader.cxx
         src/sdl/opengl_functions.cxx
         src/sdl/sdl_engine.cxx
-        src/sdl/sdl_shader.cxx)
-target_link_libraries(sdl-engine PUBLIC SDL3::SDL3-shared opengl-glad engine-includes)
+        src/sdl/sdl_shader.cxx
+        src/sdl/sdl_texture.cxx)
+target_link_libraries(sdl-engine PUBLIC
+        SDL3::SDL3-shared
+        opengl-glad
+        engine-includes)
 target_include_directories(sdl-engine PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/src/sdl
         )
-
-
-
 
 
 # Enable/disable building tests
@@ -117,17 +113,20 @@ if (BUILD_TESTS)
     target_link_libraries(test_sdl_engine PRIVATE sdl-engine)
 
     add_test_executable(test_imgui test/imgui_general.cxx)
-    target_link_libraries(test_imgui PRIVATE imgui-engine SDL3::SDL3-shared opengl-glad)
+    target_link_libraries(test_imgui PRIVATE imgui-engine)
+
+    add_test_executable(test_opengl_texture test/test_opengl_texture.cxx)
+    target_link_libraries(test_opengl_texture PRIVATE sdl-engine)
 
     set(NON_CPP_EXTENSIONS glsl)
 
-    foreach(EXTENSION ${NON_CPP_EXTENSIONS})
+    foreach (EXTENSION ${NON_CPP_EXTENSIONS})
         file(GLOB_RECURSE NON_CPP_FILES "test/*.${EXTENSION}")
-        foreach(NON_CPP_FILE ${NON_CPP_FILES})
+        foreach (NON_CPP_FILE ${NON_CPP_FILES})
             file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR}/test ${NON_CPP_FILE})
             configure_file(${NON_CPP_FILE} "${CMAKE_BINARY_DIR}/test/${REL_PATH}" COPYONLY)
-        endforeach()
-    endforeach()
+        endforeach ()
+    endforeach ()
 endif ()
 
 # Print build information

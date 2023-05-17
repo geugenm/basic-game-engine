@@ -1,11 +1,14 @@
 #pragma once
 
+#include <fstream>
 #include <functional>
 #include <glad/glad.h>
 #include <iostream>
 #include <memory>
 #include <render/shader.hxx>
 #include <stdexcept>
+
+#include "render/picopng.hxx"
 
 #include "opengl_functions.hxx"
 
@@ -33,13 +36,14 @@ struct Triangle2D
     Vector2f _vertices[3];
 };
 
-class OpenGLShader : public AbstractEngine::IShader<OpenGLShader>
+template <typename Derived>
+class OpenGLShader : public AbstractEngine::IShader<OpenGLShader<Derived>>
 {
 public:
     void initialize_impl(const std::filesystem::path& vertex_path,
                          const std::filesystem::path& fragment_path)
     {
-        vertex_shader_path_ = vertex_path;
+        vertex_shader_path_  = vertex_path;
         fragment_shader_path = fragment_path;
 
         compile_and_link();
@@ -100,31 +104,15 @@ public:
         GL::listen_opengl_errors();
     }
 
-    void render()
+    template <typename... Args> void render(Args&&... args)
     {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        GL::listen_opengl_errors();
-
-        glClear(GL_COLOR_BUFFER_BIT);
-        GL::listen_opengl_errors();
-
-        glUseProgram(shader_program_id_);
-        GL::listen_opengl_errors();
-
-        glBindVertexArray(VAO_);
-        GL::listen_opengl_errors();
-
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-        GL::listen_opengl_errors();
-
-        glBindVertexArray(0);
-        GL::listen_opengl_errors();
+        static_cast<Derived*>(this)->render_impl(std::forward<Args>(args)...);
     }
 
-private:
+protected:
     void compile_impl(const GLchar* vertex_content, const GLchar* fragment_content)
     {
-        vertex_shader_id_ = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
+        vertex_shader_id_   = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
         fragment_shader_id_ = GL::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
     }
 
@@ -151,7 +139,25 @@ private:
         GL::generate_buffer_object_name(1, &EBO_);
     }
 
-    void bind_buffer()
+    template <typename... Args> void bind_buffer(Args&&... args)
+    {
+        static_cast<Derived*>(this)->bind_buffer_impl(std::forward<Args>(args)...);
+    }
+
+    GLuint vertex_shader_id_;
+    GLuint fragment_shader_id_;
+    GLuint shader_program_id_{};
+
+    std::filesystem::path vertex_shader_path_;
+    std::filesystem::path fragment_shader_path;
+
+    GLuint VBO_, VAO_, EBO_;
+};
+
+class SomeShader : public OpenGLShader<SomeShader>
+{
+public:
+    void bind_buffer_impl()
     {
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
@@ -193,14 +199,26 @@ private:
         GL::listen_opengl_errors();
     }
 
-    GLuint vertex_shader_id_;
-    GLuint fragment_shader_id_;
-    GLuint shader_program_id_{};
+    void render_impl()
+    {
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        GL::listen_opengl_errors();
 
-    std::filesystem::path vertex_shader_path_;
-    std::filesystem::path fragment_shader_path;
+        glClear(GL_COLOR_BUFFER_BIT);
+        GL::listen_opengl_errors();
 
-    GLuint VBO_, VAO_, EBO_;
+        glUseProgram(shader_program_id_);
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(VAO_);
+        GL::listen_opengl_errors();
+
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+        GL::listen_opengl_errors();
+
+        glBindVertexArray(0);
+        GL::listen_opengl_errors();
+    }
 };
 
 } // namespace SDL
