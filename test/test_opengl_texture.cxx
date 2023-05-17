@@ -178,7 +178,10 @@ TEST(SDLEngineTest, Init)
 
 
         glm::mat4 transform = glm::mat4(1.0f);
+        const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
         transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform, time * 0.05f, glm::vec3(0.0f, 0.0f, 1.0f));
 
         // Get matrix's uniform location and set matrix
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
