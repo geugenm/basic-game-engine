@@ -3,6 +3,10 @@
 #include <complex>
 #include <gtest/gtest.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 TEST(SDLEngineTest, Init)
 {
     const char* window_title        = "TestSDLEngine";
@@ -135,6 +139,14 @@ TEST(SDLEngineTest, Init)
                   0); // Unbind texture when done, so we won't accidentily mess up our texture.
     GL::listen_opengl_errors();
 
+    glm::mat4 trans;
+    trans = glm::rotate(trans, 90.0f, glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
+    auto transformLoc =
+        static_cast<GLint>(glGetUniformLocation(shader.get_shader_program_id(), "transform"));
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
     SDL_Event event;
     while (true)
     {
@@ -154,7 +166,7 @@ TEST(SDLEngineTest, Init)
         glBindVertexArray(VAO);
         GL::listen_opengl_errors();
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         GL::listen_opengl_errors();
 
         glBindVertexArray(0);

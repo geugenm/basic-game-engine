@@ -109,6 +109,86 @@ public:
         static_cast<Derived*>(this)->render_impl(std::forward<Args>(args)...);
     }
 
+    [[nodiscard]] GLuint get_vertex_shader_id() const
+    {
+        return vertex_shader_id_;
+    }
+
+    void set_vertex_shader_id(GLuint vertexShaderId)
+    {
+        vertex_shader_id_ = vertexShaderId;
+    }
+
+    [[nodiscard]] GLuint get_fragment_shader_id() const
+    {
+        return fragment_shader_id_;
+    }
+
+    void set_fragment_shader_id(GLuint fragmentShaderId)
+    {
+        fragment_shader_id_ = fragmentShaderId;
+    }
+
+    [[nodiscard]] GLuint get_shader_program_id() const
+    {
+        return shader_program_id_;
+    }
+
+    void set_shader_program_id(GLuint shaderProgramId)
+    {
+        shader_program_id_ = shaderProgramId;
+    }
+
+    [[nodiscard]] const filesystem::path& get_vertex_shader_path() const
+    {
+        return vertex_shader_path_;
+    }
+
+    void set_vertex_shader_path(const filesystem::path& vertexShaderPath)
+    {
+        vertex_shader_path_ = vertexShaderPath;
+    }
+
+    [[nodiscard]] const filesystem::path& get_fragment_shader_path() const
+    {
+        return fragment_shader_path;
+    }
+
+    void set_fragment_shader_path(const filesystem::path& fragmentShaderPath)
+    {
+        fragment_shader_path = fragmentShaderPath;
+    }
+
+    [[nodiscard]] GLuint get_vbo() const
+    {
+        return VBO_;
+    }
+
+    void set_vbo(GLuint vbo)
+    {
+        VBO_ = vbo;
+    }
+
+    [[nodiscard]] GLuint get_vao() const
+    {
+        return VAO_;
+    }
+
+    void set_vao(GLuint vao)
+    {
+        VAO_ = vao;
+    }
+
+    [[nodiscard]] GLuint get_ebo() const
+    {
+        return EBO_;
+    }
+
+    void set_ebo(GLuint ebo)
+    {
+        EBO_ = ebo;
+    }
+
 protected:
     void compile_impl(const GLchar* vertex_content, const GLchar* fragment_content)
     {
@@ -144,6 +224,7 @@ protected:
         static_cast<Derived*>(this)->bind_buffer_impl(std::forward<Args>(args)...);
     }
 
+private:
     GLuint vertex_shader_id_;
     GLuint fragment_shader_id_;
     GLuint shader_program_id_{};
@@ -159,7 +240,7 @@ class SomeShader : public OpenGLShader<SomeShader>
 public:
     void bind_buffer_impl()
     {
-        glBindVertexArray(VAO_);
+        glBindVertexArray(get_vao());
         GL::listen_opengl_errors();
 
         Triangle2D vertices;
@@ -172,20 +253,20 @@ public:
             1, 0, 3  // Second Triangle
         };
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
+        glBindBuffer(GL_ARRAY_BUFFER, get_vbo());
         GL::listen_opengl_errors();
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices._vertices), vertices._vertices,
                      GL_STREAM_DRAW);
         GL::listen_opengl_errors();
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, get_ebo());
         GL::listen_opengl_errors();
 
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
         GL::listen_opengl_errors();
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
         GL::listen_opengl_errors();
 
         glEnableVertexAttribArray(0);
@@ -207,10 +288,10 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
         GL::listen_opengl_errors();
 
-        glUseProgram(shader_program_id_);
+        glUseProgram(get_shader_program_id());
         GL::listen_opengl_errors();
 
-        glBindVertexArray(VAO_);
+        glBindVertexArray(get_vao());
         GL::listen_opengl_errors();
 
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
