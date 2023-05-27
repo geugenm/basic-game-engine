@@ -13,7 +13,8 @@ public:
     {
         if (!is_initialized_)
         {
-            static_cast<Derived *>(this)->initialize_impl(std::forward<Args>(args)...);
+            static_cast<Derived *>(this)->initialize_impl(
+                std::forward<Args>(args)...);
             is_initialized_ = true;
         }
         else
@@ -26,7 +27,8 @@ public:
     {
         if (is_initialized_)
         {
-            static_cast<Derived *>(this)->destroy_impl(std::forward<Args>(args)...);
+            static_cast<Derived *>(this)->destroy_impl(
+                std::forward<Args>(args)...);
             is_initialized_ = false;
         }
         else
@@ -39,7 +41,8 @@ public:
     {
         if (is_initialized_)
         {
-            static_cast<Derived *>(this)->reload_impl(std::forward<Args>(args)...);
+            static_cast<Derived *>(this)->reload_impl(
+                std::forward<Args>(args)...);
         }
         else
         {
@@ -51,7 +54,8 @@ public:
     {
         if (is_initialized_)
         {
-            static_cast<Derived *>(this)->set_uniform_impl(std::forward<Args>(args)...);
+            static_cast<Derived *>(this)->set_uniform_impl(
+                std::forward<Args>(args)...);
         }
         else
         {

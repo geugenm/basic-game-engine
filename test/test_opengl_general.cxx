@@ -12,7 +12,8 @@ bool InitSDL()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
-        std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
+        std::cerr << "Failed to initialize SDL: " << SDL_GetError()
+                  << std::endl;
         return false;
     }
     return true;
@@ -22,15 +23,18 @@ SDL_Window *CreateWindow()
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, kOpenGLMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, kOpenGLMinorVersion);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
 
     constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
     SDL_Window *window =
-        SDL_CreateWindow("(opengl-compile-test) Test OPenGL SDL3 Window", kWindowHeight, kWindowWidth, flags);
+        SDL_CreateWindow("(opengl-compile-test) Test OPenGL SDL3 Window",
+                         kWindowHeight, kWindowWidth, flags);
     if (!window)
     {
-        std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;
+        std::cerr << "Failed to create SDL window: " << SDL_GetError()
+                  << std::endl;
     }
 
     return window;
@@ -41,7 +45,8 @@ SDL_GLContext CreateOpenGLContext(SDL_Window *window)
     SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context)
     {
-        std::cerr << "Failed to create OpenGL context: " << SDL_GetError() << std::endl;
+        std::cerr << "Failed to create OpenGL context: " << SDL_GetError()
+                  << std::endl;
     }
 
     return context;
@@ -63,7 +68,8 @@ bool IsOpenGLVersionSupported()
     glGetIntegerv(GL_MAJOR_VERSION, &major);
     glGetIntegerv(GL_MINOR_VERSION, &minor);
 
-    if (major < kOpenGLMajorVersion || (major == kOpenGLMajorVersion && minor < kOpenGLMinorVersion))
+    if (major < kOpenGLMajorVersion ||
+        (major == kOpenGLMajorVersion && minor < kOpenGLMinorVersion))
     {
         std::cerr << "Unsupported OpenGL version" << std::endl;
         return false;

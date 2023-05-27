@@ -69,10 +69,10 @@ TEST(ShaderTest, ShaderOutput)
     const char *fragment_shader = fragmentShaderSource.data();
 
     GLuint vertexShader =
-        OpenGLWrapper::get_compiled_shader(GL_VERTEX_SHADER, vertex_shader);
+        OpenGLWrapper::get_new_compiled_shader(GL_VERTEX_SHADER, vertex_shader);
 
-    GLuint fragmentShader =
-        OpenGLWrapper::get_compiled_shader(GL_FRAGMENT_SHADER, fragment_shader);
+    GLuint fragmentShader = OpenGLWrapper::get_new_compiled_shader(
+        GL_FRAGMENT_SHADER, fragment_shader);
 
     GLuint shaderProgram = OpenGLWrapper::get_new_program();
     OpenGLWrapper::attach_shader(shaderProgram, vertexShader);

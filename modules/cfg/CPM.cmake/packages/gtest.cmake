@@ -7,5 +7,5 @@ CPMAddPackage(
 )
 
 if (GTest_ADDED)
-  add_library(GTest::GTest ALIAS gtest)
+    add_library(GTest::GTest ALIAS gtest)
 endif ()

@@ -179,14 +179,15 @@ private:
     }
 };
 
-template <> Engine::Instance<MyEngine> *MyEngine::Instance::create_instance()
+template <> Engine::Instance<MyEngine> *Engine::create_instance()
 {
     return new MyEngine();
 }
 
 TEST(TriangleTest, BasicInterpolation)
 {
-    MyEngine::Instance::instance().initialize();
+    Engine::Instance<MyEngine> *engine = Engine::create_instance<MyEngine>();
+    engine->initialize();
 
     SDL_Event event;
     while (true)
@@ -202,11 +203,11 @@ TEST(TriangleTest, BasicInterpolation)
         auto vertices = OpenGLWrapper::get_vertices_from_glsl_file(
             "../../test/shaders/triangle_vertex.glsl");
 
-        MyEngine::Instance::instance().render(vertices.data(), vertices.size());
+        engine->render(vertices.data(), vertices.size());
     }
 
 cleanup:
-    MyEngine::Instance::instance().destroy();
+    engine->destroy();
 }
 
 auto main(int argc, char **argv) -> int

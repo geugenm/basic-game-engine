@@ -29,12 +29,14 @@ public:
             throw std::runtime_error("Failed to init create OpenGL context.");
         }
 
-        if (!OpenGLWrapper::load_opengl_functions() || !OpenGLWrapper::is_opengl_version_supported())
+        if (!OpenGLWrapper::load_opengl_functions() ||
+            !OpenGLWrapper::is_opengl_version_supported())
         {
             SDL_GL_DeleteContext(context_);
             SDL_DestroyWindow(window_);
             SDL_Quit();
-            throw std::runtime_error("Failed to load opengl functions or opengl version is not supported.");
+            throw std::runtime_error("Failed to load opengl functions or "
+                                     "opengl version is not supported.");
         }
     }
 
@@ -71,7 +73,8 @@ TEST_F(OpenGLShaderTest, InitializationFailure)
         }
     )";
 
-    ASSERT_THROW(shader.initialize_impl(shaderType, shaderSource), std::runtime_error);
+    ASSERT_THROW(shader.initialize_impl(shaderType, shaderSource),
+                 std::runtime_error);
 }
 
 TEST_F(OpenGLShaderTest, CompilationSuccess)

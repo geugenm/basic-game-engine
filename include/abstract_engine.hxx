@@ -12,24 +12,14 @@ template <typename Derived> class Instance
 public:
     virtual ~Instance() = default;
 
-    Instance(const Instance &)            = delete;
-    Instance &operator=(const Instance &) = delete;
-
-    static Instance &instance()
-    {
-        static std::once_flag init_flag;
-        std::call_once(init_flag, [&]() { instance_.reset(static_cast<Derived *>(create_instance())); });
-        return *instance_;
-    }
-
     template <typename... Args> void initialize(Args &&...args)
     {
         if (is_initialized_)
         {
-            std::cerr << "WARNING: The engine is already initialized";
-            return;
+            throw std::runtime_error("Trying to reinitialize the engine.");
         }
-        static_cast<Derived *>(this)->initialize_impl(std::forward<Args>(args)...);
+        static_cast<Derived *>(this)->initialize_impl(
+            std::forward<Args>(args)...);
         is_initialized_ = true;
     }
 
@@ -37,8 +27,9 @@ public:
     {
         if (!is_initialized_)
         {
-            std::cerr << "WARNING: The engine is not initialized. Use initialize(...) before calling render(...)";
-            return;
+            throw std::runtime_error(
+                "The engine is not initialized. Use initialize(...) before "
+                "calling render(...).");
         }
         static_cast<Derived *>(this)->render_impl(std::forward<Args>(args)...);
     }
@@ -47,8 +38,8 @@ public:
     {
         if (!is_initialized_)
         {
-            std::cerr << "WARNING: The engine is already destroyed";
-            return;
+            throw std::runtime_error(
+                "Trying to destroy already destroyed engine.");
         }
 
         static_cast<Derived *>(this)->destroy_impl(std::forward<Args>(args)...);
@@ -60,16 +51,9 @@ public:
         return is_initialized_;
     }
 
-protected:
-    Instance() = default;
-
-    static Instance *create_instance();
-
 private:
-    static std::unique_ptr<Instance> instance_;
-
     bool is_initialized_ = false;
 };
 
-template <typename Derived> std::unique_ptr<Instance<Derived>> Instance<Derived>::instance_ = nullptr;
+template <typename Derived> Instance<Derived> *create_instance();
 } // namespace Engine

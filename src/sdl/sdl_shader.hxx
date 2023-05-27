@@ -36,10 +36,12 @@ struct Triangle2D
     Vector2f _vertices[3];
 };
 
-template <typename Derived> class OpenGLShader : public AbstractEngine::IShader<OpenGLShader<Derived>>
+template <typename Derived>
+class OpenGLShader : public AbstractEngine::IShader<OpenGLShader<Derived>>
 {
 public:
-    void initialize_impl(const std::filesystem::path &vertex_path, const std::filesystem::path &fragment_path)
+    void initialize_impl(const std::filesystem::path &vertex_path,
+                         const std::filesystem::path &fragment_path)
     {
         vertex_shader_path_  = vertex_path;
         fragment_shader_path = fragment_path;
@@ -68,14 +70,16 @@ public:
     {
         if (!exists(vertex_shader_path_))
         {
-            throw std::invalid_argument("Can't reload shader, shader file was not found: " +
-                                        vertex_shader_path_.string());
+            throw std::invalid_argument(
+                "Can't reload shader, shader file was not found: " +
+                vertex_shader_path_.string());
         }
 
         if (!exists(fragment_shader_path))
         {
-            throw std::invalid_argument("Can't reload shader, shader file was not found: " +
-                                        fragment_shader_path.string());
+            throw std::invalid_argument(
+                "Can't reload shader, shader file was not found: " +
+                fragment_shader_path.string());
         }
 
         compile_and_link();
@@ -184,10 +188,13 @@ public:
     }
 
 protected:
-    void compile_impl(const GLchar *vertex_content, const GLchar *fragment_content)
+    void compile_impl(const GLchar *vertex_content,
+                      const GLchar *fragment_content)
     {
-        vertex_shader_id_   = OpenGLWrapper::get_compiled_shader(GL_VERTEX_SHADER, vertex_content);
-        fragment_shader_id_ = OpenGLWrapper::get_compiled_shader(GL_FRAGMENT_SHADER, fragment_content);
+        vertex_shader_id_ = OpenGLWrapper::get_new_compiled_shader(
+            GL_VERTEX_SHADER, vertex_content);
+        fragment_shader_id_ = OpenGLWrapper::get_new_compiled_shader(
+            GL_FRAGMENT_SHADER, fragment_content);
     }
 
     void link_impl()
@@ -215,7 +222,8 @@ protected:
 
     template <typename... Args> void bind_buffer(Args &&...args)
     {
-        static_cast<Derived *>(this)->bind_buffer_impl(std::forward<Args>(args)...);
+        static_cast<Derived *>(this)->bind_buffer_impl(
+            std::forward<Args>(args)...);
     }
 
 private:
@@ -247,50 +255,38 @@ public:
         };
 
         glBindBuffer(GL_ARRAY_BUFFER, get_vbo());
-        
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices._vertices), vertices._vertices, GL_STREAM_DRAW);
-        
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices._vertices),
+                     vertices._vertices, GL_STREAM_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, get_ebo());
-        
 
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
-        
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                     GL_STREAM_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
-        
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
+                              nullptr);
 
         glEnableVertexAttribArray(0);
-        
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        
-
         glBindVertexArray(0);
-        
     }
 
     void render_impl()
     {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        
 
         glClear(GL_COLOR_BUFFER_BIT);
-        
 
         glUseProgram(get_shader_program_id());
-        
 
         glBindVertexArray(get_vao());
-        
 
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-        
 
         glBindVertexArray(0);
-        
     }
 };
 

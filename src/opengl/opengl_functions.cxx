@@ -82,12 +82,14 @@ bool OpenGLWrapper::is_opengl_version_supported()
 
 bool OpenGLWrapper::init_opengl()
 {
-    if (!load_opengl_functions()) {
+    if (!load_opengl_functions())
+    {
         std::cerr << "Failed to load OpenGL functions.";
         return false;
     }
 
-    if (!is_opengl_version_supported()) {
+    if (!is_opengl_version_supported())
+    {
         std::cerr << "OpenGL version is not supported.";
         return false;
     }
@@ -111,17 +113,11 @@ void OpenGLWrapper::opengl_debug_callback(GLenum source, GLenum type, GLuint id,
 
 void OpenGLWrapper::enable_debug_mode()
 {
-    GLint flags;
-    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-
-    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
-    {
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageCallback(opengl_debug_callback, nullptr);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0,
-                              nullptr, GL_TRUE);
-    }
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(opengl_debug_callback, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
+                          GL_TRUE);
 }
 
 void OpenGLWrapper::disable_debug_mode()
@@ -199,8 +195,8 @@ OpenGLWrapper::get_vertices_from_glsl_file(const std::string &shader_path)
     return vertices;
 }
 
-GLuint OpenGLWrapper::get_compiled_shader(GLenum shader_type,
-                                          const GLchar *shader_content)
+GLuint OpenGLWrapper::get_new_compiled_shader(GLenum shader_type,
+                                              const GLchar *shader_content)
 {
     GLenum result_shader = glCreateShader(shader_type);
 

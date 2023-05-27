@@ -12,10 +12,12 @@ TEST(SDLEngineTest, Init)
     const char *window_title        = "TestSDLEngine";
     constexpr int32_t window_height = 1000;
     constexpr int32_t window_width  = 1000;
-    SDL::Engine::instance().initialize(window_title, window_height, window_width);
+    SDL::Engine::instance().initialize(window_title, window_height,
+                                       window_width);
 
     SDL::SomeShader shader;
-    shader.initialize_impl("shaders/texture_vertex.glsl", "shaders/texture_fragment.glsl");
+    shader.initialize_impl("shaders/texture_vertex.glsl",
+                           "shaders/texture_fragment.glsl");
 
     // Set up vertex data (and buffer(s)) and attribute pointers
     GLfloat vertices[] = {
@@ -45,26 +47,31 @@ TEST(SDLEngineTest, Init)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                 GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                          (GLvoid *)0);
 
     glEnableVertexAttribArray(0);
 
     // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                          (GLvoid *)(3 * sizeof(GLfloat)));
 
     glEnableVertexAttribArray(1);
 
     // TexCoord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                          (GLvoid *)(6 * sizeof(GLfloat)));
 
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0); // Unbind VAO
 
-    std::ifstream file("textures/texture.png", std::ios::binary | std::ios::ate);
+    std::ifstream file("textures/texture.png",
+                       std::ios::binary | std::ios::ate);
     if (!file.is_open())
     {
         throw std::invalid_argument("Failed to open PNG image");
@@ -83,7 +90,8 @@ TEST(SDLEngineTest, Init)
     unsigned long width, height;
 
     // Decode PNG data using picopng
-    auto error = static_cast<unsigned int>(decodePNG(png_data, width, height, buffer.data(), buffer.size()));
+    auto error = static_cast<unsigned int>(
+        decodePNG(png_data, width, height, buffer.data(), buffer.size()));
     if (error != 0)
     {
         throw std::runtime_error("Failed to decode PNG image");
@@ -99,7 +107,8 @@ TEST(SDLEngineTest, Init)
     glGenTextures(1, &texture);
 
     glBindTexture(GL_TEXTURE_2D,
-                  texture); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
+                  texture); // All upcoming GL_TEXTURE_2D operations now have
+                            // effect on this texture object
 
     // Set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -108,12 +117,15 @@ TEST(SDLEngineTest, Init)
 
     // Load image, create texture and generate mipmaps
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, png_data.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, png_data.data());
 
     glBindTexture(GL_TEXTURE_2D,
-                  0); // Unbind texture when done, so we won't accidentily mess up our texture.
+                  0); // Unbind texture when done, so we won't accidentily mess
+                      // up our texture.
 
-    auto transformLoc = static_cast<GLint>(glGetUniformLocation(shader.get_shader_program_id(), "transform"));
+    auto transformLoc = static_cast<GLint>(
+        glGetUniformLocation(shader.get_shader_program_id(), "transform"));
 
     SDL_Event event;
     while (true)
@@ -132,20 +144,24 @@ TEST(SDLEngineTest, Init)
 
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        GLint textureUniformLocation = glGetUniformLocation(shader.get_shader_program_id(), "ourTexture");
+        GLint textureUniformLocation =
+            glGetUniformLocation(shader.get_shader_program_id(), "ourTexture");
 
-        glUniform1i(textureUniformLocation, 0); // Set the texture uniform to use texture unit 0
+        glUniform1i(textureUniformLocation,
+                    0); // Set the texture uniform to use texture unit 0
 
         shader.render();
 
         glm::mat4 transform = glm::mat4(1.0f);
         const float time    = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        transform           = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
-        transform           = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform           = glm::rotate(transform, time * 0.05f, glm::vec3(0.0f, 0.0f, 1.0f));
+        transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform =
+            glm::rotate(transform, time * 0.05f, glm::vec3(0.0f, 0.0f, 1.0f));
 
         // Get matrix's uniform location and set matrix
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE,
+                           glm::value_ptr(transform));
 
         glBindVertexArray(VAO);
 

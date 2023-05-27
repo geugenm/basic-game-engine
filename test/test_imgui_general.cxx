@@ -19,7 +19,8 @@ TEST(ImGuiGeneralTest, BasicTest)
     {
         init_sdl();
 
-        SDL_Window *window = SDL_CreateWindow("OpenGL 3.0 SDL ImGui Test", 1280, 720, SDL_WINDOW_OPENGL);
+        SDL_Window *window = SDL_CreateWindow("OpenGL 3.0 SDL ImGui Test", 1280,
+                                              720, SDL_WINDOW_OPENGL);
         if (!window)
         {
             throw std::runtime_error("Failed to create window");
@@ -92,7 +93,8 @@ void init_opengl()
     }
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);

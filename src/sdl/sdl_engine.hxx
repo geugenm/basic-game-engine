@@ -13,14 +13,16 @@ class Engine : public ::Engine::Instance<Engine>
 {
 public:
     template <typename... Args>
-    void initialize_impl(const char *window_title, const int &height, const int width, Args &&...args)
+    void initialize_impl(const char *window_title, const int &height,
+                         const int width, Args &&...args)
     {
         if (!OpenGLWrapper::init_sdl())
         {
             throw std::invalid_argument("Failed to init sdl");
         }
 
-        window_ = OpenGLWrapper::get_new_sdl_window(window_title, height, width);
+        window_ =
+            OpenGLWrapper::get_new_sdl_window(window_title, height, width);
         if (!window_)
         {
             SDL_Quit();
@@ -35,7 +37,8 @@ public:
             throw std::invalid_argument("Failed to create OpenGL context");
         }
 
-        if (!OpenGLWrapper::load_opengl_functions() || !OpenGLWrapper::is_opengl_version_supported())
+        if (!OpenGLWrapper::load_opengl_functions() ||
+            !OpenGLWrapper::is_opengl_version_supported())
         {
             SDL_GL_DeleteContext(context_);
             SDL_DestroyWindow(window_);
@@ -64,7 +67,8 @@ private:
 
 } // namespace SDL
 
-template <>::Engine::Instance<SDL::Engine> *SDL::Engine::Instance::create_instance()
+template <>
+::Engine::Instance<SDL::Engine> *SDL::Engine::Instance::create_instance()
 {
     return new SDL::Engine();
 }

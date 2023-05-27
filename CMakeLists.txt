@@ -1,6 +1,9 @@
 # Set minimum CMake version and project details
 cmake_minimum_required(VERSION 3.25)
-project(project.basic_game_engine VERSION 1.0.0 LANGUAGES CXX C)
+project(
+        project.basic_game_engine
+        VERSION 1.0.0
+        LANGUAGES CXX C)
 
 message(STATUS "Configuring ${PROJECT_NAME}...")
 
@@ -33,57 +36,44 @@ message(STATUS "GlobalTargetList: ${_allTargets}")
 
 # Set up include directories for engine and OpenGL
 add_library(engine-includes INTERFACE)
-target_include_directories(engine-includes INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
-        )
+target_include_directories(
+        engine-includes
+        INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include)
 
 add_library(imgui-engine)
-target_include_directories(imgui-engine PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/imgui")
+target_include_directories(imgui-engine
+        PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/imgui")
 
-target_sources(imgui-engine PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/src/imgui/imgui_wrapper.cxx"
+target_sources(
+        imgui-engine
+        PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/imgui/imgui_wrapper.cxx"
         "${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp"
-        "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
-        )
-target_link_libraries(imgui-engine PUBLIC
-        opengl-glad
-        SDL3::SDL3-shared
-        engine-includes
-        opengl-glad
-        imgui)
-
+        "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp")
+target_link_libraries(imgui-engine PUBLIC opengl-glad SDL3::SDL3-shared
+        engine-includes opengl-glad imgui)
 
 # Add OpenGL glad library
 add_library(opengl-glad)
-target_sources(opengl-glad
-        PRIVATE src/opengl/glad.c
-        )
+target_sources(opengl-glad PRIVATE src/opengl/glad.c)
 target_include_directories(opengl-glad PUBLIC src/opengl)
 
-
 add_library(sdl-engine)
-target_sources(sdl-engine PRIVATE
-        src/sdl/misc/dll_reloader.cxx
-        src/opengl/opengl_functions.cxx
-        src/sdl/sdl_engine.cxx
-        src/sdl/sdl_shader.cxx
-        src/sdl/sdl_texture.cxx)
-target_link_libraries(sdl-engine PUBLIC
-        SDL3::SDL3-shared
-        opengl-glad
+target_sources(
+        sdl-engine
+        PRIVATE src/sdl/misc/dll_reloader.cxx src/opengl/opengl_functions.cxx
+        src/sdl/sdl_engine.cxx src/sdl/sdl_shader.cxx src/sdl/sdl_texture.cxx)
+target_link_libraries(sdl-engine PUBLIC SDL3::SDL3-shared opengl-glad
         engine-includes)
-target_include_directories(sdl-engine PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/src/sdl
-        )
-
+target_include_directories(
+        sdl-engine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/src/sdl)
 
 # Enable/disable building tests
 option(BUILD_TESTS "Build tests" ON)
 if (BUILD_TESTS)
     function(add_test_executable target_name source_file)
         add_executable(${target_name} ${source_file})
-        set_target_properties(${target_name} PROPERTIES
-                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test")
+        set_target_properties(${target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+                "${CMAKE_BINARY_DIR}/test")
         target_link_libraries(${target_name} PRIVATE GTest::GTest)
     endfunction()
 
@@ -98,13 +88,16 @@ if (BUILD_TESTS)
     add_test_executable(test_opengl_init test/test_opengl_general.cxx)
     target_link_libraries(test_opengl_init PRIVATE opengl-glad SDL3::SDL3-shared)
 
-    add_test_executable(test_engine_shaders_sdl test/test_abstract_engine_triangle.cxx)
+    add_test_executable(test_engine_shaders_sdl
+            test/test_abstract_engine_triangle.cxx)
     target_link_libraries(test_engine_shaders_sdl PRIVATE sdl-engine)
 
-    add_test_executable(test_opengl_engine_shaders test/test_sdl_opengl_shader.cxx)
+    add_test_executable(test_opengl_engine_shaders
+            test/test_sdl_opengl_shader.cxx)
     target_link_libraries(test_opengl_engine_shaders PRIVATE sdl-engine)
 
-    add_test_executable(test_complex_light_shader test/test_complex_light_fragment_shader.cxx)
+    add_test_executable(test_complex_light_shader
+            test/test_complex_light_fragment_shader.cxx)
     target_link_libraries(test_complex_light_shader PRIVATE sdl-engine)
 
     add_test_executable(test_opengl_texture test/test_opengl_texture.cxx)
@@ -119,7 +112,8 @@ if (BUILD_TESTS)
         file(GLOB_RECURSE NON_CPP_FILES "test/*.${EXTENSION}")
         foreach (NON_CPP_FILE ${NON_CPP_FILES})
             file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR}/test ${NON_CPP_FILE})
-            configure_file(${NON_CPP_FILE} "${CMAKE_BINARY_DIR}/test/${REL_PATH}" COPYONLY)
+            configure_file(${NON_CPP_FILE} "${CMAKE_BINARY_DIR}/test/${REL_PATH}"
+                    COPYONLY)
         endforeach ()
     endforeach ()
 endif ()
@@ -132,10 +126,8 @@ message(STATUS "Build directory: ${CMAKE_BINARY_DIR}")
 include(CMakePrintHelpers)
 cmake_print_variables(CMAKE_CXX_FLAGS CMAKE_EXE_LINKER_FLAGS CMAKE_BINARY_DIR)
 
-cmake_print_properties(
-        TARGETS MY_LIBRARIES_NAMES
-        PROPERTIES POSITION_INDEPENDENT_CODE
-)
+cmake_print_properties(TARGETS MY_LIBRARIES_NAMES
+        PROPERTIES POSITION_INDEPENDENT_CODE)
 
 # Check for required files and definitions
 if (NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/cmake/configure_compiler.cmake")

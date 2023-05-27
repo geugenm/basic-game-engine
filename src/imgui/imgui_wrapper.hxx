@@ -26,8 +26,10 @@ void setup_style(bool is_dark, float alpha)
     {
         auto ei     = static_cast<ImGuiCol_>(i);
         ImVec4 &col = style.Colors[i];
-        if ((ImGuiCol_ModalWindowDimBg != ei) && (ImGuiCol_NavWindowingDimBg != ei) &&
-            (col.w < 1.00f || (ImGuiCol_FrameBg == ei) || (ImGuiCol_WindowBg == ei) || (ImGuiCol_ChildBg == ei)))
+        if ((ImGuiCol_ModalWindowDimBg != ei) &&
+            (ImGuiCol_NavWindowingDimBg != ei) &&
+            (col.w < 1.00f || (ImGuiCol_FrameBg == ei) ||
+             (ImGuiCol_WindowBg == ei) || (ImGuiCol_ChildBg == ei)))
         {
             col.w = alpha * col.w;
         }
