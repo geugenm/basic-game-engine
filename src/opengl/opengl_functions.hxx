@@ -22,9 +22,9 @@ SDL_GLContext get_new_context(SDL_Window *window);
 
 bool load_opengl_functions();
 
-void load_opengl_function(const char *func_name);
-
 bool is_opengl_version_supported();
+
+bool init_opengl();
 
 void GLAPIENTRY opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
                                       const GLchar *message, const void *userParam);

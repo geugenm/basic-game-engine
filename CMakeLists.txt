@@ -10,9 +10,8 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-    endif()
+    add_compile_options(-fsanitize=address)
+    add_link_options(-fsanitize=address)
 endif ()
 
 # Include necessary CMake modules and scripts
@@ -31,9 +30,6 @@ message(STATUS "Library Names: ${MY_LIBRARIES_NAMES}")
 # List global targets
 get_property(_allTargets GLOBAL PROPERTY GlobalTargetList)
 message(STATUS "GlobalTargetList: ${_allTargets}")
-
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
 
 # Set up include directories for engine and OpenGL
 add_library(engine-includes INTERFACE)
