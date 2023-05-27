@@ -41,8 +41,7 @@ public:
 
     void render_impl()
     {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(window_);
+        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
 
         ImGui::ShowDemoWindow();
@@ -55,8 +54,7 @@ public:
     }
 
     void destroy_impl() {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplSDL2_Shutdown();
+        ImGui_ImplSDL3_Shutdown();
         ImGui::DestroyContext();
 
         SDL_GL_DeleteContext(gl_context_);
@@ -94,8 +92,7 @@ private:
 
         ImGui::StyleColorsDark();
 
-        ImGui_ImplSDL2_InitForOpenGL(window_, gl_context_);
-        ImGui_ImplOpenGL3_Init("#version 330 core");
+        ImGui_ImplSDL3_InitForOpenGL(window_, gl_context_);
     }
 
     SDL_Window* window_;

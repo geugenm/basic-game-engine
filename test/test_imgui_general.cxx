@@ -12,7 +12,7 @@
 #include <stdexcept>
 
 void init_sdl();
-void init_opengl(SDL_Window* window);
+void init_opengl();
 void init_imgui(SDL_Window* window, SDL_GLContext gl_context);
 void cleanup(SDL_Window* window, SDL_GLContext gl_context);
 
@@ -35,7 +35,7 @@ TEST(ImGuiGeneralTest, BasicTest)
             throw std::runtime_error("Failed to create OpenGL 3.0 context");
         }
 
-        init_opengl(window);
+        init_opengl();
         init_imgui(window, gl_context);
 
         bool running = true;
@@ -45,7 +45,7 @@ TEST(ImGuiGeneralTest, BasicTest)
         {
             while (SDL_PollEvent(&event))
             {
-                ImGui_ImplSDL2_ProcessEvent(&event);
+                ImGui_ImplSDL3_ProcessEvent(&event);
                 if (event.type == SDL_EVENT_QUIT)
                 {
                     running = false;
@@ -53,7 +53,7 @@ TEST(ImGuiGeneralTest, BasicTest)
             }
 
             ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplSDL2_NewFrame(window);
+            ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
 
             ImGui::ShowDemoWindow();
@@ -86,7 +86,7 @@ TEST(ImGuiGeneralTest, ImGuiEngineTest) {
     {
         while (SDL_PollEvent(&event))
         {
-            ImGui_ImplSDL2_ProcessEvent(&event);
+            ImGui_ImplSDL3_ProcessEvent(&event);
             if (event.type == SDL_EVENT_QUIT)
             {
                 goto cleanup;
@@ -114,7 +114,7 @@ void init_sdl()
     }
 }
 
-void init_opengl(SDL_Window* window)
+void init_opengl()
 {
     if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
     {
@@ -135,14 +135,14 @@ void init_imgui(SDL_Window* window, SDL_GLContext gl_context)
 
     ImGui::StyleColorsDark();
 
-    ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+    ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
 }
 
 void cleanup(SDL_Window* window, SDL_GLContext gl_context)
 {
     ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
     SDL_GL_DeleteContext(gl_context);

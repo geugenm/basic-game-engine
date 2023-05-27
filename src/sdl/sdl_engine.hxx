@@ -58,6 +58,7 @@ public:
         SDL_Quit();
     }
 
+
 private:
     SDL_Window* window_    = nullptr;
     SDL_GLContext context_ = nullptr;
