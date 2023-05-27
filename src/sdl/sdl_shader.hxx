@@ -15,6 +15,23 @@
 namespace SDL
 {
 
+std::string get_file_content(const std::string &file_path)
+{
+    std::ifstream file(file_path, std::ios::in | std::ios::binary);
+    if (!file)
+    {
+        std::cerr << "Error: Unable to open file: " << file_path << std::endl;
+        return "";
+    }
+
+    std::vector<char> buffer((std::istreambuf_iterator<char>(file)),
+                             std::istreambuf_iterator<char>());
+    std::string content(buffer.begin(), buffer.end());
+    file.close();
+
+    return content;
+}
+
 struct Vector2f
 {
     Vector2f() : x(0.f), y(0.f) {}
@@ -43,6 +60,14 @@ public:
     void initialize_impl(const std::filesystem::path &vertex_path,
                          const std::filesystem::path &fragment_path)
     {
+        if (!exists(vertex_path)) {
+            throw std::invalid_argument("Given vertex shader source path is not exist");
+        }
+
+        if (!exists(fragment_path)) {
+            throw std::invalid_argument("Given fragment shader source path is not exist");
+        }
+
         vertex_shader_path_  = vertex_path;
         fragment_shader_path = fragment_path;
 
@@ -51,8 +76,8 @@ public:
 
     void compile_and_link()
     {
-        const std::string vertex_file_content;
-        const std::string fragment_file_content;
+        const std::string vertex_file_content = get_file_content(vertex_shader_path_);
+        const std::string fragment_file_content = get_file_content(fragment_shader_path);
 
         const GLchar *vertex_content   = vertex_file_content.data();
         const GLchar *fragment_content = fragment_file_content.data();
@@ -107,54 +132,9 @@ public:
         static_cast<Derived *>(this)->render_impl(std::forward<Args>(args)...);
     }
 
-    [[nodiscard]] GLuint get_vertex_shader_id() const
-    {
-        return vertex_shader_id_;
-    }
-
-    void set_vertex_shader_id(GLuint vertexShaderId)
-    {
-        vertex_shader_id_ = vertexShaderId;
-    }
-
-    [[nodiscard]] GLuint get_fragment_shader_id() const
-    {
-        return fragment_shader_id_;
-    }
-
-    void set_fragment_shader_id(GLuint fragmentShaderId)
-    {
-        fragment_shader_id_ = fragmentShaderId;
-    }
-
     [[nodiscard]] GLuint get_shader_program_id() const
     {
         return shader_program_id_;
-    }
-
-    void set_shader_program_id(GLuint shaderProgramId)
-    {
-        shader_program_id_ = shaderProgramId;
-    }
-
-    [[nodiscard]] const filesystem::path &get_vertex_shader_path() const
-    {
-        return vertex_shader_path_;
-    }
-
-    void set_vertex_shader_path(const filesystem::path &vertexShaderPath)
-    {
-        vertex_shader_path_ = vertexShaderPath;
-    }
-
-    [[nodiscard]] const filesystem::path &get_fragment_shader_path() const
-    {
-        return fragment_shader_path;
-    }
-
-    void set_fragment_shader_path(const filesystem::path &fragmentShaderPath)
-    {
-        fragment_shader_path = fragmentShaderPath;
     }
 
     [[nodiscard]] GLuint get_vbo() const
@@ -162,29 +142,14 @@ public:
         return VBO_;
     }
 
-    void set_vbo(GLuint vbo)
-    {
-        VBO_ = vbo;
-    }
-
     [[nodiscard]] GLuint get_vao() const
     {
         return VAO_;
     }
 
-    void set_vao(GLuint vao)
-    {
-        VAO_ = vao;
-    }
-
     [[nodiscard]] GLuint get_ebo() const
     {
         return EBO_;
-    }
-
-    void set_ebo(GLuint ebo)
-    {
-        EBO_ = ebo;
     }
 
 protected:

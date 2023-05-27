@@ -221,7 +221,7 @@ TEST(TriangleTest, LavaLampTriangle)
         }
 
         auto vertices = OpenGLWrapper::get_vertices_from_glsl_file(
-            "../../test/shaders/triangle_vertex.glsl");
+            "test/shaders/triangle_vertex.glsl");
 
         engine->render(vertices.data(), vertices.size());
     }

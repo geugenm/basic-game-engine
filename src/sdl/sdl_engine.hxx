@@ -12,9 +12,8 @@ namespace SDL
 class Engine : public ::Engine::Instance<Engine>
 {
 public:
-    template <typename... Args>
     void initialize_impl(const char *window_title, const int &height,
-                         const int width, Args &&...args)
+                         const int width)
     {
         if (!OpenGLWrapper::init_sdl())
         {
@@ -47,13 +46,12 @@ public:
         }
     }
 
-    template <typename... Args> void render_impl(Args &&...args)
+    void render_impl()
     {
         SDL_GL_SwapWindow(window_);
-        OpenGLWrapper::listen_opengl_errors();
     }
 
-    template <typename... Args> void destroy_impl(Args &&...args)
+    void destroy_impl()
     {
         SDL_GL_DeleteContext(context_);
         SDL_DestroyWindow(window_);
@@ -67,8 +65,7 @@ private:
 
 } // namespace SDL
 
-template <>
-::Engine::Instance<SDL::Engine> *SDL::Engine::Instance::create_instance()
+template <> Engine::Instance<SDL::Engine> *Engine::create_instance()
 {
     return new SDL::Engine();
 }

@@ -12,7 +12,8 @@ TEST(SDLEngineTest, Init)
     const char *window_title        = "TestSDLEngine";
     constexpr int32_t window_height = 1000;
     constexpr int32_t window_width  = 1000;
-    SDL::Engine::instance().initialize(window_title, window_height,
+    Engine::Instance<SDL::Engine> *engine = Engine::create_instance<SDL::Engine>();
+    engine->initialize(window_title, window_height,
                                        window_width);
 
     SDL::SomeShader shader;
@@ -52,7 +53,7 @@ TEST(SDLEngineTest, Init)
 
     // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
-                          (GLvoid *)0);
+                          nullptr);
 
     glEnableVertexAttribArray(0);
 
@@ -169,7 +170,7 @@ TEST(SDLEngineTest, Init)
 
         glBindVertexArray(0);
 
-        SDL::Engine::Instance::instance().render();
+        engine->render();
     }
 
 cleanup:
@@ -179,7 +180,7 @@ cleanup:
 
     glDeleteBuffers(1, &EBO);
 
-    SDL::Engine::instance().destroy();
+    engine->destroy();
 }
 
 auto main(int argc, char **argv) -> int
