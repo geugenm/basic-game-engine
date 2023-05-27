@@ -2,6 +2,8 @@
 #include "imgui_wrapper.hxx"
 #include "opengl_functions.hxx"
 
+#include "tahoma.h"
+
 #include <fstream>
 #include <gtest/gtest.h>
 
@@ -27,7 +29,7 @@ class MyEngine : public Engine::Instance<MyEngine>
 public:
     ~MyEngine() override = default;
 
-    template <typename... Args> void initialize_impl(Args &&...args)
+    void initialize_impl()
     {
         if (!OpenGLWrapper::init_sdl())
         {
@@ -60,6 +62,13 @@ public:
 
         ImWrapper::init_imgui(window_, context_);
 
+
+        ImGuiIO* io = &ImGui::GetIO();
+        ImFontConfig font_cfg;
+        font_cfg.FontDataOwnedByAtlas = false;
+        io->Fonts->AddFontFromMemoryTTF((void*)tahoma, sizeof(tahoma), 17.f, &font_cfg);
+
+
         compile_shaders();
         init_buffers();
     }
@@ -82,9 +91,7 @@ public:
         }
     }
 
-    template <typename... Args>
-    void render_impl(const GLfloat vertices[], long vertices_size,
-                     Args &&...args)
+    void render_impl(const GLfloat vertices[], long vertices_size)
     {
         shader_change_daemon();
 
@@ -124,16 +131,19 @@ public:
 
         ImWrapper::render();
 
+
         SDL_GL_SwapWindow(window_);
     }
 
-    template <typename... Args> void destroy_impl(Args &&...args)
+    void destroy_impl()
     {
         glDeleteVertexArrays(1, &VAO_);
 
         glDeleteBuffers(1, &VBO_);
 
         glDeleteProgram(program_id_);
+
+        ImWrapper::destroy();
 
         SDL_GL_DeleteContext(context_);
         SDL_DestroyWindow(window_);

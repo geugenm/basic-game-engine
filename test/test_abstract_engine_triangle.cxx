@@ -26,7 +26,7 @@ class MyEngine : public Engine::Instance<MyEngine>
 public:
     ~MyEngine() override = default;
 
-    template <typename... Args> void initialize_impl(Args &&...args)
+    void initialize_impl()
     {
         if (!OpenGLWrapper::init_sdl())
         {
@@ -79,9 +79,7 @@ public:
         }
     }
 
-    template <typename... Args>
-    void render_impl(const GLfloat vertices[], long vertices_size,
-                     Args &&...args)
+    void render_impl(const GLfloat vertices[], long vertices_size)
     {
         shader_change_daemon();
 
@@ -118,7 +116,7 @@ public:
         SDL_GL_SwapWindow(window_);
     }
 
-    template <typename... Args> void destroy_impl(Args &&...args)
+    void destroy_impl()
     {
         glDeleteVertexArrays(1, &VAO_);
 
