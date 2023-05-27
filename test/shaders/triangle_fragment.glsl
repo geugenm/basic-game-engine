@@ -11,7 +11,7 @@ float noise(vec2 x) {
     f = f * f * (3.0 - 2.0 * f);
     float n = p.x + p.y * 57.0;
     return mix(mix(fract(sin(n) * 753.5453123), fract(sin(n + 1.0) * 753.5453123), f.x),
-    mix(fract(sin(n + 57.0) * 753.5453123), fract(sin(n + 58.0) * 753.5453123), f.x), f.y);
+               mix(fract(sin(n + 57.0) * 753.5453123), fract(sin(n + 58.0) * 753.5453123), f.x), f.y);
 }
 
 void main() {

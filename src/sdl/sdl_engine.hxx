@@ -13,8 +13,7 @@ class Engine : public ::Engine::Instance<Engine>
 {
 public:
     template <typename... Args>
-    void initialize_impl(const char* window_title, const int& height, const int width,
-                         Args&&... args)
+    void initialize_impl(const char *window_title, const int &height, const int width, Args &&...args)
     {
         if (!GL::init_sdl())
         {
@@ -45,28 +44,27 @@ public:
         }
     }
 
-    template <typename... Args> void render_impl(Args&&... args)
+    template <typename... Args> void render_impl(Args &&...args)
     {
         SDL_GL_SwapWindow(window_);
         GL::listen_opengl_errors();
     }
 
-    template <typename... Args> void destroy_impl(Args&&... args)
+    template <typename... Args> void destroy_impl(Args &&...args)
     {
         SDL_GL_DeleteContext(context_);
         SDL_DestroyWindow(window_);
         SDL_Quit();
     }
 
-
 private:
-    SDL_Window* window_    = nullptr;
+    SDL_Window *window_    = nullptr;
     SDL_GLContext context_ = nullptr;
 };
 
 } // namespace SDL
 
-template <>::Engine::Instance<SDL::Engine>* SDL::Engine::Instance::create_instance()
+template <>::Engine::Instance<SDL::Engine> *SDL::Engine::Instance::create_instance()
 {
     return new SDL::Engine();
 }

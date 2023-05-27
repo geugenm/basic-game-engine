@@ -1,9 +1,9 @@
 #version 330 core
 
 const vec2 triangle_vertices[3] = vec2[](
-vec2(-0.9, 0.1),
-vec2(0.9, -0.7),
-vec2(0.0, 0.9)
+    vec2(-0.9, 0.1),
+    vec2(0.9, -0.7),
+    vec2(0.0, 0.9)
 );
 
 out vec2 vTexCoord;

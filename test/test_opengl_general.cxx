@@ -18,7 +18,7 @@ bool InitSDL()
     return true;
 }
 
-SDL_Window* CreateWindow()
+SDL_Window *CreateWindow()
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, kOpenGLMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, kOpenGLMinorVersion);
@@ -26,8 +26,8 @@ SDL_Window* CreateWindow()
 
     constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-    SDL_Window* window = SDL_CreateWindow("(opengl-compile-test) Test OPenGL SDL3 Window",
-                                          kWindowHeight, kWindowWidth, flags);
+    SDL_Window *window =
+        SDL_CreateWindow("(opengl-compile-test) Test OPenGL SDL3 Window", kWindowHeight, kWindowWidth, flags);
     if (!window)
     {
         std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;
@@ -36,7 +36,7 @@ SDL_Window* CreateWindow()
     return window;
 }
 
-SDL_GLContext CreateOpenGLContext(SDL_Window* window)
+SDL_GLContext CreateOpenGLContext(SDL_Window *window)
 {
     SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context)
@@ -63,8 +63,7 @@ bool IsOpenGLVersionSupported()
     glGetIntegerv(GL_MAJOR_VERSION, &major);
     glGetIntegerv(GL_MINOR_VERSION, &minor);
 
-    if (major < kOpenGLMajorVersion ||
-        (major == kOpenGLMajorVersion && minor < kOpenGLMinorVersion))
+    if (major < kOpenGLMajorVersion || (major == kOpenGLMajorVersion && minor < kOpenGLMinorVersion))
     {
         std::cerr << "Unsupported OpenGL version" << std::endl;
         return false;
@@ -80,7 +79,7 @@ TEST(OpenGLTest, GladInitialization)
         FAIL();
     }
 
-    SDL_Window* window = CreateWindow();
+    SDL_Window *window = CreateWindow();
     if (!window)
     {
         SDL_Quit();
@@ -133,7 +132,7 @@ TEST(OpenGLTest, GladInitialization)
     SDL_Quit();
 }
 
-auto main(int argc, char** argv) -> int
+auto main(int argc, char **argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

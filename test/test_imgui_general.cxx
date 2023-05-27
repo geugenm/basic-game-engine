@@ -5,17 +5,17 @@
 #include <glad/glad.h>
 #include <gtest/gtest.h>
 
-#include "sdl_engine.hxx"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl3.h"
 #include "imgui_engine.hxx"
+#include "sdl_engine.hxx"
 
 #include <stdexcept>
 
 void init_sdl();
 void init_opengl();
-void init_imgui(SDL_Window* window, SDL_GLContext gl_context);
-void cleanup(SDL_Window* window, SDL_GLContext gl_context);
+void init_imgui(SDL_Window *window, SDL_GLContext gl_context);
+void cleanup(SDL_Window *window, SDL_GLContext gl_context);
 
 TEST(ImGuiGeneralTest, BasicTest)
 {
@@ -23,8 +23,7 @@ TEST(ImGuiGeneralTest, BasicTest)
     {
         init_sdl();
 
-        SDL_Window* window =
-            SDL_CreateWindow("OpenGL 3.0 SDL ImGui Test", 1280, 720, SDL_WINDOW_OPENGL);
+        SDL_Window *window = SDL_CreateWindow("OpenGL 3.0 SDL ImGui Test", 1280, 720, SDL_WINDOW_OPENGL);
         if (!window)
         {
             throw std::runtime_error("Failed to create window");
@@ -59,29 +58,28 @@ TEST(ImGuiGeneralTest, BasicTest)
 
             ImGui::ShowDemoWindow();
 
-
-            ImGui::Render();
             glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
             glClear(GL_COLOR_BUFFER_BIT);
+            ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             SDL_GL_SwapWindow(window);
         }
 
         cleanup(window, gl_context);
     }
-    catch (const std::exception& e)
+    catch (const std::exception &e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
         FAIL();
     }
 }
 
-TEST(ImGuiGeneralTest, ImGuiEngineTest) {
-    const char* window_title        = "TestSDLEngine";
+TEST(ImGuiGeneralTest, ImGuiEngineTest)
+{
+    const char *window_title    = "TestSDLEngine";
     constexpr int window_height = 1000;
     constexpr int window_width  = 1000;
     SDL::Engine::instance().initialize(window_title, window_height, window_width);
-
 
     SDL_Event event;
     while (true)
@@ -102,7 +100,7 @@ cleanup:
     SDL::Engine::Instance::instance().destroy();
 }
 
-auto main(int argc, char** argv) -> int
+auto main(int argc, char **argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
@@ -130,7 +128,7 @@ void init_opengl()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 }
 
-void init_imgui(SDL_Window* window, SDL_GLContext gl_context)
+void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -141,7 +139,7 @@ void init_imgui(SDL_Window* window, SDL_GLContext gl_context)
     ImGui_ImplOpenGL3_Init("#version 330 core");
 }
 
-void cleanup(SDL_Window* window, SDL_GLContext gl_context)
+void cleanup(SDL_Window *window, SDL_GLContext gl_context)
 {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();

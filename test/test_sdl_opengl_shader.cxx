@@ -41,7 +41,7 @@ public:
 protected:
     SDL::OpenGLShader<SDL::SomeShader> shader;
 
-    SDL_Window * window_ = nullptr;
+    SDL_Window *window_ = nullptr;
 
     SDL_GLContext context_;
 };
@@ -120,7 +120,7 @@ TEST_F(OpenGLShaderTest, Destruction)
     ASSERT_NO_THROW(shader.destroy_impl());
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

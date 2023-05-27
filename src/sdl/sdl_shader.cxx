@@ -2,4 +2,4 @@
 
 namespace SDL
 {
-} // namespace Engine
+} // namespace SDL

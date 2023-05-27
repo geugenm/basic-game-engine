@@ -7,7 +7,7 @@ class MyEngine : public Engine::Instance<MyEngine>
 public:
     ~MyEngine() override = default;
 
-    template <typename... Args> void initialize_impl(Args&&... args)
+    template <typename... Args> void initialize_impl(Args &&...args)
     {
         if (!GL::init_sdl())
         {
@@ -60,15 +60,13 @@ public:
         }
     }
 
-    template <typename... Args>
-    void render_impl(const GLfloat vertices[], long vertices_size, Args&&... args)
+    template <typename... Args> void render_impl(const GLfloat vertices[], long vertices_size, Args &&...args)
     {
         shader_change_daemon();
 
         const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        GLint timeLoc = glGetUniformLocation(program_id_, "time");
+        GLint timeLoc    = glGetUniformLocation(program_id_, "time");
         glUniform1f(timeLoc, time);
-
 
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
@@ -80,7 +78,7 @@ public:
         glBindVertexArray(VAO_);
         GL::listen_opengl_errors();
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)nullptr);
         GL::listen_opengl_errors();
 
         glEnableVertexAttribArray(0);
@@ -109,7 +107,7 @@ public:
         GL::listen_opengl_errors();
     }
 
-    template <typename... Args> void destroy_impl(Args&&... args)
+    template <typename... Args> void destroy_impl(Args &&...args)
     {
         glDeleteVertexArrays(1, &VAO_);
         GL::listen_opengl_errors();
@@ -126,19 +124,18 @@ public:
     }
 
 private:
-    SDL_Window* window_    = nullptr;
+    SDL_Window *window_    = nullptr;
     SDL_GLContext context_ = nullptr;
     GLuint program_id_     = 0;
 
-    static constexpr std::string_view k_vertex_shader_path_     = "shaders/triangle_vertex.glsl";
-    static constexpr std::string_view k_fragment_shader_path_   = "shaders/triangle_fragment.glsl";
+    static constexpr std::string_view k_vertex_shader_path_   = "shaders/triangle_vertex.glsl";
+    static constexpr std::string_view k_fragment_shader_path_ = "shaders/triangle_fragment.glsl";
 
     GLuint VBO_, VAO_;
 
     void compile_shaders()
     {
-        GLuint vertexShader =
-            GL::load_shader(GL_VERTEX_SHADER, GL::get_file_content(k_vertex_shader_path_.data()));
+        GLuint vertexShader = GL::load_shader(GL_VERTEX_SHADER, GL::get_file_content(k_vertex_shader_path_.data()));
         GLuint fragmentShader =
             GL::load_shader(GL_FRAGMENT_SHADER, GL::get_file_content(k_fragment_shader_path_.data()));
 
@@ -169,7 +166,7 @@ private:
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
         GL::listen_opengl_errors();
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)nullptr);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)nullptr);
         GL::listen_opengl_errors();
 
         glEnableVertexAttribArray(0);
@@ -180,7 +177,7 @@ private:
     }
 };
 
-template <> Engine::Instance<MyEngine>* MyEngine::Instance::create_instance()
+template <> Engine::Instance<MyEngine> *MyEngine::Instance::create_instance()
 {
     return new MyEngine();
 }
@@ -209,7 +206,7 @@ cleanup:
     MyEngine::Instance::instance().destroy();
 }
 
-auto main(int argc, char** argv) -> int
+auto main(int argc, char **argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

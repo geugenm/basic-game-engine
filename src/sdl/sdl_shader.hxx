@@ -19,7 +19,7 @@ struct Vector2f
 {
     Vector2f() : x(0.f), y(0.f) {}
 
-    Vector2f(const GLfloat& x, const GLfloat y) : x(x), y(y) {}
+    Vector2f(const GLfloat &x, const GLfloat y) : x(x), y(y) {}
     GLfloat x;
     GLfloat y;
 };
@@ -36,12 +36,10 @@ struct Triangle2D
     Vector2f _vertices[3];
 };
 
-template <typename Derived>
-class OpenGLShader : public AbstractEngine::IShader<OpenGLShader<Derived>>
+template <typename Derived> class OpenGLShader : public AbstractEngine::IShader<OpenGLShader<Derived>>
 {
 public:
-    void initialize_impl(const std::filesystem::path& vertex_path,
-                         const std::filesystem::path& fragment_path)
+    void initialize_impl(const std::filesystem::path &vertex_path, const std::filesystem::path &fragment_path)
     {
         vertex_shader_path_  = vertex_path;
         fragment_shader_path = fragment_path;
@@ -54,8 +52,8 @@ public:
         const std::string vertex_file_content   = GL::get_file_content(vertex_shader_path_);
         const std::string fragment_file_content = GL::get_file_content(fragment_shader_path);
 
-        const GLchar* vertex_content   = vertex_file_content.data();
-        const GLchar* fragment_content = fragment_file_content.data();
+        const GLchar *vertex_content   = vertex_file_content.data();
+        const GLchar *fragment_content = fragment_file_content.data();
 
         compile_impl(vertex_content, fragment_content);
         link_impl();
@@ -104,9 +102,9 @@ public:
         GL::listen_opengl_errors();
     }
 
-    template <typename... Args> void render(Args&&... args)
+    template <typename... Args> void render(Args &&...args)
     {
-        static_cast<Derived*>(this)->render_impl(std::forward<Args>(args)...);
+        static_cast<Derived *>(this)->render_impl(std::forward<Args>(args)...);
     }
 
     [[nodiscard]] GLuint get_vertex_shader_id() const
@@ -139,22 +137,22 @@ public:
         shader_program_id_ = shaderProgramId;
     }
 
-    [[nodiscard]] const filesystem::path& get_vertex_shader_path() const
+    [[nodiscard]] const filesystem::path &get_vertex_shader_path() const
     {
         return vertex_shader_path_;
     }
 
-    void set_vertex_shader_path(const filesystem::path& vertexShaderPath)
+    void set_vertex_shader_path(const filesystem::path &vertexShaderPath)
     {
         vertex_shader_path_ = vertexShaderPath;
     }
 
-    [[nodiscard]] const filesystem::path& get_fragment_shader_path() const
+    [[nodiscard]] const filesystem::path &get_fragment_shader_path() const
     {
         return fragment_shader_path;
     }
 
-    void set_fragment_shader_path(const filesystem::path& fragmentShaderPath)
+    void set_fragment_shader_path(const filesystem::path &fragmentShaderPath)
     {
         fragment_shader_path = fragmentShaderPath;
     }
@@ -190,7 +188,7 @@ public:
     }
 
 protected:
-    void compile_impl(const GLchar* vertex_content, const GLchar* fragment_content)
+    void compile_impl(const GLchar *vertex_content, const GLchar *fragment_content)
     {
         vertex_shader_id_   = GL::compile_shader(GL_VERTEX_SHADER, vertex_content);
         fragment_shader_id_ = GL::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
@@ -219,9 +217,9 @@ protected:
         GL::generate_buffer_object_name(1, &EBO_);
     }
 
-    template <typename... Args> void bind_buffer(Args&&... args)
+    template <typename... Args> void bind_buffer(Args &&...args)
     {
-        static_cast<Derived*>(this)->bind_buffer_impl(std::forward<Args>(args)...);
+        static_cast<Derived *>(this)->bind_buffer_impl(std::forward<Args>(args)...);
     }
 
 private:
@@ -256,8 +254,7 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, get_vbo());
         GL::listen_opengl_errors();
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices._vertices), vertices._vertices,
-                     GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices._vertices), vertices._vertices, GL_STREAM_DRAW);
         GL::listen_opengl_errors();
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, get_ebo());

@@ -9,7 +9,7 @@
 
 TEST(SDLEngineTest, Init)
 {
-    const char* window_title        = "TestSDLEngine";
+    const char *window_title        = "TestSDLEngine";
     constexpr int32_t window_height = 1000;
     constexpr int32_t window_width  = 1000;
     SDL::Engine::instance().initialize(window_title, window_height, window_width);
@@ -56,23 +56,21 @@ TEST(SDLEngineTest, Init)
     GL::listen_opengl_errors();
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)0);
     GL::listen_opengl_errors();
 
     glEnableVertexAttribArray(0);
     GL::listen_opengl_errors();
 
     // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
-                          (GLvoid*)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
     GL::listen_opengl_errors();
 
     glEnableVertexAttribArray(1);
     GL::listen_opengl_errors();
 
     // TexCoord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
-                          (GLvoid*)(6 * sizeof(GLfloat)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
     GL::listen_opengl_errors();
 
     glEnableVertexAttribArray(2);
@@ -91,7 +89,7 @@ TEST(SDLEngineTest, Init)
     file.seekg(0, std::ios::beg);
 
     std::vector<unsigned char> buffer(size);
-    if (!file.read(reinterpret_cast<char*>(buffer.data()), size))
+    if (!file.read(reinterpret_cast<char *>(buffer.data()), size))
     {
         throw std::runtime_error("Failed to read PNG image");
     }
@@ -100,8 +98,7 @@ TEST(SDLEngineTest, Init)
     unsigned long width, height;
 
     // Decode PNG data using picopng
-    auto error =
-        static_cast<unsigned int>(decodePNG(png_data, width, height, buffer.data(), buffer.size()));
+    auto error = static_cast<unsigned int>(decodePNG(png_data, width, height, buffer.data(), buffer.size()));
     if (error != 0)
     {
         throw std::runtime_error("Failed to decode PNG image");
@@ -117,9 +114,8 @@ TEST(SDLEngineTest, Init)
     glGenTextures(1, &texture);
     GL::listen_opengl_errors();
 
-    glBindTexture(
-        GL_TEXTURE_2D,
-        texture); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    glBindTexture(GL_TEXTURE_2D,
+                  texture); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
     GL::listen_opengl_errors();
 
     // Set texture filtering parameters
@@ -131,21 +127,14 @@ TEST(SDLEngineTest, Init)
 
     // Load image, create texture and generate mipmaps
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 png_data.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, png_data.data());
     GL::listen_opengl_errors();
 
     glBindTexture(GL_TEXTURE_2D,
                   0); // Unbind texture when done, so we won't accidentily mess up our texture.
     GL::listen_opengl_errors();
 
-
-
-
-    auto transformLoc =
-        static_cast<GLint>(glGetUniformLocation(shader.get_shader_program_id(), "transform"));
-
-
+    auto transformLoc = static_cast<GLint>(glGetUniformLocation(shader.get_shader_program_id(), "transform"));
 
     SDL_Event event;
     while (true)
@@ -166,8 +155,7 @@ TEST(SDLEngineTest, Init)
         glBindTexture(GL_TEXTURE_2D, texture);
         GL::listen_opengl_errors();
 
-        GLint textureUniformLocation =
-            glGetUniformLocation(shader.get_shader_program_id(), "ourTexture");
+        GLint textureUniformLocation = glGetUniformLocation(shader.get_shader_program_id(), "ourTexture");
         GL::listen_opengl_errors();
 
         glUniform1i(textureUniformLocation, 0); // Set the texture uniform to use texture unit 0
@@ -175,20 +163,15 @@ TEST(SDLEngineTest, Init)
 
         shader.render();
 
-
-
         glm::mat4 transform = glm::mat4(1.0f);
-        const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform = glm::rotate(transform, time * 0.05f, glm::vec3(0.0f, 0.0f, 1.0f));
+        const float time    = static_cast<float>(SDL_GetTicks()) / 1000.0f;
+        transform           = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+        transform           = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform           = glm::rotate(transform, time * 0.05f, glm::vec3(0.0f, 0.0f, 1.0f));
 
         // Get matrix's uniform location and set matrix
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
         GL::listen_opengl_errors();
-
-
-
 
         glBindVertexArray(VAO);
         GL::listen_opengl_errors();
@@ -215,7 +198,7 @@ cleanup:
     SDL::Engine::instance().destroy();
 }
 
-auto main(int argc, char** argv) -> int
+auto main(int argc, char **argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

@@ -8,7 +8,7 @@
 constexpr int k_window_width  = 1040;
 constexpr int k_window_height = 585;
 
-void set_uniforms(const GLuint& shader_program, const Uniform<float, float, float, float>& uniform)
+void set_uniforms(const GLuint &shader_program, const Uniform<float, float, float, float> &uniform)
 {
     const auto [mouse_x, mouse_y, mouse_click_x, mouse_click_y] = uniform.values;
 
@@ -25,10 +25,12 @@ void set_uniforms(const GLuint& shader_program, const Uniform<float, float, floa
                 mouse_click_y - k_window_height);
 }
 
-bool check_shader_compile_status(GLuint shader) {
+bool check_shader_compile_status(GLuint shader)
+{
     GLint success;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success) {
+    if (!success)
+    {
         GLchar infoLog[512];
         glGetShaderInfoLog(shader, 512, nullptr, infoLog);
         std::cerr << "Shader compilation failed: " << infoLog << std::endl;
@@ -37,10 +39,12 @@ bool check_shader_compile_status(GLuint shader) {
     return true;
 }
 
-bool check_program_link_status(GLuint program) {
+bool check_program_link_status(GLuint program)
+{
     GLint success;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (!success) {
+    if (!success)
+    {
         GLchar infoLog[512];
         glGetProgramInfoLog(program, 512, nullptr, infoLog);
         std::cerr << "Program linking failed: " << infoLog << std::endl;
@@ -48,7 +52,6 @@ bool check_program_link_status(GLuint program) {
     }
     return true;
 }
-
 
 TEST(ShaderTest, ShaderOutput)
 {
@@ -58,7 +61,7 @@ TEST(ShaderTest, ShaderOutput)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    SDL_Window* window    = GL::create_window("Test", k_window_width, k_window_height);
+    SDL_Window *window    = GL::create_window("Test", k_window_width, k_window_height);
     SDL_GLContext context = GL::create_opengl_context(window);
 
     GL::load_opengl_functions();
@@ -70,25 +73,25 @@ TEST(ShaderTest, ShaderOutput)
     glViewport(0, 0, k_window_width, k_window_height);
     GL::listen_opengl_errors();
 
-    const std::string vertexShaderSource =
-        GL::get_file_content("shaders/light_figures_rgb_vertex.glsl");
-    const char* vertex_shader = vertexShaderSource.data();
+    const std::string vertexShaderSource = GL::get_file_content("shaders/light_figures_rgb_vertex.glsl");
+    const char *vertex_shader            = vertexShaderSource.data();
 
-    const std::string fragmentShaderSource =
-        GL::get_file_content("shaders/light_figures_rgb_fragment.glsl");
-    const char* fragment_shader = fragmentShaderSource.data();
+    const std::string fragmentShaderSource = GL::get_file_content("shaders/light_figures_rgb_fragment.glsl");
+    const char *fragment_shader            = fragmentShaderSource.data();
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertex_shader, nullptr);
     glCompileShader(vertexShader);
-    if (!check_shader_compile_status(vertexShader)) {
+    if (!check_shader_compile_status(vertexShader))
+    {
         FAIL();
     }
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragment_shader, nullptr);
     glCompileShader(fragmentShader);
-    if (!check_shader_compile_status(fragmentShader)) {
+    if (!check_shader_compile_status(fragmentShader))
+    {
         FAIL();
     }
 
@@ -96,7 +99,8 @@ TEST(ShaderTest, ShaderOutput)
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
-    if (!check_program_link_status(shaderProgram)) {
+    if (!check_program_link_status(shaderProgram))
+    {
         FAIL();
     }
 
@@ -122,12 +126,11 @@ TEST(ShaderTest, ShaderOutput)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(0);
 
     // Texture Coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
-                          (GLvoid*)(2 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)(2 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
@@ -167,8 +170,7 @@ TEST(ShaderTest, ShaderOutput)
         float mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
 
-        set_uniforms(shaderProgram,
-                     Uniform<float, float, float, float>(mouseX, mouseY, mouseClickX, mouseClickY));
+        set_uniforms(shaderProgram, Uniform<float, float, float, float>(mouseX, mouseY, mouseClickX, mouseClickY));
 
         // Render quad
         glBindVertexArray(VAO);
@@ -185,7 +187,7 @@ TEST(ShaderTest, ShaderOutput)
     SDL_Quit();
 }
 
-auto main(int argc, char** argv) -> int
+auto main(int argc, char **argv) -> int
 {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

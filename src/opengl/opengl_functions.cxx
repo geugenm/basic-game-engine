@@ -20,7 +20,7 @@ bool GL::init_sdl()
     return true;
 }
 
-SDL_Window* GL::create_window(const char* window_title, const int& width, const int& height)
+SDL_Window *GL::create_window(const char *window_title, const int &width, const int &height)
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, k_opengl_major_version);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, k_opengl_minor_version);
@@ -28,7 +28,7 @@ SDL_Window* GL::create_window(const char* window_title, const int& width, const 
 
     constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-    SDL_Window* window = SDL_CreateWindow(window_title, width, height, flags);
+    SDL_Window *window = SDL_CreateWindow(window_title, width, height, flags);
     if (!window)
     {
         std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;
@@ -37,7 +37,7 @@ SDL_Window* GL::create_window(const char* window_title, const int& width, const 
     return window;
 }
 
-SDL_GLContext GL::create_opengl_context(SDL_Window* window)
+SDL_GLContext GL::create_opengl_context(SDL_Window *window)
 {
     SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context)
@@ -58,7 +58,7 @@ bool GL::load_opengl_functions()
     return true;
 }
 
-void GL::load_gl_func(const char* func_name)
+void GL::load_gl_func(const char *func_name)
 {
     SDL_FunctionPointer gl_pointer = SDL_GL_GetProcAddress(func_name);
     if (nullptr == gl_pointer)
@@ -76,8 +76,7 @@ bool GL::is_opengl_version_supported()
     glGetIntegerv(GL_MINOR_VERSION, &minor);
     GL::listen_opengl_errors();
 
-    if (major < k_opengl_major_version ||
-        (major == k_opengl_major_version && minor < k_opengl_minor_version))
+    if (major < k_opengl_major_version || (major == k_opengl_major_version && minor < k_opengl_minor_version))
     {
         std::cerr << "Unsupported OpenGL version" << std::endl;
         return false;
@@ -86,8 +85,8 @@ bool GL::is_opengl_version_supported()
     return true;
 }
 
-void GL::opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
-                               GLsizei length, const GLchar* message, const void* userParam)
+void GL::opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                               const GLchar *message, const void *userParam)
 {
     std::cerr << "OpenGL Error:" << std::endl;
     std::cerr << "  Source: " << source << std::endl;
@@ -109,12 +108,12 @@ void GL::listen_opengl_errors()
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 }
 
-GLuint GL::load_shader(GLenum type, const std::string& source)
+GLuint GL::load_shader(GLenum type, const std::string &source)
 {
     GLuint shader = glCreateShader(type);
     GL::listen_opengl_errors();
 
-    const char* src = source.c_str();
+    const char *src = source.c_str();
     glShaderSource(shader, 1, &src, nullptr);
     GL::listen_opengl_errors();
 
@@ -124,7 +123,7 @@ GLuint GL::load_shader(GLenum type, const std::string& source)
     return shader;
 }
 
-std::string GL::get_file_content(const std::string& file_path)
+std::string GL::get_file_content(const std::string &file_path)
 {
     std::ifstream file(file_path, std::ios::binary);
 
@@ -138,7 +137,7 @@ std::string GL::get_file_content(const std::string& file_path)
     return buffer.str();
 }
 
-bool GL::has_shader_file_changed(const std::string& file_path, time_t& last_modified_time)
+bool GL::has_shader_file_changed(const std::string &file_path, time_t &last_modified_time)
 {
     struct stat file_stat
     {
@@ -157,7 +156,7 @@ bool GL::has_shader_file_changed(const std::string& file_path, time_t& last_modi
     return false;
 }
 
-std::vector<GLfloat> GL::parse_vertices_from_shader(const std::string& shader_path)
+std::vector<GLfloat> GL::parse_vertices_from_shader(const std::string &shader_path)
 {
     std::ifstream file(shader_path);
     std::stringstream buf;
@@ -185,7 +184,7 @@ std::vector<GLfloat> GL::parse_vertices_from_shader(const std::string& shader_pa
     return vertices;
 }
 
-GLuint GL::compile_shader(GLenum shader_type, const GLchar* shader_content)
+GLuint GL::compile_shader(GLenum shader_type, const GLchar *shader_content)
 {
     GLenum result_shader = glCreateShader(shader_type);
     GL::listen_opengl_errors();
@@ -258,13 +257,13 @@ void GL::delete_shader(GLuint shader)
     GL::listen_opengl_errors();
 }
 
-void GL::generate_vertex_array(GLsizei n, GLuint* arrays)
+void GL::generate_vertex_array(GLsizei n, GLuint *arrays)
 {
     glGenVertexArrays(n, arrays);
     GL::listen_opengl_errors();
 }
 
-void GL::generate_buffer_object_name(GLsizei n, GLuint* arrays)
+void GL::generate_buffer_object_name(GLsizei n, GLuint *arrays)
 {
     glGenBuffers(n, arrays);
     GL::listen_opengl_errors();
