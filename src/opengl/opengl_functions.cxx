@@ -12,15 +12,15 @@
 
 bool OpenGLWrapper::init_sdl()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    constexpr Uint32 flags = SDL_INIT_VIDEO;
+    if (SDL_Init(flags) != 0)
     {
-        std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
         return false;
     }
     return true;
 }
 
-SDL_Window *OpenGLWrapper::create_window(const char *window_title, const int &width, const int &height)
+SDL_Window *OpenGLWrapper::get_new_sdl_window(const char *window_title, const int &width, const int &height)
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, k_opengl_major_version);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, k_opengl_minor_version);
@@ -37,7 +37,7 @@ SDL_Window *OpenGLWrapper::create_window(const char *window_title, const int &wi
     return window;
 }
 
-SDL_GLContext OpenGLWrapper::create_opengl_context(SDL_Window *window)
+SDL_GLContext OpenGLWrapper::get_new_context(SDL_Window *window)
 {
     SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context)

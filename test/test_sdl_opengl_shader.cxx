@@ -13,7 +13,7 @@ public:
             throw std::runtime_error("Failed to init sdl.");
         }
 
-        window_ = OpenGLWrapper::create_window("", 100, 200);
+        window_ = OpenGLWrapper::get_new_sdl_window("", 100, 200);
 
         if (!window_)
         {
@@ -21,7 +21,7 @@ public:
             throw std::runtime_error("Failed to init window.");
         }
 
-        context_ = OpenGLWrapper::create_opengl_context(window_);
+        context_ = OpenGLWrapper::get_new_context(window_);
         if (!context_)
         {
             SDL_DestroyWindow(window_);

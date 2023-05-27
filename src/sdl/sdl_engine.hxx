@@ -20,14 +20,14 @@ public:
             throw std::invalid_argument("Failed to init sdl");
         }
 
-        window_ = OpenGLWrapper::create_window(window_title, height, width);
+        window_ = OpenGLWrapper::get_new_sdl_window(window_title, height, width);
         if (!window_)
         {
             SDL_Quit();
             throw std::invalid_argument("Failed to create SDL window");
         }
 
-        context_ = OpenGLWrapper::create_opengl_context(window_);
+        context_ = OpenGLWrapper::get_new_context(window_);
         if (!context_)
         {
             SDL_DestroyWindow(window_);

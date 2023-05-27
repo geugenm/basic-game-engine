@@ -2,27 +2,32 @@
 #include "opengl_functions.hxx"
 #include "render/uniform.hxx"
 
-#include <SDL.h>
+#include <fstream>
+
+#include <SDL3/SDL.h>
 #include <gtest/gtest.h>
 
 constexpr int k_window_width  = 1040;
 constexpr int k_window_height = 585;
 
-void set_uniforms(const GLuint &shader_program, const Uniform<float, float, float, float> &uniform)
+void set_uniforms(const GLuint &shader_program,
+                  const Uniform<float, float, float, float> &uniform)
 {
-    const auto [mouse_x, mouse_y, mouse_click_x, mouse_click_y] = uniform.values;
+    const auto [mouse_x, mouse_y, mouse_click_x, mouse_click_y] =
+        uniform.values;
 
     const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
 
-    GLint resolutionUniformLocation = glGetUniformLocation(shader_program, "iResolution");
+    GLint resolutionUniformLocation =
+        glGetUniformLocation(shader_program, "iResolution");
     glUniform2f(resolutionUniformLocation, k_window_width, k_window_height);
 
     GLint timeUniformLocation = glGetUniformLocation(shader_program, "iTime");
     glUniform1f(timeUniformLocation, time);
 
     GLint mouseUniformLocation = glGetUniformLocation(shader_program, "iMouse");
-    glUniform4f(mouseUniformLocation, mouse_x, -mouse_y + k_window_height, mouse_click_x,
-                mouse_click_y - k_window_height);
+    glUniform4f(mouseUniformLocation, mouse_x, -mouse_y + k_window_height,
+                mouse_click_x, mouse_click_y - k_window_height);
 }
 
 bool check_shader_compile_status(GLuint shader)
@@ -53,6 +58,23 @@ bool check_program_link_status(GLuint program)
     return true;
 }
 
+std::string get_file_content(const std::string &file_path)
+{
+    std::ifstream file(file_path, std::ios::in | std::ios::binary);
+    if (!file)
+    {
+        std::cerr << "Error: Unable to open file: " << file_path << std::endl;
+        return "";
+    }
+
+    std::vector<char> buffer((std::istreambuf_iterator<char>(file)),
+                             std::istreambuf_iterator<char>());
+    std::string content(buffer.begin(), buffer.end());
+    file.close();
+
+    return content;
+}
+
 TEST(ShaderTest, ShaderOutput)
 {
     OpenGLWrapper::init_sdl();
@@ -61,23 +83,24 @@ TEST(ShaderTest, ShaderOutput)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    SDL_Window *window    = OpenGLWrapper::create_window("Test", k_window_width, k_window_height);
-    SDL_GLContext context = OpenGLWrapper::create_opengl_context(window);
+    SDL_Window *window = OpenGLWrapper::get_new_sdl_window(
+        "Test", k_window_width, k_window_height);
+    SDL_GLContext context = OpenGLWrapper::get_new_context(window);
 
     OpenGLWrapper::load_opengl_functions();
     OpenGLWrapper::is_opengl_version_supported();
 
-    glDebugMessageCallback(OpenGLWrapper::opengl_debug_callback, nullptr);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    OpenGLWrapper::enable_debug_mode();
 
     glViewport(0, 0, k_window_width, k_window_height);
-    OpenGLWrapper::listen_opengl_errors();
 
-    const std::string vertexShaderSource = OpenGLWrapper::get_file_content("shaders/light_figures_rgb_vertex.glsl");
-    const char *vertex_shader            = vertexShaderSource.data();
+    const std::string vertexShaderSource =
+        get_file_content("shaders/light_figures_rgb_vertex.glsl");
+    const char *vertex_shader = vertexShaderSource.data();
 
-    const std::string fragmentShaderSource = OpenGLWrapper::get_file_content("shaders/light_figures_rgb_fragment.glsl");
-    const char *fragment_shader            = fragmentShaderSource.data();
+    const std::string fragmentShaderSource =
+        get_file_content("shaders/light_figures_rgb_fragment.glsl");
+    const char *fragment_shader = fragmentShaderSource.data();
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertex_shader, nullptr);
@@ -123,14 +146,17 @@ TEST(ShaderTest, ShaderOutput)
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                 GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+                          (GLvoid *)0);
     glEnableVertexAttribArray(0);
 
     // Texture Coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid *)(2 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+                          (GLvoid *)(2 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
@@ -170,7 +196,9 @@ TEST(ShaderTest, ShaderOutput)
         float mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
 
-        set_uniforms(shaderProgram, Uniform<float, float, float, float>(mouseX, mouseY, mouseClickX, mouseClickY));
+        set_uniforms(shaderProgram,
+                     Uniform<float, float, float, float>(
+                         mouseX, mouseY, mouseClickX, mouseClickY));
 
         // Render quad
         glBindVertexArray(VAO);
