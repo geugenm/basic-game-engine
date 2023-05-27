@@ -55,28 +55,28 @@ bool check_program_link_status(GLuint program)
 
 TEST(ShaderTest, ShaderOutput)
 {
-    GL::init_sdl();
+    OpenGLWrapper::init_sdl();
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    SDL_Window *window    = GL::create_window("Test", k_window_width, k_window_height);
-    SDL_GLContext context = GL::create_opengl_context(window);
+    SDL_Window *window    = OpenGLWrapper::create_window("Test", k_window_width, k_window_height);
+    SDL_GLContext context = OpenGLWrapper::create_opengl_context(window);
 
-    GL::load_opengl_functions();
-    GL::is_opengl_version_supported();
+    OpenGLWrapper::load_opengl_functions();
+    OpenGLWrapper::is_opengl_version_supported();
 
-    glDebugMessageCallback(GL::opengl_debug_callback, nullptr);
+    glDebugMessageCallback(OpenGLWrapper::opengl_debug_callback, nullptr);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
     glViewport(0, 0, k_window_width, k_window_height);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
-    const std::string vertexShaderSource = GL::get_file_content("shaders/light_figures_rgb_vertex.glsl");
+    const std::string vertexShaderSource = OpenGLWrapper::get_file_content("shaders/light_figures_rgb_vertex.glsl");
     const char *vertex_shader            = vertexShaderSource.data();
 
-    const std::string fragmentShaderSource = GL::get_file_content("shaders/light_figures_rgb_fragment.glsl");
+    const std::string fragmentShaderSource = OpenGLWrapper::get_file_content("shaders/light_figures_rgb_fragment.glsl");
     const char *fragment_shader            = fragmentShaderSource.data();
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);

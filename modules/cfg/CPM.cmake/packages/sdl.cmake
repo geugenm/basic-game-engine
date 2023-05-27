@@ -42,8 +42,8 @@ CPMAddPackage(
         "SDL_VULKAN OFF"
         "SDL_ASSEMBLY OFF"
 
-        "SDL_TEST ON"
-        "SDL_TESTS ON"
+        "SDL_TEST OFF"
+        "SDL_TESTS OFF"
 
         "SDL_ROCKCHIP OFF"
 )

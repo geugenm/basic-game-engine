@@ -32,52 +32,52 @@ TEST(SDLEngineTest, Init)
     };
     GLuint VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glGenBuffers(1, &VBO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glGenBuffers(1, &EBO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glBindVertexArray(VAO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)0);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glEnableVertexAttribArray(0);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     // Color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glEnableVertexAttribArray(1);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     // TexCoord attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glEnableVertexAttribArray(2);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glBindVertexArray(0); // Unbind VAO
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     std::ifstream file("textures/texture.png", std::ios::binary | std::ios::ate);
     if (!file.is_open())
@@ -112,27 +112,27 @@ TEST(SDLEngineTest, Init)
     // Load and create a texture
     GLuint texture;
     glGenTextures(1, &texture);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glBindTexture(GL_TEXTURE_2D,
                   texture); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     // Set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     // Load image, create texture and generate mipmaps
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, png_data.data());
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glBindTexture(GL_TEXTURE_2D,
                   0); // Unbind texture when done, so we won't accidentily mess up our texture.
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     auto transformLoc = static_cast<GLint>(glGetUniformLocation(shader.get_shader_program_id(), "transform"));
 
@@ -150,16 +150,16 @@ TEST(SDLEngineTest, Init)
         }
 
         glActiveTexture(GL_TEXTURE0);
-        GL::listen_opengl_errors();
+        OpenGLWrapper::listen_opengl_errors();
 
         glBindTexture(GL_TEXTURE_2D, texture);
-        GL::listen_opengl_errors();
+        OpenGLWrapper::listen_opengl_errors();
 
         GLint textureUniformLocation = glGetUniformLocation(shader.get_shader_program_id(), "ourTexture");
-        GL::listen_opengl_errors();
+        OpenGLWrapper::listen_opengl_errors();
 
         glUniform1i(textureUniformLocation, 0); // Set the texture uniform to use texture unit 0
-        GL::listen_opengl_errors();
+        OpenGLWrapper::listen_opengl_errors();
 
         shader.render();
 
@@ -171,29 +171,29 @@ TEST(SDLEngineTest, Init)
 
         // Get matrix's uniform location and set matrix
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-        GL::listen_opengl_errors();
+        OpenGLWrapper::listen_opengl_errors();
 
         glBindVertexArray(VAO);
-        GL::listen_opengl_errors();
+        OpenGLWrapper::listen_opengl_errors();
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        GL::listen_opengl_errors();
+        OpenGLWrapper::listen_opengl_errors();
 
         glBindVertexArray(0);
-        GL::listen_opengl_errors();
+        OpenGLWrapper::listen_opengl_errors();
 
         SDL::Engine::Instance::instance().render();
     }
 
 cleanup:
     glDeleteVertexArrays(1, &VAO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glDeleteBuffers(1, &VBO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     glDeleteBuffers(1, &EBO);
-    GL::listen_opengl_errors();
+    OpenGLWrapper::listen_opengl_errors();
 
     SDL::Engine::instance().destroy();
 }

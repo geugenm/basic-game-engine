@@ -7,7 +7,7 @@
 #include "SDL3/SDL.h"
 #include "glad/glad.h"
 
-namespace GL
+namespace OpenGLWrapper
 {
 
 constexpr uint16_t k_opengl_major_version = 3;

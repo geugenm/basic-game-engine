@@ -9,6 +9,12 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+    endif()
+endif ()
+
 # Include necessary CMake modules and scripts
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/configure_compiler.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/code_quality.cmake)
@@ -26,6 +32,8 @@ message(STATUS "Library Names: ${MY_LIBRARIES_NAMES}")
 get_property(_allTargets GLOBAL PROPERTY GlobalTargetList)
 message(STATUS "GlobalTargetList: ${_allTargets}")
 
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
 
 # Set up include directories for engine and OpenGL
 add_library(engine-includes INTERFACE)
@@ -37,7 +45,7 @@ add_library(imgui-engine)
 target_include_directories(imgui-engine PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/imgui")
 
 target_sources(imgui-engine PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/src/imgui/imgui_engine.cxx"
+        "${CMAKE_CURRENT_LIST_DIR}/src/imgui/imgui_wrapper.cxx"
         "${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp"
         "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
         )

@@ -5,10 +5,7 @@
 #include <glad/glad.h>
 #include <gtest/gtest.h>
 
-#include "backends/imgui_impl_opengl3.h"
-#include "backends/imgui_impl_sdl3.h"
-#include "imgui_engine.hxx"
-#include "sdl_engine.hxx"
+#include "imgui_wrapper.hxx"
 
 #include <stdexcept>
 
