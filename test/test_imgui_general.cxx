@@ -5,8 +5,9 @@
 #include <glad/glad.h>
 #include <gtest/gtest.h>
 
-#include "imgui_backends/imgui_impl_opengl3.h"
-#include "imgui_backends/imgui_impl_sdl.h"
+#include "sdl_engine.hxx"
+#include "backends/imgui_impl_opengl3.h"
+#include "backends/imgui_impl_sdl3.h"
 #include "imgui_engine.hxx"
 
 #include <stdexcept>
@@ -58,6 +59,7 @@ TEST(ImGuiGeneralTest, BasicTest)
 
             ImGui::ShowDemoWindow();
 
+
             ImGui::Render();
             glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
             glClear(GL_COLOR_BUFFER_BIT);
@@ -78,7 +80,7 @@ TEST(ImGuiGeneralTest, ImGuiEngineTest) {
     const char* window_title        = "TestSDLEngine";
     constexpr int window_height = 1000;
     constexpr int window_width  = 1000;
-    ImUI::Engine::Instance::instance().initialize(window_title, window_height, window_width);
+    SDL::Engine::instance().initialize(window_title, window_height, window_width);
 
 
     SDL_Event event;
@@ -93,11 +95,11 @@ TEST(ImGuiGeneralTest, ImGuiEngineTest) {
             }
         }
 
-        ImUI::Engine::instance().render();
+        SDL::Engine::instance().render();
     }
 
 cleanup:
-    ImUI::Engine::Instance::instance().destroy();
+    SDL::Engine::Instance::instance().destroy();
 }
 
 auto main(int argc, char** argv) -> int
