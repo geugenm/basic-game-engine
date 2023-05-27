@@ -14,8 +14,6 @@
 
 void init_sdl();
 void init_opengl();
-void init_imgui(SDL_Window *window, SDL_GLContext gl_context);
-void cleanup(SDL_Window *window, SDL_GLContext gl_context);
 
 TEST(ImGuiGeneralTest, BasicTest)
 {
@@ -36,7 +34,7 @@ TEST(ImGuiGeneralTest, BasicTest)
         }
 
         init_opengl();
-        init_imgui(window, gl_context);
+        ImWrapper::init_imgui(window, gl_context);
 
         bool running = true;
         SDL_Event event;
@@ -45,59 +43,32 @@ TEST(ImGuiGeneralTest, BasicTest)
         {
             while (SDL_PollEvent(&event))
             {
-                ImGui_ImplSDL3_ProcessEvent(&event);
+                ImWrapper::process_event(event);
                 if (event.type == SDL_EVENT_QUIT)
                 {
                     running = false;
                 }
             }
 
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplSDL3_NewFrame();
-            ImGui::NewFrame();
+            ImWrapper::new_frame();
 
             ImGui::ShowDemoWindow();
 
             glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
             glClear(GL_COLOR_BUFFER_BIT);
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            ImWrapper::render();
+
             SDL_GL_SwapWindow(window);
         }
 
-        cleanup(window, gl_context);
+        ImWrapper::destroy();
     }
     catch (const std::exception &e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
         FAIL();
     }
-}
-
-TEST(ImGuiGeneralTest, ImGuiEngineTest)
-{
-    const char *window_title    = "TestSDLEngine";
-    constexpr int window_height = 1000;
-    constexpr int window_width  = 1000;
-    SDL::Engine::instance().initialize(window_title, window_height, window_width);
-
-    SDL_Event event;
-    while (true)
-    {
-        while (SDL_PollEvent(&event))
-        {
-            ImGui_ImplSDL3_ProcessEvent(&event);
-            if (event.type == SDL_EVENT_QUIT)
-            {
-                goto cleanup;
-            }
-        }
-
-        SDL::Engine::instance().render();
-    }
-
-cleanup:
-    SDL::Engine::Instance::instance().destroy();
 }
 
 auto main(int argc, char **argv) -> int
@@ -126,26 +97,4 @@ void init_opengl()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-}
-
-void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
-{
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-
-    ImGui::StyleColorsDark();
-
-    ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
-}
-
-void cleanup(SDL_Window *window, SDL_GLContext gl_context)
-{
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL3_Shutdown();
-    ImGui::DestroyContext();
-
-    SDL_GL_DeleteContext(gl_context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
 }

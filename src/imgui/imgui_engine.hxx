@@ -13,7 +13,7 @@
 #include <memory>
 #include <mutex>
 
-namespace ImUI
+namespace ImWrapper
 {
 void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 {
@@ -22,11 +22,9 @@ void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330 core");
-    const int ahajahajh = 12;
-    const int test      = 13;
 }
 
-void destroy(SDL_Window *window, SDL_GLContext gl_context)
+void destroy()
 {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
@@ -43,9 +41,10 @@ void new_frame()
 void process_event(const SDL_Event &event)
 {
     ImGui_ImplSDL3_ProcessEvent(&event);
-    const int a          = 12;
-    const int bkdejjdkgj = 12;
 }
 
-void render() {}
+void render() {
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
 } // namespace ImUI
