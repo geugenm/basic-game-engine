@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "imgui_wrapper.hxx"
+#include "opengl_functions.hxx"
 
 #include <stdexcept>
 
@@ -31,6 +32,7 @@ TEST(ImGuiGeneralTest, BasicTest)
         }
 
         init_opengl();
+        OpenGLWrapper::enable_debug_mode();
         ImWrapper::init_imgui(window, gl_context);
 
         bool running = true;

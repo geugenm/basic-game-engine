@@ -47,9 +47,9 @@ public:
         static std::time_t fragment_shader_last_modified = 0;
 
         bool vertex_shader_changed =
-            OpenGLWrapper::has_shader_file_changed(k_vertex_shader_path_.data(), vertex_shader_last_modified);
+            OpenGLWrapper::file_has_changed(k_vertex_shader_path_.data(), vertex_shader_last_modified);
         bool fragment_shader_changed =
-            OpenGLWrapper::has_shader_file_changed(k_fragment_shader_path_.data(), fragment_shader_last_modified);
+            OpenGLWrapper::file_has_changed(k_fragment_shader_path_.data(), fragment_shader_last_modified);
 
         if (vertex_shader_changed || fragment_shader_changed)
         {
@@ -135,9 +135,10 @@ private:
 
     void compile_shaders()
     {
-        GLuint vertexShader =
-            OpenGLWrapper::load_shader(GL_VERTEX_SHADER, OpenGLWrapper::get_file_content(k_vertex_shader_path_.data()));
-        GLuint fragmentShader = OpenGLWrapper::load_shader(GL_FRAGMENT_SHADER, OpenGLWrapper::get_file_content(k_fragment_shader_path_.data()));
+        GLuint vertexShader = OpenGLWrapper::get_shader_from_file(
+            GL_VERTEX_SHADER, OpenGLWrapper::get_file_content(k_vertex_shader_path_.data()));
+        GLuint fragmentShader = OpenGLWrapper::get_shader_from_file(
+            GL_FRAGMENT_SHADER, OpenGLWrapper::get_file_content(k_fragment_shader_path_.data()));
 
         program_id_ = glCreateProgram();
         OpenGLWrapper::listen_opengl_errors();
@@ -197,7 +198,7 @@ TEST(TriangleTest, BasicInterpolation)
             }
         }
 
-        auto vertices = OpenGLWrapper::parse_vertices_from_shader("../../test/shaders/triangle_vertex.glsl");
+        auto vertices = OpenGLWrapper::get_vertices_from_glsl_file("../../test/shaders/triangle_vertex.glsl");
 
         MyEngine::Instance::instance().render(vertices.data(), vertices.size());
     }

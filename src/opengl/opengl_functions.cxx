@@ -58,7 +58,7 @@ bool OpenGLWrapper::load_opengl_functions()
     return true;
 }
 
-void OpenGLWrapper::load_gl_func(const char *func_name)
+void OpenGLWrapper::load_opengl_function(const char *func_name)
 {
     SDL_FunctionPointer gl_pointer = SDL_GL_GetProcAddress(func_name);
     if (nullptr == gl_pointer)
@@ -71,14 +71,11 @@ bool OpenGLWrapper::is_opengl_version_supported()
 {
     int major, minor;
     glGetIntegerv(GL_MAJOR_VERSION, &major);
-    OpenGLWrapper::listen_opengl_errors();
 
     glGetIntegerv(GL_MINOR_VERSION, &minor);
-    OpenGLWrapper::listen_opengl_errors();
 
     if (major < k_opengl_major_version || (major == k_opengl_major_version && minor < k_opengl_minor_version))
     {
-        std::cerr << "Unsupported OpenGL version" << std::endl;
         return false;
     }
 
@@ -86,7 +83,7 @@ bool OpenGLWrapper::is_opengl_version_supported()
 }
 
 void OpenGLWrapper::opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                               const GLchar *message, const void *userParam)
+                                          const GLchar *message, const void *userParam)
 {
     std::cerr << "OpenGL Error:" << std::endl;
     std::cerr << "  Source: " << source << std::endl;
@@ -97,47 +94,45 @@ void OpenGLWrapper::opengl_debug_callback(GLenum source, GLenum type, GLuint id,
     std::cerr << std::endl;
 }
 
-void OpenGLWrapper::listen_opengl_errors()
+void OpenGLWrapper::enable_debug_mode()
 {
-    glEnable(GL_DEBUG_OUTPUT);
+    GLint flags;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
 
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-
-    glDebugMessageCallback(opengl_debug_callback, nullptr);
-
-    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+    {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(opengl_debug_callback, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    }
 }
 
-GLuint OpenGLWrapper::load_shader(GLenum type, const std::string &source)
+void OpenGLWrapper::disable_debug_mode()
+{
+    GLint flags;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+    {
+        glDisable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(nullptr, nullptr);
+    }
+}
+
+GLuint OpenGLWrapper::get_shader_from_file(GLenum type, const std::string &source)
 {
     GLuint shader = glCreateShader(type);
-    OpenGLWrapper::listen_opengl_errors();
 
     const char *src = source.c_str();
     glShaderSource(shader, 1, &src, nullptr);
-    OpenGLWrapper::listen_opengl_errors();
 
     glCompileShader(shader);
-    OpenGLWrapper::listen_opengl_errors();
 
     return shader;
 }
 
-std::string OpenGLWrapper::get_file_content(const std::string &file_path)
-{
-    std::ifstream file(file_path, std::ios::binary);
-
-    if (!file.is_open())
-    {
-        throw std::runtime_error("Failed to open " + std::filesystem::path(file_path).string());
-    }
-
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
-
-bool OpenGLWrapper::has_shader_file_changed(const std::string &file_path, time_t &last_modified_time)
+bool OpenGLWrapper::file_has_changed(const std::string &file_path, std::time_t &last_modified_time)
 {
     struct stat file_stat
     {
@@ -156,7 +151,7 @@ bool OpenGLWrapper::has_shader_file_changed(const std::string &file_path, time_t
     return false;
 }
 
-std::vector<GLfloat> OpenGLWrapper::parse_vertices_from_shader(const std::string &shader_path)
+std::vector<GLfloat> OpenGLWrapper::get_vertices_from_glsl_file(const std::string &shader_path)
 {
     std::ifstream file(shader_path);
     std::stringstream buf;
@@ -184,26 +179,21 @@ std::vector<GLfloat> OpenGLWrapper::parse_vertices_from_shader(const std::string
     return vertices;
 }
 
-GLuint OpenGLWrapper::compile_shader(GLenum shader_type, const GLchar *shader_content)
+GLuint OpenGLWrapper::get_compiled_shader(GLenum shader_type, const GLchar *shader_content)
 {
     GLenum result_shader = glCreateShader(shader_type);
-    OpenGLWrapper::listen_opengl_errors();
 
     glShaderSource(result_shader, 1, &shader_content, nullptr);
-    OpenGLWrapper::listen_opengl_errors();
 
     glCompileShader(result_shader);
-    OpenGLWrapper::listen_opengl_errors();
 
     GLint success;
     glGetShaderiv(result_shader, GL_COMPILE_STATUS, &success);
-    OpenGLWrapper::listen_opengl_errors();
 
     if (!success)
     {
         GLchar info_log[k_info_log_size];
         glGetShaderInfoLog(result_shader, 512, nullptr, info_log);
-        OpenGLWrapper::listen_opengl_errors();
 
         std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n" << info_log << std::endl;
         throw std::runtime_error("Failed to compile shader");
@@ -215,27 +205,23 @@ GLuint OpenGLWrapper::compile_shader(GLenum shader_type, const GLchar *shader_co
 void OpenGLWrapper::link_shader_program(GLuint program)
 {
     glLinkProgram(program);
-    OpenGLWrapper::listen_opengl_errors();
 
     GLint success;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
-    OpenGLWrapper::listen_opengl_errors();
 
     if (!success)
     {
         GLchar info_log[k_info_log_size];
         glGetProgramInfoLog(program, 512, nullptr, info_log);
-        OpenGLWrapper::listen_opengl_errors();
 
         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log << std::endl;
         throw std::runtime_error("Failed to link shader");
     }
 }
 
-GLuint OpenGLWrapper::create_program()
+GLuint OpenGLWrapper::get_new_program()
 {
     GLuint program = glCreateProgram();
-    OpenGLWrapper::listen_opengl_errors();
 
     if (program == 0)
     {
@@ -248,23 +234,19 @@ GLuint OpenGLWrapper::create_program()
 void OpenGLWrapper::attach_shader(GLuint program, GLuint shader)
 {
     glAttachShader(program, shader);
-    OpenGLWrapper::listen_opengl_errors();
 }
 
 void OpenGLWrapper::delete_shader(GLuint shader)
 {
     glDeleteShader(shader);
-    OpenGLWrapper::listen_opengl_errors();
 }
 
-void OpenGLWrapper::generate_vertex_array(GLsizei n, GLuint *arrays)
+void OpenGLWrapper::generate_vertex_array(GLsizei generated_names_amount, GLuint *buffer_array)
 {
-    glGenVertexArrays(n, arrays);
-    OpenGLWrapper::listen_opengl_errors();
+    glGenVertexArrays(generated_names_amount, buffer_array);
 }
 
-void OpenGLWrapper::generate_buffer_object_name(GLsizei n, GLuint *arrays)
+void OpenGLWrapper::generate_buffer_object_name(GLsizei generated_names_amount, GLuint *buffer_array)
 {
-    glGenBuffers(n, arrays);
-    OpenGLWrapper::listen_opengl_errors();
+    glGenBuffers(generated_names_amount, buffer_array);
 }

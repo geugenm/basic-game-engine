@@ -49,8 +49,8 @@ public:
 
     void compile_and_link()
     {
-        const std::string vertex_file_content   = OpenGLWrapper::get_file_content(vertex_shader_path_);
-        const std::string fragment_file_content = OpenGLWrapper::get_file_content(fragment_shader_path);
+        const std::string vertex_file_content;
+        const std::string fragment_file_content;
 
         const GLchar *vertex_content   = vertex_file_content.data();
         const GLchar *fragment_content = fragment_file_content.data();
@@ -90,16 +90,12 @@ public:
         }
 
         glDeleteVertexArrays(1, &VAO_);
-        OpenGLWrapper::listen_opengl_errors();
 
         glDeleteBuffers(1, &VBO_);
-        OpenGLWrapper::listen_opengl_errors();
 
         glDeleteBuffers(1, &EBO_);
-        OpenGLWrapper::listen_opengl_errors();
 
         glDeleteProgram(shader_program_id_);
-        OpenGLWrapper::listen_opengl_errors();
     }
 
     template <typename... Args> void render(Args &&...args)
@@ -190,13 +186,13 @@ public:
 protected:
     void compile_impl(const GLchar *vertex_content, const GLchar *fragment_content)
     {
-        vertex_shader_id_   = OpenGLWrapper::compile_shader(GL_VERTEX_SHADER, vertex_content);
-        fragment_shader_id_ = OpenGLWrapper::compile_shader(GL_FRAGMENT_SHADER, fragment_content);
+        vertex_shader_id_   = OpenGLWrapper::get_compiled_shader(GL_VERTEX_SHADER, vertex_content);
+        fragment_shader_id_ = OpenGLWrapper::get_compiled_shader(GL_FRAGMENT_SHADER, fragment_content);
     }
 
     void link_impl()
     {
-        shader_program_id_ = OpenGLWrapper::create_program();
+        shader_program_id_ = OpenGLWrapper::get_new_program();
 
         OpenGLWrapper::attach_shader(shader_program_id_, vertex_shader_id_);
         OpenGLWrapper::attach_shader(shader_program_id_, fragment_shader_id_);
@@ -239,7 +235,6 @@ public:
     void bind_buffer_impl()
     {
         glBindVertexArray(get_vao());
-        OpenGLWrapper::listen_opengl_errors();
 
         Triangle2D vertices;
         vertices._vertices[0] = Vector2f{0.f, 0.2f};
@@ -252,50 +247,50 @@ public:
         };
 
         glBindBuffer(GL_ARRAY_BUFFER, get_vbo());
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices._vertices), vertices._vertices, GL_STREAM_DRAW);
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, get_ebo());
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glEnableVertexAttribArray(0);
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glBindVertexArray(0);
-        OpenGLWrapper::listen_opengl_errors();
+        
     }
 
     void render_impl()
     {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glClear(GL_COLOR_BUFFER_BIT);
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glUseProgram(get_shader_program_id());
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glBindVertexArray(get_vao());
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-        OpenGLWrapper::listen_opengl_errors();
+        
 
         glBindVertexArray(0);
-        OpenGLWrapper::listen_opengl_errors();
+        
     }
 };
 
