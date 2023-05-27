@@ -19,7 +19,7 @@
         https://glad.dav1d.de/#profile=core&language=c-debug&specification=gl&loader=on&api=gles2%3D3.2
 */
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

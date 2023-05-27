@@ -1,5 +1,5 @@
-#include "../src/sdl/opengl_functions.hxx"
 #include "abstract_engine.hxx"
+#include "opengl_functions.hxx"
 #include <gtest/gtest.h>
 
 class MyEngine : public Engine::Instance<MyEngine>

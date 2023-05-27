@@ -1,6 +1,6 @@
+#include "opengl_functions.hxx"
 #include <glad/glad.h>
 #include <gtest/gtest.h>
-#include <opengl_functions.hxx>
 #include <sdl_shader.hxx>
 
 class OpenGLShaderTest : public ::testing::Test

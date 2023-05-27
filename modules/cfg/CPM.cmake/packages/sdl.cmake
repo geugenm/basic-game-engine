@@ -6,18 +6,23 @@ CPMAddPackage(
         GIT_TAG fd42a2f994c73e6c87b3eebfddd3a2d6829492af
         OPTIONS
         "SDL_ATOMIC OFF"
+
         "SDL_STATIC ON"
         "SDL_SHARED ON"
+
         "SDL_VIRTUAL_JOYSTICK OFF"
         "SDL_HIDAPI_JOYSTICK OFF"
         "SDL_HAPTIC OFF"
         "SDL_JOYSTICK ON"
-        "SDL_CCACHE OFF"
+
+        "SDL_CCACHE ON"
+
         "SDL_WAYLAND OFF"
         "SDL_WAYLAND_LIBDECOR OFF"
         "SDL_WAYLAND_LIBDECOR_SHARED OFF"
         "SDL_WAYLAND_QT_TOUCH OFF"
         "SDL_WAYLAND_SHARED OFF"
+
         "SDL_X11 ON"
         "SDL_X11_SHARED ON"
         "SDL_X11_XCURSOR OFF"
@@ -28,5 +33,17 @@ CPMAddPackage(
         "SDL_X11_XSCRNSAVER OFF"
         "SDL_X11_XSHAPE OFF"
         "X11_LIB ON"
-)
 
+        "SDL_DISABLE_INSTALL OFF"
+        "SDL_DISABLE_INSTALL_CPACK OFF"
+        "SDL_DISABLE_INSTALL_MAN OFF"
+        "SDL_DISABLE_UNINSTALL OFF"
+
+        "SDL_VULKAN OFF"
+        "SDL_ASSEMBLY OFF"
+
+        "SDL_TEST ON"
+        "SDL_TESTS ON"
+
+        "SDL_ROCKCHIP OFF"
+)

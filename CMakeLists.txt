@@ -33,12 +33,6 @@ target_include_directories(engine-includes INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
         )
 
-add_library(opengl-includes INTERFACE)
-target_include_directories(opengl-includes INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include/opengl
-        )
-
-
 add_library(imgui-engine)
 target_include_directories(imgui-engine PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/imgui")
 
@@ -51,22 +45,22 @@ target_compile_definitions(imgui-engine PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
 target_link_libraries(imgui-engine PUBLIC opengl-glad
         SDL3::SDL3-shared
         engine-includes
-        opengl-includes
+        opengl-glad
         imgui)
 
 
 # Add OpenGL glad library
 add_library(opengl-glad)
 target_sources(opengl-glad
-        PRIVATE src/glad.c
+        PRIVATE src/opengl/glad.c
         )
-target_link_libraries(opengl-glad PUBLIC opengl-includes)
+target_include_directories(opengl-glad PUBLIC src/opengl)
 
 
 add_library(sdl-engine)
 target_sources(sdl-engine PRIVATE
         src/sdl/misc/dll_reloader.cxx
-        src/sdl/opengl_functions.cxx
+        src/opengl/opengl_functions.cxx
         src/sdl/sdl_engine.cxx
         src/sdl/sdl_shader.cxx
         src/sdl/sdl_texture.cxx)
@@ -92,7 +86,7 @@ if (BUILD_TESTS)
     enable_testing()
 
     add_test_executable(test_sdl_static_compilation test/test_sdl_general.cxx)
-    target_link_libraries(test_sdl_static_compilation PRIVATE SDL3::SDL3-static)
+    target_link_libraries(test_sdl_static_compilation PRIVATE SDL3::SDL3-shared)
 
     add_test_executable(test_sdl_shared_compilation test/test_sdl_general.cxx)
     target_link_libraries(test_sdl_shared_compilation PRIVATE SDL3::SDL3-shared)
