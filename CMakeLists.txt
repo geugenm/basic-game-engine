@@ -106,6 +106,9 @@ if (BUILD_TESTS)
     add_test_executable(test_imgui test/test_imgui_general.cxx)
     target_link_libraries(test_imgui PRIVATE sdl-engine imgui-engine)
 
+    add_test_executable(test_imgui_interaction test/test_imgui_engine_interaction.cxx)
+    target_link_libraries(test_imgui_interaction PRIVATE sdl-engine imgui-engine)
+
     set(NON_CPP_EXTENSIONS glsl png)
 
     foreach (EXTENSION ${NON_CPP_EXTENSIONS})

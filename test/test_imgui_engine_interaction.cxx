@@ -1,8 +1,9 @@
 #include "abstract_engine.hxx"
+#include "imgui_wrapper.hxx"
 #include "opengl_functions.hxx"
-#include <gtest/gtest.h>
 
 #include <fstream>
+#include <gtest/gtest.h>
 
 std::string get_file_content(const std::string &file_path)
 {
@@ -56,6 +57,8 @@ public:
             SDL_Quit();
             FAIL();
         }
+
+        ImWrapper::init_imgui(window_, context_);
 
         compile_shaders();
         init_buffers();
@@ -114,6 +117,12 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(0);
+
+        ImWrapper::new_frame();
+
+        ImGui::ShowDemoWindow();
+
+        ImWrapper::render();
 
         SDL_GL_SwapWindow(window_);
     }
@@ -194,6 +203,7 @@ TEST(TriangleTest, LavaLampTriangle)
     {
         while (SDL_PollEvent(&event))
         {
+            ImWrapper::process_event(event);
             if (event.type == SDL_EVENT_QUIT)
             {
                 goto cleanup;
