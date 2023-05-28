@@ -107,9 +107,8 @@ TEST(SDLEngineTest, Init)
     GLuint texture;
     glGenTextures(1, &texture);
 
-    glBindTexture(GL_TEXTURE_2D,
-                  texture); // All upcoming GL_TEXTURE_2D operations now have
-                            // effect on this texture object
+    // All upcoming GL_TEXTURE_2D operations now have an effect on this texture object
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     // Set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

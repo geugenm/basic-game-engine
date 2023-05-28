@@ -32,6 +32,25 @@ std::string get_file_content(const std::string &file_path)
     return content;
 }
 
+bool file_was_modified(const char *file_path)
+{
+    std::time_t last_modified_time = 0;
+    std::ifstream file_stream(file_path, std::ios::in | std::ios::binary);
+
+    if (!file_stream.is_open())
+    {
+        throw std::invalid_argument(
+            std::string(file_path) +
+            ": was not found, can't check if it was modified.");
+    }
+
+    file_stream.seekg(0, std::ios::end);
+    last_modified_time = file_stream.tellg();
+    file_stream.close();
+
+    return last_modified_time != 0;
+}
+
 struct Vector2f
 {
     Vector2f() : x(0.f), y(0.f) {}
@@ -53,6 +72,9 @@ struct Triangle2D
     Vector2f _vertices[3];
 };
 
+
+
+
 template <typename Derived>
 class OpenGLShader : public AbstractEngine::IShader<OpenGLShader<Derived>>
 {
@@ -60,12 +82,16 @@ public:
     void initialize_impl(const std::filesystem::path &vertex_path,
                          const std::filesystem::path &fragment_path)
     {
-        if (!exists(vertex_path)) {
-            throw std::invalid_argument("Given vertex shader source path is not exist");
+        if (!exists(vertex_path))
+        {
+            throw std::invalid_argument(
+                "Given vertex shader source path is not exist");
         }
 
-        if (!exists(fragment_path)) {
-            throw std::invalid_argument("Given fragment shader source path is not exist");
+        if (!exists(fragment_path))
+        {
+            throw std::invalid_argument(
+                "Given fragment shader source path is not exist");
         }
 
         vertex_shader_path_  = vertex_path;
@@ -76,8 +102,10 @@ public:
 
     void compile_and_link()
     {
-        const std::string vertex_file_content = get_file_content(vertex_shader_path_);
-        const std::string fragment_file_content = get_file_content(fragment_shader_path);
+        const std::string vertex_file_content =
+            get_file_content(vertex_shader_path_);
+        const std::string fragment_file_content =
+            get_file_content(fragment_shader_path);
 
         const GLchar *vertex_content   = vertex_file_content.data();
         const GLchar *fragment_content = fragment_file_content.data();

@@ -131,7 +131,6 @@ public:
 
         ImWrapper::render();
 
-
         SDL_GL_SwapWindow(window_);
     }
 
@@ -151,17 +150,6 @@ public:
     }
 
 private:
-    SDL_Window *window_    = nullptr;
-    SDL_GLContext context_ = nullptr;
-    GLuint program_id_     = 0;
-
-    static constexpr std::string_view k_vertex_shader_path_ =
-        "shaders/triangle_vertex.glsl";
-    static constexpr std::string_view k_fragment_shader_path_ =
-        "shaders/triangle_fragment.glsl";
-
-    GLuint VBO_, VAO_;
-
     void compile_shaders()
     {
         GLuint vertexShader = OpenGLWrapper::get_shader_from_file(
@@ -196,6 +184,17 @@ private:
 
         glBindVertexArray(0);
     }
+
+    SDL_Window *window_    = nullptr;
+    SDL_GLContext context_ = nullptr;
+    GLuint program_id_     = 0;
+
+    static constexpr std::string_view k_vertex_shader_path_ =
+        "shaders/triangle_vertex.glsl";
+    static constexpr std::string_view k_fragment_shader_path_ =
+        "shaders/triangle_fragment.glsl";
+
+    GLuint VBO_, VAO_;
 };
 
 template <> Engine::Instance<MyEngine> *Engine::create_instance()
