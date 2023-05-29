@@ -15,14 +15,14 @@ constexpr uint16_t k_opengl_major_version = 3;
 constexpr uint16_t k_opengl_minor_version = 2;
 constexpr uint32_t k_info_log_size        = 512;
 
-bool init_sdl();
+void init_sdl();
 
 SDL_Window *get_new_sdl_window(const char *window_title, const int &height,
                                const int &width);
 
 SDL_GLContext get_new_sdl_gl_context(SDL_Window *window);
 
-bool load_opengl_functions();
+void load_opengl_functions();
 
 bool is_opengl_version_supported();
 
@@ -67,5 +67,9 @@ void generate_vertex_array(GLsizei generated_names_amount,
 
 void generate_buffer_object_name(GLsizei generated_names_amount,
                                  GLuint *buffer_array);
+
+void unbind_vertex_array();
+
+void disable_vertex_attribute_array();
 
 } // namespace OpenGLWrapper

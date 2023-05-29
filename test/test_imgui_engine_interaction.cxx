@@ -4,8 +4,6 @@
 
 #include "open_gl_shader.hxx"
 
-#include "tahoma.h"
-
 #include <fstream>
 #include <gtest/gtest.h>
 
@@ -16,10 +14,7 @@ public:
 
     void initialize_impl()
     {
-        if (!OpenGLWrapper::init_sdl())
-        {
-            FAIL();
-        }
+        OpenGLWrapper::init_sdl();
 
         window_ = OpenGLWrapper::get_new_sdl_window("Test", 1000, 1000);
         if (!window_)
@@ -36,22 +31,9 @@ public:
             FAIL();
         }
 
-        if (!OpenGLWrapper::load_opengl_functions() ||
-            !OpenGLWrapper::is_opengl_version_supported())
-        {
-            SDL_GL_DeleteContext(context_);
-            SDL_DestroyWindow(window_);
-            SDL_Quit();
-            FAIL();
-        }
+        OpenGLWrapper::init_opengl();
 
         ImWrapper::init_imgui(window_, context_);
-
-        ImGuiIO *io = &ImGui::GetIO();
-        ImFontConfig font_cfg;
-        font_cfg.FontDataOwnedByAtlas = false;
-        io->Fonts->AddFontFromMemoryTTF((void *)tahoma, sizeof(tahoma), 17.f,
-                                        &font_cfg);
 
         shader_ = new OpenGLWrapper::Shader(k_vertex_shader_path_.data(),
                                             k_fragment_shader_path_.data());
@@ -73,9 +55,7 @@ public:
         {
             glDeleteProgram(shader_->get_program_id());
 
-            delete shader_;
-            shader_ = new OpenGLWrapper::Shader(k_vertex_shader_path_.data(),
-                                                k_fragment_shader_path_.data());
+            shader_->recompile();
         }
     }
 
@@ -84,7 +64,7 @@ public:
         shader_change_daemon();
 
         const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        GLint timeLoc    = glGetUniformLocation(shader_->get_program_id(), "time");
+        GLint timeLoc = glGetUniformLocation(shader_->get_program_id(), "time");
         glUniform1f(timeLoc, time);
 
         // Update the vertex buffer with the new vertices
@@ -96,11 +76,11 @@ public:
         glBindVertexArray(VAO_);
 
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
-                              (GLvoid *)nullptr);
+                              static_cast<GLvoid *>(nullptr));
 
         glEnableVertexAttribArray(0);
 
-        glBindVertexArray(0);
+        OpenGLWrapper::unbind_vertex_array();
 
         // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
@@ -111,7 +91,8 @@ public:
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glBindVertexArray(0);
+        OpenGLWrapper::unbind_vertex_array();
+
 
         ImWrapper::new_frame();
 
@@ -149,11 +130,11 @@ private:
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
 
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
-                              (GLvoid *)nullptr);
+                              static_cast<GLvoid *>(nullptr));
 
-        glEnableVertexAttribArray(0);
+        OpenGLWrapper::disable_vertex_attribute_array();
 
-        glBindVertexArray(0);
+        OpenGLWrapper::unbind_vertex_array();
     }
 
     SDL_Window *window_    = nullptr;

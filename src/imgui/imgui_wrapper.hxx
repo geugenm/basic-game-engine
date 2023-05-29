@@ -6,6 +6,8 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
 
+#include "tahoma.h"
+
 namespace ImWrapper
 {
 
@@ -42,6 +44,13 @@ void setup_style(bool is_dark, float alpha)
     style.WindowRounding   = 6.0f;
     style.FrameRounding    = 3.0f;
     style.Alpha            = 1.0f;
+
+
+    ImGuiIO *io = &ImGui::GetIO();
+    ImFontConfig font_cfg;
+    font_cfg.FontDataOwnedByAtlas = false;
+    io->Fonts->AddFontFromMemoryTTF((void *)tahoma, sizeof(tahoma), 17.f,
+                                    &font_cfg);
 }
 
 void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
