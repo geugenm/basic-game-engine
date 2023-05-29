@@ -7,18 +7,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "open_gl_shader.hxx"
+#include "render/picopng.hxx"
+
 TEST(SDLEngineTest, Init)
 {
     const char *window_title        = "TestSDLEngine";
     constexpr int32_t window_height = 1000;
     constexpr int32_t window_width  = 1000;
-    Engine::Instance<SDL::Engine> *engine = Engine::create_instance<SDL::Engine>();
-    engine->initialize(window_title, window_height,
-                                       window_width);
+    Engine::Instance<SDL::Engine> *engine =
+        Engine::create_instance<SDL::Engine>();
+    engine->initialize(window_title, window_height, window_width);
 
-    SDL::SomeShader shader;
-    shader.initialize_impl("shaders/texture_vertex.glsl",
-                           "shaders/texture_fragment.glsl");
+    OpenGLWrapper::Shader shader("shaders/texture_vertex.glsl",
+                                 "shaders/texture_fragment.glsl");
 
     // Set up vertex data (and buffer(s)) and attribute pointers
     GLfloat vertices[] = {
@@ -81,7 +83,7 @@ TEST(SDLEngineTest, Init)
     std::streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    std::vector<unsigned char> buffer(size);
+    std::vector<unsigned char> buffer(static_cast<unsigned long>(size));
     if (!file.read(reinterpret_cast<char *>(buffer.data()), size))
     {
         throw std::runtime_error("Failed to read PNG image");
@@ -107,7 +109,8 @@ TEST(SDLEngineTest, Init)
     GLuint texture;
     glGenTextures(1, &texture);
 
-    // All upcoming GL_TEXTURE_2D operations now have an effect on this texture object
+    // All upcoming GL_TEXTURE_2D operations now have an effect on this texture
+    // object
     glBindTexture(GL_TEXTURE_2D, texture);
 
     // Set texture filtering parameters
@@ -124,8 +127,7 @@ TEST(SDLEngineTest, Init)
                   0); // Unbind texture when done, so we won't accidentily mess
                       // up our texture.
 
-    auto transformLoc = static_cast<GLint>(
-        glGetUniformLocation(shader.get_shader_program_id(), "transform"));
+    auto transformLoc = shader.get_uniform_location("transform");
 
     SDL_Event event;
     while (true)
@@ -145,12 +147,12 @@ TEST(SDLEngineTest, Init)
         glBindTexture(GL_TEXTURE_2D, texture);
 
         GLint textureUniformLocation =
-            glGetUniformLocation(shader.get_shader_program_id(), "ourTexture");
+            glGetUniformLocation(shader.get_program_id(), "ourTexture");
 
         glUniform1i(textureUniformLocation,
                     0); // Set the texture uniform to use texture unit 0
 
-        shader.render();
+        shader.use();
 
         glm::mat4 transform = glm::mat4(1.0f);
         const float time    = static_cast<float>(SDL_GetTicks()) / 1000.0f;
@@ -165,7 +167,7 @@ TEST(SDLEngineTest, Init)
 
         glBindVertexArray(VAO);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         glBindVertexArray(0);
 

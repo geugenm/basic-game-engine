@@ -61,7 +61,7 @@ void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    setup_style(true, 0.8);
+    setup_style(true, 0.8f);
 
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 150 core");

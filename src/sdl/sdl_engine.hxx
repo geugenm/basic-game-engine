@@ -1,7 +1,6 @@
 #pragma once
 
 #include "opengl_functions.hxx"
-#include "sdl_shader.hxx"
 #include <abstract_engine.hxx>
 
 #include <glad/glad.h>
@@ -15,10 +14,7 @@ public:
     void initialize_impl(const char *window_title, const int &height,
                          const int width)
     {
-        if (!OpenGLWrapper::init_sdl())
-        {
-            throw std::invalid_argument("Failed to init sdl");
-        }
+        OpenGLWrapper::init_sdl();
 
         window_ =
             OpenGLWrapper::get_new_sdl_window(window_title, height, width);
@@ -36,14 +32,7 @@ public:
             throw std::invalid_argument("Failed to create OpenGL context");
         }
 
-        if (!OpenGLWrapper::load_opengl_functions() ||
-            !OpenGLWrapper::is_opengl_version_supported())
-        {
-            SDL_GL_DeleteContext(context_);
-            SDL_DestroyWindow(window_);
-            SDL_Quit();
-            throw std::invalid_argument("Failed to load opengl");
-        }
+        OpenGLWrapper::init_opengl();
     }
 
     void render_impl()

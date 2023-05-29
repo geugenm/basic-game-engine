@@ -32,6 +32,16 @@ public:
         return program_id_;
     }
 
+    [[nodiscard]] GLint get_uniform_location(const char * uniform_name) const {
+        const GLint uniform_location = glGetUniformLocation(get_program_id(), uniform_name);
+
+        if (uniform_location == -1) {
+            throw std::invalid_argument("Given uniform is not found.");
+        }
+
+        return uniform_location;
+    }
+
     ~Shader() = default;
 
 private:

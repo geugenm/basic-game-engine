@@ -43,14 +43,10 @@ public:
 
     void render_impl(const GLfloat vertices[], long vertices_size)
     {
-        if (shader_ == nullptr) {
-            throw std::runtime_error("Shader is not initialized.");
-        }
-
         shader_change_daemon();
 
         const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        const GLint timeLoc = glGetUniformLocation(shader_->get_program_id(), "time");
+        const GLint timeLoc = shader_->get_uniform_location("time");
         glUniform1f(timeLoc, time);
 
         // Update the vertex buffer with the new vertices
@@ -97,6 +93,7 @@ public:
 
         if (shader_ != nullptr) {
             glDeleteProgram(shader_->get_program_id());
+            delete shader_;
         }
 
         ImWrapper::destroy();

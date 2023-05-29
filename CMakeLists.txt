@@ -61,7 +61,7 @@ add_library(sdl-engine)
 target_sources(
         sdl-engine
         PRIVATE src/sdl/misc/dll_reloader.cxx src/opengl/opengl_functions.cxx
-        src/sdl/sdl_engine.cxx src/sdl/sdl_shader.cxx src/sdl/sdl_texture.cxx)
+        src/sdl/sdl_engine.cxx src/sdl/sdl_texture.cxx)
 target_link_libraries(sdl-engine PUBLIC SDL3::SDL3-shared opengl-glad
         engine-includes)
 target_include_directories(
