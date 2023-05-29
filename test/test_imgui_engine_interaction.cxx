@@ -41,30 +41,16 @@ public:
         init_buffers();
     }
 
-    void shader_change_daemon()
-    {
-        static std::time_t vertex_shader_last_modified   = 0;
-        static std::time_t fragment_shader_last_modified = 0;
-
-        bool vertex_shader_changed = OpenGLWrapper::file_has_changed(
-            k_vertex_shader_path_.data(), vertex_shader_last_modified);
-        bool fragment_shader_changed = OpenGLWrapper::file_has_changed(
-            k_fragment_shader_path_.data(), fragment_shader_last_modified);
-
-        if (vertex_shader_changed || fragment_shader_changed)
-        {
-            glDeleteProgram(shader_->get_program_id());
-
-            shader_->recompile();
-        }
-    }
-
     void render_impl(const GLfloat vertices[], long vertices_size)
     {
+        if (shader_ == nullptr) {
+            throw std::runtime_error("Shader is not initialized.");
+        }
+
         shader_change_daemon();
 
         const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        GLint timeLoc = glGetUniformLocation(shader_->get_program_id(), "time");
+        const GLint timeLoc = glGetUniformLocation(shader_->get_program_id(), "time");
         glUniform1f(timeLoc, time);
 
         // Update the vertex buffer with the new vertices
@@ -78,7 +64,7 @@ public:
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
                               static_cast<GLvoid *>(nullptr));
 
-        glEnableVertexAttribArray(0);
+        OpenGLWrapper::disable_vertex_attribute_array();
 
         OpenGLWrapper::unbind_vertex_array();
 
@@ -109,7 +95,9 @@ public:
 
         glDeleteBuffers(1, &VBO_);
 
-        glDeleteProgram(shader_->get_program_id());
+        if (shader_ != nullptr) {
+            glDeleteProgram(shader_->get_program_id());
+        }
 
         ImWrapper::destroy();
 
@@ -119,6 +107,24 @@ public:
     }
 
 private:
+    void shader_change_daemon()
+    {
+        static std::time_t vertex_shader_last_modified   = 0;
+        static std::time_t fragment_shader_last_modified = 0;
+
+        const bool vertex_shader_changed = OpenGLWrapper::file_has_changed(
+            k_vertex_shader_path_.data(), vertex_shader_last_modified);
+        const bool fragment_shader_changed = OpenGLWrapper::file_has_changed(
+            k_fragment_shader_path_.data(), fragment_shader_last_modified);
+
+        if (vertex_shader_changed || fragment_shader_changed)
+        {
+            glDeleteProgram(shader_->get_program_id());
+
+            shader_->recompile();
+        }
+    }
+
     void init_buffers()
     {
         glGenVertexArrays(1, &VAO_);
@@ -140,14 +146,15 @@ private:
     SDL_Window *window_    = nullptr;
     SDL_GLContext context_ = nullptr;
 
-    OpenGLWrapper::Shader *shader_;
+    OpenGLWrapper::Shader *shader_ = nullptr;
 
     static constexpr std::string_view k_vertex_shader_path_ =
         "shaders/triangle_vertex.glsl";
     static constexpr std::string_view k_fragment_shader_path_ =
         "shaders/triangle_fragment.glsl";
 
-    GLuint VBO_, VAO_;
+    GLuint VBO_{};
+    GLuint VAO_{};
 };
 
 template <> Engine::Instance<MyEngine> *Engine::create_instance()
