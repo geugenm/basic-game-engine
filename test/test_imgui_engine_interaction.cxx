@@ -45,10 +45,6 @@ public:
     {
         shader_change_daemon();
 
-        const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        const GLint timeLoc = shader_->get_uniform_location("time");
-        glUniform1f(timeLoc, time);
-
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
 
@@ -67,7 +63,11 @@ public:
         // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shader_->get_program_id());
+        shader_->use();
+
+        const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
+        const GLint timeLoc = shader_->get_uniform_location("time");
+        glUniform1f(timeLoc, time);
 
         glBindVertexArray(VAO_);
 

@@ -70,6 +70,8 @@ void generate_buffer_object_name(GLsizei generated_names_amount,
 
 void unbind_vertex_array();
 
+void unbind_texture(GLenum texture_type);
+
 void disable_vertex_attribute_array();
 
 } // namespace OpenGLWrapper

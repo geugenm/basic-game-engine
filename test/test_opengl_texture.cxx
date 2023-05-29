@@ -71,7 +71,7 @@ TEST(SDLEngineTest, Init)
 
     glEnableVertexAttribArray(2);
 
-    glBindVertexArray(0); // Unbind VAO
+    OpenGLWrapper::unbind_vertex_array();
 
     std::ifstream file("textures/texture.png",
                        std::ios::binary | std::ios::ate);
@@ -123,9 +123,7 @@ TEST(SDLEngineTest, Init)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, png_data.data());
 
-    glBindTexture(GL_TEXTURE_2D,
-                  0); // Unbind texture when done, so we won't accidentily mess
-                      // up our texture.
+    OpenGLWrapper::unbind_texture(GL_TEXTURE_2D);
 
     auto transformLoc = shader.get_uniform_location("transform");
 
@@ -146,13 +144,14 @@ TEST(SDLEngineTest, Init)
 
         glBindTexture(GL_TEXTURE_2D, texture);
 
+        shader.use();
+
         GLint textureUniformLocation =
             glGetUniformLocation(shader.get_program_id(), "ourTexture");
 
         glUniform1i(textureUniformLocation,
                     0); // Set the texture uniform to use texture unit 0
 
-        shader.use();
 
         glm::mat4 transform = glm::mat4(1.0f);
         const float time    = static_cast<float>(SDL_GetTicks()) / 1000.0f;
@@ -169,7 +168,7 @@ TEST(SDLEngineTest, Init)
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-        glBindVertexArray(0);
+        OpenGLWrapper::unbind_vertex_array();
 
         engine->render();
     }

@@ -359,3 +359,8 @@ void OpenGLWrapper::disable_vertex_attribute_array()
 {
     glEnableVertexAttribArray(0);
 }
+
+void OpenGLWrapper::unbind_texture(GLenum texture_type)
+{
+    glBindTexture(texture_type,0);
+}
