@@ -8,12 +8,12 @@
 namespace OpenGLWrapper
 {
 
-class OpenGLShader
+class Shader
 {
 public:
     GLuint program_;
 
-    OpenGLShader(const GLchar *vertex_path, const GLchar *fragment_path)
+    Shader(const GLchar *vertex_path, const GLchar *fragment_path)
     {
         // 1. Получаем исходный код шейдера из filePath
         std::string vertexCode;
@@ -39,7 +39,7 @@ public:
             vertexCode   = vShaderStream.str();
             fragmentCode = fShaderStream.str();
         }
-        catch (std::ifstream::failure e)
+        catch (std::ifstream::failure & e)
         {
             std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ"
                       << std::endl;
@@ -102,7 +102,7 @@ public:
         glUseProgram(program_);
     }
 
-    ~OpenGLShader() = default;
+    ~Shader() = default;
 };
 
 } // namespace OpenGLWrapper

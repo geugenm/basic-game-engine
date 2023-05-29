@@ -2,6 +2,8 @@
 #include "imgui_wrapper.hxx"
 #include "opengl_functions.hxx"
 
+#include "open_gl_shader.hxx"
+
 #include "tahoma.h"
 
 #include <fstream>
@@ -62,14 +64,15 @@ public:
 
         ImWrapper::init_imgui(window_, context_);
 
-
-        ImGuiIO* io = &ImGui::GetIO();
+        ImGuiIO *io = &ImGui::GetIO();
         ImFontConfig font_cfg;
         font_cfg.FontDataOwnedByAtlas = false;
-        io->Fonts->AddFontFromMemoryTTF((void*)tahoma, sizeof(tahoma), 17.f, &font_cfg);
+        io->Fonts->AddFontFromMemoryTTF((void *)tahoma, sizeof(tahoma), 17.f,
+                                        &font_cfg);
 
+        shader_ = new OpenGLWrapper::Shader(k_vertex_shader_path_.data(),
+                                            k_fragment_shader_path_.data());
 
-        compile_shaders();
         init_buffers();
     }
 
@@ -85,9 +88,10 @@ public:
 
         if (vertex_shader_changed || fragment_shader_changed)
         {
-            glDeleteProgram(program_id_);
+            glDeleteProgram(shader_->program_);
 
-            compile_shaders();
+            shader_ = new OpenGLWrapper::Shader(k_vertex_shader_path_.data(),
+                                                k_fragment_shader_path_.data());
         }
     }
 
@@ -96,7 +100,7 @@ public:
         shader_change_daemon();
 
         const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        GLint timeLoc    = glGetUniformLocation(program_id_, "time");
+        GLint timeLoc    = glGetUniformLocation(shader_->program_, "time");
         glUniform1f(timeLoc, time);
 
         // Update the vertex buffer with the new vertices
@@ -117,7 +121,7 @@ public:
         // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(program_id_);
+        glUseProgram(shader_->program_);
 
         glBindVertexArray(VAO_);
 
@@ -140,7 +144,7 @@ public:
 
         glDeleteBuffers(1, &VBO_);
 
-        glDeleteProgram(program_id_);
+        glDeleteProgram(shader_->program_);
 
         ImWrapper::destroy();
 
@@ -150,23 +154,6 @@ public:
     }
 
 private:
-    void compile_shaders()
-    {
-        GLuint vertexShader = OpenGLWrapper::get_shader_from_file(
-            GL_VERTEX_SHADER, get_file_content(k_vertex_shader_path_.data()));
-        GLuint fragmentShader = OpenGLWrapper::get_shader_from_file(
-            GL_FRAGMENT_SHADER,
-            get_file_content(k_fragment_shader_path_.data()));
-
-        program_id_ = glCreateProgram();
-
-        glAttachShader(program_id_, vertexShader);
-
-        glAttachShader(program_id_, fragmentShader);
-
-        glLinkProgram(program_id_);
-    }
-
     void init_buffers()
     {
         glGenVertexArrays(1, &VAO_);
@@ -187,7 +174,8 @@ private:
 
     SDL_Window *window_    = nullptr;
     SDL_GLContext context_ = nullptr;
-    GLuint program_id_     = 0;
+
+    OpenGLWrapper::Shader *shader_;
 
     static constexpr std::string_view k_vertex_shader_path_ =
         "shaders/triangle_vertex.glsl";
