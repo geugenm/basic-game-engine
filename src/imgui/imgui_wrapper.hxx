@@ -11,7 +11,7 @@
 namespace ImWrapper
 {
 
-void setup_style(bool is_dark, float alpha)
+void setup_style(const bool & is_dark, const float & alpha)
 {
     ImGuiStyle &style = ImGui::GetStyle();
 
@@ -55,13 +55,16 @@ void setup_style(bool is_dark, float alpha)
 
 void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 {
+    if (window == nullptr) {
+        throw std::invalid_argument("Given SDL window is not initialized.");
+    }
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     setup_style(true, 0.8);
 
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+    ImGui_ImplOpenGL3_Init("#version 150 core");
 }
 
 void destroy()
