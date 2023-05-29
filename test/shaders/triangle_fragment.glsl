@@ -4,6 +4,7 @@ in vec2 vTexCoord;
 out vec4 outColor;
 
 uniform float time;
+uniform vec3 color;
 
 float noise(vec2 x) {
     vec2 p = floor(x);
@@ -35,7 +36,7 @@ void main() {
     // Add color variation
     col = mix(col, vec3(0.3, 0.6, 1.0), 0.2);
     col = mix(col, vec3(1.0, 0.3, 0.7), 0.3);
-    col = mix(col, vec3(1.0, 0.0, 0.0), 0.1);
+    col = mix(col, color, 0.1);
 
     // Add glow effect
     float glow = pow(n, 10.0);

@@ -11,7 +11,7 @@
 namespace ImWrapper
 {
 
-void setup_style(const bool & is_dark, const float & alpha)
+void setup_style(const bool &is_dark, const float &alpha)
 {
     ImGuiStyle &style = ImGui::GetStyle();
 
@@ -45,7 +45,6 @@ void setup_style(const bool & is_dark, const float & alpha)
     style.FrameRounding    = 3.0f;
     style.Alpha            = 1.0f;
 
-
     ImGuiIO *io = &ImGui::GetIO();
     ImFontConfig font_cfg;
     font_cfg.FontDataOwnedByAtlas = false;
@@ -55,9 +54,11 @@ void setup_style(const bool & is_dark, const float & alpha)
 
 void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 {
-    if (window == nullptr) {
+    if (window == nullptr)
+    {
         throw std::invalid_argument("Given SDL window is not initialized.");
     }
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -89,6 +90,23 @@ void process_event(const SDL_Event &event)
 void render()
 {
     ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void render(ImDrawData *draw_data)
+{
+    ImGuiIO &io = ImGui::GetIO();
+    const auto frame_buffer_width =
+        static_cast<size_t>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+    const auto frame_buffer_height =
+        static_cast<size_t>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+    if (frame_buffer_width == 0 || frame_buffer_height == 0)
+    {
+        return;
+    }
+
+    draw_data->ScaleClipRects(io.DisplayFramebufferScale);
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 

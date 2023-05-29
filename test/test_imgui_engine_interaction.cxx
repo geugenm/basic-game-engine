@@ -77,6 +77,14 @@ public:
 
         ImGui::ShowDemoWindow();
 
+        ImGui::Begin("Color Picker");
+        static float color[3] = {1.0f, 0.0f, 0.0f};
+        ImGui::ColorEdit3("Color", color);
+        ImGui::End();
+
+        const GLint colorLoc = shader_->get_uniform_location("color");
+        glUniform3f(colorLoc, color[0], color[1], color[2]);
+
         ImWrapper::render();
 
         SDL_GL_SwapWindow(window_);
