@@ -113,6 +113,12 @@ TEST(SDLEngineTest, Init)
     // object
     glBindTexture(GL_TEXTURE_2D, texture);
 
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                    GL_REPEAT); // set texture wrapping to GL_REPEAT (default
+                                // wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
     // Set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -124,6 +130,8 @@ TEST(SDLEngineTest, Init)
                  GL_UNSIGNED_BYTE, png_data.data());
 
     OpenGLWrapper::unbind_texture(GL_TEXTURE_2D);
+
+    shader.use();
 
     auto transformLoc = shader.get_uniform_location("transform");
 
@@ -152,7 +160,6 @@ TEST(SDLEngineTest, Init)
         glUniform1i(textureUniformLocation,
                     0); // Set the texture uniform to use texture unit 0
 
-
         glm::mat4 transform = glm::mat4(1.0f);
         const float time    = static_cast<float>(SDL_GetTicks()) / 1000.0f;
         transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
@@ -165,6 +172,8 @@ TEST(SDLEngineTest, Init)
                            glm::value_ptr(transform));
 
         glBindVertexArray(VAO);
+
+        glClear(GL_COLOR_BUFFER_BIT);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
