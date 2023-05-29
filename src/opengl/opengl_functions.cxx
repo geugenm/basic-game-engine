@@ -350,16 +350,6 @@ GLuint OpenGLWrapper::get_compiled_shader_from_file(GLenum shader_type,
     return result;
 }
 
-void OpenGLWrapper::unbind_vertex_array()
-{
-    glBindVertexArray(0);
-}
-
-void OpenGLWrapper::disable_vertex_attribute_array()
-{
-    glEnableVertexAttribArray(0);
-}
-
 void OpenGLWrapper::unbind_texture(GLenum texture_type)
 {
     glBindTexture(texture_type,0);

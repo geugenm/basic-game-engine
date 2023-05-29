@@ -19,24 +19,22 @@ public:
         window_ = OpenGLWrapper::get_new_sdl_window("Test", 1000, 1000);
         if (!window_)
         {
-            SDL_Quit();
-            FAIL();
+            throw std::invalid_argument("SDL window was not initialized.");
         }
 
         context_ = OpenGLWrapper::get_new_sdl_gl_context(window_);
         if (!context_)
         {
-            SDL_DestroyWindow(window_);
-            SDL_Quit();
-            FAIL();
+            throw std::runtime_error(
+                "OpenGL context for SDL window was not created.");
         }
 
         OpenGLWrapper::init_opengl();
 
         ImWrapper::init_imgui(window_, context_);
 
-        shader_ = new OpenGLWrapper::Shader(k_vertex_shader_path_.data(),
-                                            k_fragment_shader_path_.data());
+        shader_ = new OpenGLWrapper::Shader(k_vertex_shader_path_,
+                                            k_fragment_shader_path_);
 
         init_buffers();
     }
@@ -56,16 +54,16 @@ public:
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
                               static_cast<GLvoid *>(nullptr));
 
-        OpenGLWrapper::disable_vertex_attribute_array();
+        glEnableVertexAttribArray(0);
 
-        OpenGLWrapper::unbind_vertex_array();
+        glBindVertexArray(0);
 
         // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader_->use();
 
-        const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
+        const float time    = static_cast<float>(SDL_GetTicks()) / 1000.0f;
         const GLint timeLoc = shader_->get_uniform_location("time");
         glUniform1f(timeLoc, time);
 
@@ -73,8 +71,7 @@ public:
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        OpenGLWrapper::unbind_vertex_array();
-
+        glBindVertexArray(0);
 
         ImWrapper::new_frame();
 
@@ -91,7 +88,8 @@ public:
 
         glDeleteBuffers(1, &VBO_);
 
-        if (shader_ != nullptr) {
+        if (shader_ != nullptr)
+        {
             glDeleteProgram(shader_->get_program_id());
             delete shader_;
         }
@@ -135,9 +133,8 @@ private:
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
                               static_cast<GLvoid *>(nullptr));
 
-        OpenGLWrapper::disable_vertex_attribute_array();
-
-        OpenGLWrapper::unbind_vertex_array();
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
     }
 
     SDL_Window *window_    = nullptr;

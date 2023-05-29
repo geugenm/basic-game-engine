@@ -71,7 +71,7 @@ TEST(SDLEngineTest, Init)
 
     glEnableVertexAttribArray(2);
 
-    OpenGLWrapper::unbind_vertex_array();
+    glBindVertexArray(0);
 
     std::ifstream file("textures/texture.png",
                        std::ios::binary | std::ios::ate);
@@ -168,7 +168,7 @@ TEST(SDLEngineTest, Init)
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-        OpenGLWrapper::unbind_vertex_array();
+        glBindVertexArray(0);
 
         engine->render();
     }
