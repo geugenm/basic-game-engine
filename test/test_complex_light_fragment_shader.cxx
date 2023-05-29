@@ -53,7 +53,7 @@ TEST(ShaderTest, ShaderOutput)
 
     SDL_Window *window = OpenGLWrapper::get_new_sdl_window(
         "Test", k_window_width, k_window_height);
-    SDL_GLContext context = OpenGLWrapper::get_new_context(window);
+    SDL_GLContext context = OpenGLWrapper::get_new_sdl_gl_context(window);
 
     OpenGLWrapper::init_opengl();
     OpenGLWrapper::enable_debug_mode();

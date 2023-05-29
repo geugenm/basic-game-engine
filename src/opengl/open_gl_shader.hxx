@@ -11,98 +11,38 @@ namespace OpenGLWrapper
 class Shader
 {
 public:
-    GLuint program_;
-
     Shader(const GLchar *vertex_path, const GLchar *fragment_path)
     {
-        // 1. Получаем исходный код шейдера из filePath
-        std::string vertexCode;
-        std::string fragmentCode;
-        std::ifstream vShaderFile;
-        std::ifstream fShaderFile;
-        // Удостоверимся, что ifstream объекты могут выкидывать исключения
-        vShaderFile.exceptions(std::ifstream::badbit);
-        fShaderFile.exceptions(std::ifstream::badbit);
-        try
-        {
-            // Открываем файлы
-            vShaderFile.open(vertex_path);
-            fShaderFile.open(fragment_path);
-            std::stringstream vShaderStream, fShaderStream;
-            // Считываем данные в потоки
-            vShaderStream << vShaderFile.rdbuf();
-            fShaderStream << fShaderFile.rdbuf();
-            // Закрываем файлы
-            vShaderFile.close();
-            fShaderFile.close();
-            // Преобразовываем потоки в массив GLchar
-            vertexCode   = vShaderStream.str();
-            fragmentCode = fShaderStream.str();
-        }
-        catch (std::ifstream::failure & e)
-        {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ"
-                      << std::endl;
-        }
-        const GLchar *vShaderCode = vertexCode.c_str();
-        const GLchar *fShaderCode = fragmentCode.c_str();
+        GLuint vertex = OpenGLWrapper::get_compiled_shader_from_file(GL_VERTEX_SHADER,
+                                                                       vertex_path);
+        GLuint fragment = OpenGLWrapper::get_compiled_shader_from_file(
+            GL_FRAGMENT_SHADER, fragment_path);
 
-        // 2. Сборка шейдеров
-        GLuint vertex, fragment;
-        GLint success;
-        GLchar infoLog[512];
+        program_id_ = OpenGLWrapper::get_new_program();
 
-        // Вершинный шейдер
-        vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vShaderCode, NULL);
-        glCompileShader(vertex);
-        // Если есть ошибки - вывести их
-        glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                      << infoLog << std::endl;
-        };
+        OpenGLWrapper::attach_shader(program_id_, vertex);
+        OpenGLWrapper::attach_shader(program_id_, fragment);
 
-        // Аналогично для фрагментного шейдера
-        fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fShaderCode, NULL);
-        glCompileShader(fragment);
-        // Если есть ошибки - вывести их
-        glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                      << infoLog << std::endl;
-        };
+        OpenGLWrapper::link_shader_program(program_id_);
 
-        // Шейдерная программа
-        program_ = glCreateProgram();
-        glAttachShader(program_, vertex);
-        glAttachShader(program_, fragment);
-        glLinkProgram(program_);
-        // Если есть ошибки - вывести их
-        glGetProgramiv(program_, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(program_, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                      << infoLog << std::endl;
-        }
-
-        // Удаляем шейдеры, поскольку они уже в программу и нам больше не нужны.
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
+        OpenGLWrapper::delete_shader(vertex);
+        OpenGLWrapper::delete_shader(fragment);
     }
 
-    void use()
+    void use() const
     {
-        glUseProgram(program_);
+        glUseProgram(program_id_);
+    }
+
+    [[nodiscard]] GLuint get_program_id() const
+    {
+        return program_id_;
     }
 
     ~Shader() = default;
+
+private:
+    GLuint program_id_;
 };
 
 } // namespace OpenGLWrapper

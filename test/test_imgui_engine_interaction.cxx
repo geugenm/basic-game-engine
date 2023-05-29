@@ -9,23 +9,6 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-std::string get_file_content(const std::string &file_path)
-{
-    std::ifstream file(file_path, std::ios::in | std::ios::binary);
-    if (!file)
-    {
-        std::cerr << "Error: Unable to open file: " << file_path << std::endl;
-        return "";
-    }
-
-    std::vector<char> buffer((std::istreambuf_iterator<char>(file)),
-                             std::istreambuf_iterator<char>());
-    std::string content(buffer.begin(), buffer.end());
-    file.close();
-
-    return content;
-}
-
 class MyEngine : public Engine::Instance<MyEngine>
 {
 public:
@@ -45,7 +28,7 @@ public:
             FAIL();
         }
 
-        context_ = OpenGLWrapper::get_new_context(window_);
+        context_ = OpenGLWrapper::get_new_sdl_gl_context(window_);
         if (!context_)
         {
             SDL_DestroyWindow(window_);
@@ -88,8 +71,9 @@ public:
 
         if (vertex_shader_changed || fragment_shader_changed)
         {
-            glDeleteProgram(shader_->program_);
+            glDeleteProgram(shader_->get_program_id());
 
+            delete shader_;
             shader_ = new OpenGLWrapper::Shader(k_vertex_shader_path_.data(),
                                                 k_fragment_shader_path_.data());
         }
@@ -100,7 +84,7 @@ public:
         shader_change_daemon();
 
         const float time = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        GLint timeLoc    = glGetUniformLocation(shader_->program_, "time");
+        GLint timeLoc    = glGetUniformLocation(shader_->get_program_id(), "time");
         glUniform1f(timeLoc, time);
 
         // Update the vertex buffer with the new vertices
@@ -121,7 +105,7 @@ public:
         // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shader_->program_);
+        glUseProgram(shader_->get_program_id());
 
         glBindVertexArray(VAO_);
 
@@ -144,7 +128,7 @@ public:
 
         glDeleteBuffers(1, &VBO_);
 
-        glDeleteProgram(shader_->program_);
+        glDeleteProgram(shader_->get_program_id());
 
         ImWrapper::destroy();
 

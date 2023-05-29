@@ -41,7 +41,7 @@ SDL_Window *OpenGLWrapper::get_new_sdl_window(const char *window_title,
     return window;
 }
 
-SDL_GLContext OpenGLWrapper::get_new_context(SDL_Window *window)
+SDL_GLContext OpenGLWrapper::get_new_sdl_gl_context(SDL_Window *window)
 {
     SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context)
@@ -80,21 +80,43 @@ bool OpenGLWrapper::is_opengl_version_supported()
     return true;
 }
 
-bool OpenGLWrapper::init_opengl()
+void OpenGLWrapper::init_opengl()
 {
     if (!load_opengl_functions())
     {
-        std::cerr << "Failed to load OpenGL functions.";
-        return false;
+        throw std::runtime_error("Failed to load OpenGL functions.");
     }
 
     if (!is_opengl_version_supported())
     {
-        std::cerr << "OpenGL version is not supported.";
-        return false;
+        throw std::runtime_error("OpenGL version is not supported.");
     }
+}
 
-    return true;
+std::string OpenGLWrapper::glenum_to_string(GLenum value)
+{
+    switch (value) {
+        case GL_DEBUG_SOURCE_API: return "API";
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM: return "WINDOW_SYSTEM";
+        case GL_DEBUG_SOURCE_SHADER_COMPILER: return "SHADER_COMPILER";
+        case GL_DEBUG_SOURCE_THIRD_PARTY: return "THIRD_PARTY";
+        case GL_DEBUG_SOURCE_APPLICATION: return "APPLICATION";
+        case GL_DEBUG_SOURCE_OTHER: return "OTHER";
+        case GL_DEBUG_TYPE_ERROR: return "ERROR";
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "DEPRECATED_BEHAVIOR";
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: return "UNDEFINED_BEHAVIOR";
+        case GL_DEBUG_TYPE_PORTABILITY: return "PORTABILITY";
+        case GL_DEBUG_TYPE_PERFORMANCE: return "PERFORMANCE";
+        case GL_DEBUG_TYPE_MARKER: return "MARKER";
+        case GL_DEBUG_TYPE_PUSH_GROUP: return "PUSH_GROUP";
+        case GL_DEBUG_TYPE_POP_GROUP: return "POP_GROUP";
+        case GL_DEBUG_TYPE_OTHER: return "OTHER";
+        case GL_DEBUG_SEVERITY_HIGH: return "HIGH";
+        case GL_DEBUG_SEVERITY_MEDIUM: return "MEDIUM";
+        case GL_DEBUG_SEVERITY_LOW: return "LOW";
+        case GL_DEBUG_SEVERITY_NOTIFICATION: return "NOTIFICATION";
+        default: return "UNKNOWN";
+    }
 }
 
 void OpenGLWrapper::opengl_debug_callback(GLenum source, GLenum type, GLuint id,
@@ -102,13 +124,20 @@ void OpenGLWrapper::opengl_debug_callback(GLenum source, GLenum type, GLuint id,
                                           const GLchar *message,
                                           const void *userParam)
 {
-    std::cerr << "OpenGL Error:" << std::endl;
-    std::cerr << "  Source: " << source << std::endl;
-    std::cerr << "  Type: " << type << std::endl;
-    std::cerr << "  ID: " << id << std::endl;
-    std::cerr << "  Severity: " << severity << std::endl;
-    std::cerr << "  Message: " << message << std::endl;
-    std::cerr << std::endl;
+    std::ostringstream msg;
+    msg << "OpenGL Error:" << std::endl;
+    msg << "  Source: " << glenum_to_string(source) << std::endl;
+    msg << "  Type: " << glenum_to_string(type) << std::endl;
+    msg << "  ID: " << id << std::endl;
+    msg << "  Severity: " << glenum_to_string(severity) << std::endl;
+    msg << "  Message: " << message << std::endl;
+    msg << std::endl;
+
+    if (msg.bad()) {
+        throw std::invalid_argument("Can't print the error message: bad ostringstream");
+    }
+
+    std::cerr << msg.str() << std::flush;
 }
 
 void OpenGLWrapper::enable_debug_mode()
@@ -130,19 +159,6 @@ void OpenGLWrapper::disable_debug_mode()
         glDisable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(nullptr, nullptr);
     }
-}
-
-GLuint OpenGLWrapper::get_shader_from_file(GLenum type,
-                                           const std::string &source)
-{
-    GLuint shader = glCreateShader(type);
-
-    const char *src = source.c_str();
-    glShaderSource(shader, 1, &src, nullptr);
-
-    glCompileShader(shader);
-
-    return shader;
 }
 
 bool OpenGLWrapper::file_has_changed(const std::string &file_path,
@@ -270,4 +286,39 @@ void OpenGLWrapper::generate_buffer_object_name(GLsizei generated_names_amount,
                                                 GLuint *buffer_array)
 {
     glGenBuffers(generated_names_amount, buffer_array);
+}
+
+char *OpenGLWrapper::get_file_content(const std::string &file_path)
+{
+    std::ifstream input_file(file_path);
+
+    if (!input_file.is_open())
+    {
+        throw std::invalid_argument("Unable to open file: " + file_path);
+    }
+
+    std::string content((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
+
+    if (content.empty()) {
+        std::cerr << "Trying to read empty file: " << file_path << std::endl;
+        return nullptr;
+    }
+
+    const size_t content_size = content.size();
+    char *result = static_cast<char *>(std::malloc(content_size + 1));
+    std::copy(content.begin(), content.end(), result);
+    result[content_size] = '\0';
+
+    return result;
+}
+
+GLuint OpenGLWrapper::get_compiled_shader_from_file(GLenum shader_type,
+                                                    const char *shader_path)
+{
+    GLchar *shader_content = OpenGLWrapper::get_file_content(shader_path);
+
+    GLuint result =
+        OpenGLWrapper::get_new_compiled_shader(shader_type, shader_content);
+
+    return result;
 }

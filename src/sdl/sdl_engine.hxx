@@ -28,7 +28,7 @@ public:
             throw std::invalid_argument("Failed to create SDL window");
         }
 
-        context_ = OpenGLWrapper::get_new_context(window_);
+        context_ = OpenGLWrapper::get_new_sdl_gl_context(window_);
         if (!context_)
         {
             SDL_DestroyWindow(window_);

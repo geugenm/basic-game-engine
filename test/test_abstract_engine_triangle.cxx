@@ -40,7 +40,7 @@ public:
             FAIL();
         }
 
-        context_ = OpenGLWrapper::get_new_context(window_);
+        context_ = OpenGLWrapper::get_new_sdl_gl_context(window_);
         if (!context_)
         {
             SDL_DestroyWindow(window_);
@@ -143,9 +143,9 @@ private:
 
     void compile_shaders()
     {
-        GLuint vertexShader = OpenGLWrapper::get_shader_from_file(
+        GLuint vertexShader = OpenGLWrapper::get_compiled_shader(
             GL_VERTEX_SHADER, get_file_content(k_vertex_shader_path_.data()));
-        GLuint fragmentShader = OpenGLWrapper::get_shader_from_file(
+        GLuint fragmentShader = OpenGLWrapper::get_compiled_shader(
             GL_FRAGMENT_SHADER,
             get_file_content(k_fragment_shader_path_.data()));
 

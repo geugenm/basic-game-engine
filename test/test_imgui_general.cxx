@@ -19,7 +19,8 @@ TEST(ImGuiGeneralTest, BasicTest)
         SDL_Window *window = OpenGLWrapper::get_new_sdl_window(
             "OpenGL 3.0 SDL ImGui Test", 1280, 720);
 
-        SDL_GLContext gl_context = OpenGLWrapper::get_new_context(window);
+        SDL_GLContext gl_context =
+            OpenGLWrapper::get_new_sdl_gl_context(window);
 
         OpenGLWrapper::init_opengl();
         OpenGLWrapper::enable_debug_mode();
