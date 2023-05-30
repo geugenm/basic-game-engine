@@ -24,16 +24,20 @@ void setup_style(const bool &is_dark, const float &alpha)
         ImGui::StyleColorsLight();
     }
 
-    for (int i = 0; i <= ImGuiCol_COUNT; i++)
+    for (int color_index = 0; color_index < ImGuiCol_COUNT; color_index++)
     {
-        auto ei     = static_cast<ImGuiCol_>(i);
-        ImVec4 &col = style.Colors[i];
-        if ((ImGuiCol_ModalWindowDimBg != ei) &&
-            (ImGuiCol_NavWindowingDimBg != ei) &&
-            (col.w < 1.00f || (ImGuiCol_FrameBg == ei) ||
-             (ImGuiCol_WindowBg == ei) || (ImGuiCol_ChildBg == ei)))
+        const auto color   = static_cast<ImGuiCol>(color_index);
+        ImVec4 &color_value = style.Colors[color_index];
+
+        const bool is_background_dim_color = (color == ImGuiCol_ModalWindowDimBg ||
+                                           color == ImGuiCol_NavWindowingDimBg);
+        const bool is_transparent_or_background =
+            (color_value.w < 1.00f || color == ImGuiCol_FrameBg ||
+             color == ImGuiCol_WindowBg || color == ImGuiCol_ChildBg);
+
+        if (!is_background_dim_color && is_transparent_or_background)
         {
-            col.w = alpha * col.w;
+            color_value.w = alpha * color_value.w;
         }
     }
 
@@ -43,7 +47,15 @@ void setup_style(const bool &is_dark, const float &alpha)
     style.WindowBorderSize = 0.0f;
     style.WindowRounding   = 6.0f;
     style.FrameRounding    = 3.0f;
-    style.Alpha            = 1.0f;
+
+    style.Alpha         = 1.0f;
+    style.ChildRounding = 6;
+    style.GrabRounding  = 2;
+    style.PopupRounding = 2;
+    style.ScrollbarSize = 9;
+
+    style.FramePadding = ImVec2(6, 3);
+    style.ItemSpacing  = ImVec2(4, 4);
 
     ImGuiIO *io = &ImGui::GetIO();
     ImFontConfig font_cfg;

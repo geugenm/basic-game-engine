@@ -1,5 +1,5 @@
 # Set minimum CMake version and project details
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.23)
 project(
         project.basic_game_engine
         VERSION 1.0.0
