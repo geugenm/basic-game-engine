@@ -3,33 +3,20 @@
 #include "opengl_functions.hxx"
 
 #include "open_gl_shader.hxx"
+#include "sdl_engine.hxx"
 
 #include <fstream>
 #include <gtest/gtest.h>
 
-class MyEngine : public Engine::Instance<MyEngine>
+class my_engine : public sdl_sdk::engine
 {
 public:
-    ~MyEngine() override = default;
+    ~my_engine() override = default;
 
-    void initialize_impl()
+    template <typename... Args> void initialize_impl(const char *window_title, const int &height,
+                         const int width)
     {
-        OpenGLWrapper::init_sdl();
-
-        window_ = OpenGLWrapper::get_new_sdl_window("Test", 1000, 1000);
-        if (!window_)
-        {
-            throw std::invalid_argument("SDL window was not initialized.");
-        }
-
-        context_ = OpenGLWrapper::get_new_sdl_gl_context(window_);
-        if (!context_)
-        {
-            throw std::runtime_error(
-                "OpenGL context for SDL window was not created.");
-        }
-
-        OpenGLWrapper::init_opengl();
+        sdl_sdk::engine::initialize_impl(window_title, height, width);
 
         ImWrapper::init_imgui(window_, context_);
 
@@ -39,7 +26,7 @@ public:
         init_buffers();
     }
 
-    void render_impl(const GLfloat vertices[], long vertices_size)
+    template <typename... Args>  void render_impl(const GLfloat vertices[], long vertices_size)
     {
         shader_change_daemon();
 
@@ -87,10 +74,10 @@ public:
 
         ImWrapper::render();
 
-        SDL_GL_SwapWindow(window_);
+        sdl_sdk::engine::render_impl();
     }
 
-    void destroy_impl()
+    template <typename... Args>  void destroy_impl()
     {
         glDeleteVertexArrays(1, &VAO_);
 
@@ -104,9 +91,7 @@ public:
 
         ImWrapper::destroy();
 
-        SDL_GL_DeleteContext(context_);
-        SDL_DestroyWindow(window_);
-        SDL_Quit();
+        sdl_sdk::engine::destroy_impl();
     }
 
 private:
@@ -145,9 +130,6 @@ private:
         glBindVertexArray(0);
     }
 
-    SDL_Window *window_    = nullptr;
-    SDL_GLContext context_ = nullptr;
-
     OpenGLWrapper::Shader *shader_ = nullptr;
 
     static constexpr std::string_view k_vertex_shader_path_ =
@@ -159,15 +141,15 @@ private:
     GLuint VAO_{};
 };
 
-template <> Engine::Instance<MyEngine> *Engine::create_instance()
+sdl_sdk::engine * sdl_sdk::create_instance()
 {
-    return new MyEngine();
+    return new my_engine();
 }
 
 TEST(TriangleTest, LavaLampTriangle)
 {
-    Engine::Instance<MyEngine> *engine = Engine::create_instance<MyEngine>();
-    engine->initialize();
+    auto engine = sdl_sdk::create_instance();
+    engine->initialize("12", 1000, 1000);
 
     SDL_Event event;
     while (true)

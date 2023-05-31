@@ -49,7 +49,7 @@ void setup_style(const bool &is_dark, const float &alpha)
 
     for (int color_index = 0; color_index < ImGuiCol_COUNT; color_index++)
     {
-        const auto color   = static_cast<ImGuiCol>(color_index);
+        const auto color   = color_index;
         ImVec4 &color_value = style.Colors[color_index];
 
         const bool is_background_dim_color = (color == ImGuiCol_ModalWindowDimBg ||

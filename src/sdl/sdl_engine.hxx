@@ -5,14 +5,16 @@
 
 #include <glad/glad.h>
 
-namespace SDL
+namespace sdl_sdk
 {
 
-class Engine : public ::Engine::Instance<Engine>
+class engine : public sdk::engine<engine>
 {
 public:
-    void initialize_impl(const char *window_title, const int &height,
-                         const int width)
+    ~engine() override = default;
+
+    template <typename... Args> void initialize_impl(const char *window_title, const int &height,
+                         const int width, Args && ... args)
     {
         OpenGLWrapper::init_sdl();
 
@@ -35,26 +37,27 @@ public:
         OpenGLWrapper::init_opengl();
     }
 
-    void render_impl()
+    template <typename... Args> void render_impl(Args && ... args)
     {
         SDL_GL_SwapWindow(window_);
     }
 
-    void destroy_impl()
+    template <typename... Args> void destroy_impl(Args && ... args)
     {
         SDL_GL_DeleteContext(context_);
         SDL_DestroyWindow(window_);
         SDL_Quit();
     }
 
-private:
+protected:
     SDL_Window *window_    = nullptr;
     SDL_GLContext context_ = nullptr;
 };
 
-} // namespace SDL
+sdl_sdk::engine * create_instance();
 
-template <> Engine::Instance<SDL::Engine> *Engine::create_instance()
-{
-    return new SDL::Engine();
+} // namespace sdl_sdk
+
+template <> sdk::engine<sdl_sdk::engine> * sdk::create_instance() {
+    return sdl_sdk::create_instance();
 }
