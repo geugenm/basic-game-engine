@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include <utility>
+#include <vector>
 
 namespace sdk
 {
@@ -35,25 +36,25 @@ private:
     mutable std::string info_;
 };
 
-template <typename Derived> class engine
+class component
 {
 public:
-    virtual ~engine() = default;
+    explicit component(const char *name) : name_(name) {}
 
-    template <typename... Args> void initialize(Args &&...args)
+    virtual ~component() = default;
+
+    virtual void initialize()
     {
         if (is_initialized_)
         {
             throw engine_error("Trying to reinitialize the engine.",
                                "initialize");
         }
-        static_cast<Derived *>(this)->initialize_impl(
-            std::forward<Args>(args)...);
 
         is_initialized_ = true;
     }
 
-    template <typename... Args> void render(Args &&...args)
+    virtual void render()
     {
         if (!is_initialized_)
         {
@@ -62,10 +63,8 @@ public:
                 "calling render(...).",
                 "render");
         }
-        static_cast<Derived *>(this)->render_impl(std::forward<Args>(args)...);
     }
-
-    template <typename... Args> void destroy(Args &&...args)
+    virtual void destroy()
     {
         if (!is_initialized_)
         {
@@ -73,9 +72,78 @@ public:
                                "destroy");
         }
 
-        static_cast<Derived *>(this)->destroy_impl(std::forward<Args>(args)...);
+        is_initialized_ = false;
+    }
+
+    [[nodiscard]] const char *get_name() const
+    {
+        return name_;
+    }
+
+private:
+    const char *name_;
+
+    bool is_initialized_ = false;
+};
+
+using component_ptr = std::unique_ptr<component>;
+
+class engine
+{
+public:
+    virtual ~engine() = default;
+
+    virtual void initialize()
+    {
+        if (is_initialized_)
+        {
+            throw engine_error("Trying to reinitialize the engine.",
+                               "initialize");
+        }
+
+        is_initialized_ = true;
+    }
+
+    virtual void render()
+    {
+        if (!is_initialized_)
+        {
+            throw engine_error(
+                "The engine is not initialized. Use initialize(...) before "
+                "calling render(...).",
+                "render");
+        }
+
+        for (auto const &component : components_)
+        {
+            component->render();
+        }
+    }
+
+    virtual void destroy()
+    {
+        if (!is_initialized_)
+        {
+            throw engine_error("Trying to destroy already destroyed engine.",
+                               "destroy");
+        }
+
+        for (auto const &component : components_)
+        {
+            component->destroy();
+        }
 
         is_initialized_ = false;
+    }
+
+    void add_component(component_ptr component)
+    {
+        if (component == nullptr)
+        {
+            throw engine_error("Trying to add null component", "add_component");
+        }
+        component->initialize();
+        components_.push_back(std::move(component));
     }
 
     [[nodiscard]] bool is_initialized() const
@@ -85,7 +153,7 @@ public:
 
 private:
     bool is_initialized_ = false;
-};
 
-template <typename Derived> engine<Derived> *create_instance();
+    std::vector<component_ptr> components_;
+};
 } // namespace sdk

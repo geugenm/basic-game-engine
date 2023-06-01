@@ -21,8 +21,8 @@ void OpenGLWrapper::init_sdl()
 }
 
 SDL_Window *OpenGLWrapper::get_new_sdl_window(const char *window_title,
-                                              const int &width,
-                                              const int &height)
+                                              const int &window_width,
+                                              const int &window_height)
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, k_opengl_major_version);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, k_opengl_minor_version);
@@ -31,7 +31,7 @@ SDL_Window *OpenGLWrapper::get_new_sdl_window(const char *window_title,
 
     constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-    SDL_Window *window = SDL_CreateWindow(window_title, width, height, flags);
+    SDL_Window *window = SDL_CreateWindow(window_title, window_width, window_height, flags);
     if (!window)
     {
         std::cerr << SDL_GetError() << std::endl;

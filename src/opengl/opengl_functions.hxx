@@ -17,8 +17,8 @@ constexpr uint32_t k_info_log_size        = 512;
 
 void init_sdl();
 
-SDL_Window *get_new_sdl_window(const char *window_title, const int &height,
-                               const int &width);
+SDL_Window *get_new_sdl_window(const char *window_title, const int &window_width,
+                               const int &window_height);
 
 SDL_GLContext get_new_sdl_gl_context(SDL_Window *window);
 
