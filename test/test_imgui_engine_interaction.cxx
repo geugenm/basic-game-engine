@@ -1,5 +1,5 @@
 #include "abstract_engine.hxx"
-//#include "imgui_wrapper.hxx"
+#include "imgui_wrapper.hxx"
 #include "opengl_functions.hxx"
 
 #include "open_gl_shader.hxx"
@@ -21,25 +21,15 @@ public:
     void initialize() override
     {
         sdl_sdk::engine::initialize();
-        //ImWrapper::init_imgui(access_window(), get_context());
     }
 
     void render() override
     {
         sdl_sdk::engine::render();
-
-        //ImWrapper::new_frame();
-
-        //ImGui::ShowDemoWindow();
-
-        //ImWrapper::render();
-
-        sdl_sdk::engine::render();
     }
 
     void destroy() override
     {
-        //ImWrapper::destroy();
 
         sdl_sdk::engine::destroy();
     }
@@ -160,20 +150,54 @@ private:
     GLuint VAO_{};
 };
 
+class imgui_component : public sdk::component
+{
+public:
+    explicit imgui_component(const char *name, SDL_Window *sdl_window,
+                             SDL_GLContext sdl_context)
+        : sdk::component(name)
+    {
+        ImWrapper::init_imgui(sdl_window, sdl_context);
+    }
+
+    ~imgui_component() override = default;
+
+    void initialize() override {}
+
+    void render() override
+    {
+        ImWrapper::new_frame();
+
+        ImGui::ShowDemoWindow();
+
+        ImWrapper::render();
+    }
+
+    void destroy() override
+    {
+        ImWrapper::destroy();
+    }
+};
+
 TEST(TriangleTest, LavaLampTriangle)
 {
-    sdk::engine *engine = new my_engine("12", 1000, 1000);
+    sdl_sdk::engine *engine = new my_engine("12", 1000, 1000);
     engine->initialize();
+
     sdk::component_ptr shader =
         std::make_unique<shader_component>("test_shader");
     engine->add_component(std::move(shader));
+
+    sdk::component_ptr imgui =
+        std::make_unique<imgui_component>("imgui", engine->access_window(), engine->access_context());
+    engine->add_component(std::move(imgui));
 
     SDL_Event event;
     while (true)
     {
         while (SDL_PollEvent(&event))
         {
-            //ImWrapper::process_event(event);
+            ImWrapper::process_event(event);
             if (event.type == SDL_EVENT_QUIT)
             {
                 goto cleanup;

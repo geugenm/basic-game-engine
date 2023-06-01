@@ -40,10 +40,13 @@ public:
         }
 
         OpenGLWrapper::init_opengl();
+
+        sdk::engine::initialize();
     }
 
     void render() override
     {
+        sdk::engine::render();
         SDL_GL_SwapWindow(window_);
     }
 
@@ -52,28 +55,28 @@ public:
         SDL_GL_DeleteContext(context_);
         SDL_DestroyWindow(window_);
         SDL_Quit();
+
+        sdk::engine::destroy();
     }
 
-    [[nodiscard]] const SDL_Window * get_window() const {
-        if (!is_initialized()) {
-            throw sdk::engine_error("Trying to get the uninitialized window.", "get_window");
+    [[nodiscard]] SDL_Window *access_window()
+    {
+        if (!is_initialized())
+        {
+            throw sdk::engine_error("Trying to get the uninitialized window.",
+                                    "get_window");
         }
         return window_;
     }
 
-    [[nodiscard]] SDL_GLContext get_context() const {
-        if (!is_initialized()) {
-            throw sdk::engine_error("Trying to get the uninitialized context.", "get_context");
+    [[nodiscard]] SDL_GLContext access_context()
+    {
+        if (!is_initialized())
+        {
+            throw sdk::engine_error("Trying to get the uninitialized window.",
+                                    "get_window");
         }
         return context_;
-    }
-
-protected:
-    [[nodiscard]] SDL_Window * access_window() {
-        if (!is_initialized()) {
-            throw sdk::engine_error("Trying to get the uninitialized window.", "get_window");
-        }
-        return window_;
     }
 
 private:
