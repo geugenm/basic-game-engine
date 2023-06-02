@@ -76,7 +76,7 @@ public:
         }
     }
 
-    [[nodiscard]] opengl_subsdk::shader *get_shader() const
+    [[nodiscard]] opengl_subsdk::shader *get_shader()
     {
         return shader_;
     }
@@ -140,11 +140,21 @@ public:
 
     ~imgui_component() override = default;
 
-    void initialize_impl() override {}
+    void initialize_impl() override {
+        for (auto const &window : windows_)
+        {
+            window->initialize();
+        }
+    }
 
     void render_impl() override
     {
         imgui_subsdk::new_frame();
+
+        for (auto const &window : windows_)
+        {
+            window->render();
+        }
 
         ImGui::ShowDemoWindow();
 
@@ -153,8 +163,68 @@ public:
 
     void destroy_impl() override
     {
+        for (auto const &window : windows_)
+        {
+            window->destroy();
+        }
+
         imgui_subsdk::destroy();
     }
+
+    void add_window(std::unique_ptr<sdk::component> imgui_window)
+    {
+        if (imgui_window == nullptr)
+        {
+            throw sdk::engine_error("Trying to add null component",
+                                    "add_component");
+        }
+
+        imgui_window->initialize();
+        windows_.push_back(std::move(imgui_window));
+    }
+
+private:
+    std::vector<std::unique_ptr<sdk::component>> windows_;
+};
+
+class imgui_shader_editor : public sdk::component
+{
+public:
+    imgui_shader_editor(const imgui_component &imgui_main,
+                        opengl_subsdk::shader *shader,
+                        const char *name = "imgui_shader_editor")
+        : sdk::component(name), imgui_(imgui_main), shader_(shader)
+    {
+        if (shader_ == nullptr)
+        {
+            throw sdk::engine_error("Given shader is null.");
+        }
+    }
+
+    void initialize_impl() override
+    {
+        if (!imgui_.is_initialized())
+        {
+            throw sdk::engine_error("ImGui component is not initialized");
+        }
+    }
+
+    void render_impl() override
+    {
+        ImGui::Begin("Color Picker");
+        static float color[3] = {1.0f, 0.0f, 0.0f};
+        ImGui::ColorEdit3("Color", color);
+        ImGui::End();
+
+        const GLint colorLoc = shader_->get_uniform_location("color");
+        glUniform3f(colorLoc, color[0], color[1], color[2]);
+    }
+
+    void destroy_impl() override {}
+
+private:
+    const imgui_component &imgui_;
+    opengl_subsdk::shader *shader_;
 };
 
 TEST(TriangleTest, LavaLampTriangle)
@@ -162,13 +232,23 @@ TEST(TriangleTest, LavaLampTriangle)
     auto *engine = new sdl_subsdk::engine("12", 1000, 1000);
     engine->initialize();
 
+
     auto shader = std::make_unique<shader_component>("test_shader");
 
     auto imgui = std::make_unique<imgui_component>(engine->get_window(),
                                                    engine->get_context());
+    imgui->initialize();
+
+    auto shader_editor = std::make_unique<imgui_shader_editor>(
+        *imgui.get(), shader->get_shader());
+
+    imgui->add_window(std::move(shader_editor));
 
     engine->add_component(std::move(shader));
     engine->add_component(std::move(imgui));
+
+
+
 
     SDL_Event event;
     while (true)

@@ -65,8 +65,7 @@ public:
     {
         if (is_initialized_)
         {
-            throw engine_error("Trying to reinitialize the component.",
-                               "initialize");
+            return ;
         }
 
         initialize_impl();
@@ -138,6 +137,11 @@ public:
 
     void init() {
         object::initialize();
+
+        for (auto const &component : components_)
+        {
+            component->initialize();
+        }
     }
 
     void render()
@@ -168,14 +172,6 @@ public:
         }
         component->initialize();
         components_.push_back(std::move(component));
-    }
-
-    [[nodiscard]] component * get_component(const size_t & index) {
-        if (index >= components_.size()) {
-            throw engine_error("index is larger than components amount");
-        }
-
-        return components_[index].get();
     }
 
 private:
