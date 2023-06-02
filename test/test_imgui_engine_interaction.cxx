@@ -140,7 +140,8 @@ public:
 
     ~imgui_component() override = default;
 
-    void initialize_impl() override {
+    void initialize_impl() override
+    {
         for (auto const &window : windows_)
         {
             window->initialize();
@@ -171,7 +172,7 @@ public:
         imgui_subsdk::destroy();
     }
 
-    void add_window(std::unique_ptr<sdk::component> imgui_window)
+    void add_window(sdk::component *imgui_window)
     {
         if (imgui_window == nullptr)
         {
@@ -180,7 +181,7 @@ public:
         }
 
         imgui_window->initialize();
-        windows_.push_back(std::move(imgui_window));
+        windows_.push_back(std::unique_ptr<sdk::component>(imgui_window));
     }
 
 private:
@@ -199,6 +200,13 @@ public:
         {
             throw sdk::engine_error("Given shader is null.");
         }
+    }
+
+    imgui_shader_editor(const imgui_component *imgui_main,
+                        opengl_subsdk::shader *shader,
+                        const char *name = "imgui_shader_editor")
+        : imgui_shader_editor(*imgui_main, shader, name)
+    {
     }
 
     void initialize_impl() override
@@ -232,23 +240,15 @@ TEST(TriangleTest, LavaLampTriangle)
     auto *engine = new sdl_subsdk::engine("12", 1000, 1000);
     engine->initialize();
 
+    auto shader = new shader_component("test_shader");
+    engine->add_component(shader);
 
-    auto shader = std::make_unique<shader_component>("test_shader");
+    auto imgui =
+        new imgui_component(engine->get_window(), engine->get_context());
+    engine->add_component(imgui);
 
-    auto imgui = std::make_unique<imgui_component>(engine->get_window(),
-                                                   engine->get_context());
-    imgui->initialize();
-
-    auto shader_editor = std::make_unique<imgui_shader_editor>(
-        *imgui.get(), shader->get_shader());
-
-    imgui->add_window(std::move(shader_editor));
-
-    engine->add_component(std::move(shader));
-    engine->add_component(std::move(imgui));
-
-
-
+    auto shader_editor = new imgui_shader_editor(*imgui, shader->get_shader());
+    imgui->add_window(shader_editor);
 
     SDL_Event event;
     while (true)

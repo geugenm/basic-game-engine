@@ -65,7 +65,7 @@ public:
     {
         if (is_initialized_)
         {
-            return ;
+            return;
         }
 
         initialize_impl();
@@ -80,7 +80,7 @@ public:
             throw engine_error(
                 "The object is not initialized. Use initialize(...) before "
                 "calling render(...).",
-                "render", get_name());
+                "sdk::object::render", get_name());
         }
 
         render_impl();
@@ -91,7 +91,7 @@ public:
         if (!is_initialized_)
         {
             throw engine_error("Trying to destroy already destroyed object.",
-                               "destroy");
+                               "sdk::object::destroy");
         }
 
         destroy_impl();
@@ -123,10 +123,11 @@ private:
 class component : public object
 {
 public:
-    explicit component(const char *component_name = "component") : object(component_name) {}
+    explicit component(const char *component_name = "component")
+        : object(component_name)
+    {
+    }
 };
-
-using component_ptr = std::unique_ptr<component>;
 
 class engine : public object
 {
@@ -135,7 +136,8 @@ public:
 
     ~engine() override = default;
 
-    void init() {
+    void init()
+    {
         object::initialize();
 
         for (auto const &component : components_)
@@ -164,7 +166,7 @@ public:
         }
     }
 
-    void add_component(component_ptr component)
+    void add_component(std::unique_ptr<component> component)
     {
         if (component == nullptr)
         {
@@ -174,7 +176,17 @@ public:
         components_.push_back(std::move(component));
     }
 
+    void add_component(component *component)
+    {
+        if (component == nullptr)
+        {
+            throw engine_error("Trying to add null component", "add_component");
+        }
+        component->initialize();
+        components_.push_back(std::unique_ptr<sdk::component>(component));
+    }
+
 private:
-    std::vector<component_ptr> components_;
+    std::vector<std::unique_ptr<component>> components_;
 };
 } // namespace sdk

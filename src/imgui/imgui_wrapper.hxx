@@ -10,21 +10,34 @@
 
 namespace imgui_subsdk
 {
+constexpr bool k_use_dark_style             = true;
+constexpr float k_window_alpha              = 0.8f;
+constexpr std::string_view k_opengl_version = "#version 150 core";
 
 void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 {
     if (window == nullptr)
     {
-        throw std::invalid_argument("Given SDL window is not initialized.");
+        throw sdk::engine_error("Given SDL window is nullptr.", "init_imgui");
+    }
+
+    if (gl_context == nullptr)
+    {
+        throw sdk::engine_error("Given SDL GL context is nullptr.",
+                                "init_imgui");
     }
 
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+    if (ImGui::CreateContext() == nullptr)
+    {
+        throw sdk::engine_error("Failed to create ImGui context.",
+                                "init_imgui");
+    }
 
-    ImStyle::setup_style(true, 0.8f);
+    ImStyle::setup_style(k_use_dark_style, k_window_alpha);
 
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
-    ImGui_ImplOpenGL3_Init("#version 150 core");
+    ImGui_ImplOpenGL3_Init(k_opengl_version.data());
 }
 
 void destroy()
@@ -54,11 +67,18 @@ void render()
 
 void render(ImDrawData *draw_data)
 {
-    ImGuiIO &io = ImGui::GetIO();
+    if (draw_data == nullptr)
+    {
+        throw sdk::engine_error("Given nullptr draw data.", "imgui::render");
+    }
+
+    ImGuiIO const &io = ImGui::GetIO();
+
     const auto frame_buffer_width =
         static_cast<size_t>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
     const auto frame_buffer_height =
         static_cast<size_t>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+
     if (frame_buffer_width == 0 || frame_buffer_height == 0)
     {
         return;
