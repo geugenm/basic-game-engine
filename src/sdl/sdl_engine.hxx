@@ -20,7 +20,7 @@ public:
 
     ~engine() override = default;
 
-    [[nodiscard]] SDL_Window *access_window()
+    [[nodiscard]] SDL_Window *get_window()
     {
         if (!is_initialized())
         {
@@ -30,7 +30,7 @@ public:
         return window_;
     }
 
-    [[nodiscard]] SDL_GLContext access_context()
+    [[nodiscard]] SDL_GLContext get_context()
     {
         if (!is_initialized())
         {

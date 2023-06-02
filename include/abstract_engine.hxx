@@ -170,6 +170,14 @@ public:
         components_.push_back(std::move(component));
     }
 
+    [[nodiscard]] component * get_component(const size_t & index) {
+        if (index >= components_.size()) {
+            throw engine_error("index is larger than components amount");
+        }
+
+        return components_[index].get();
+    }
+
 private:
     std::vector<component_ptr> components_;
 };

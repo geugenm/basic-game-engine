@@ -19,7 +19,6 @@ public:
 
     ~shader_component() override = default;
 
-protected:
     void initialize_impl() override
     {
         init_buffers();
@@ -77,6 +76,11 @@ protected:
         }
     }
 
+    [[nodiscard]] opengl_subsdk::shader *get_shader() const
+    {
+        return shader_;
+    }
+
 private:
     void init_buffers()
     {
@@ -127,8 +131,8 @@ private:
 class imgui_component : public sdk::component
 {
 public:
-    explicit imgui_component(const char *name, SDL_Window *sdl_window,
-                             SDL_GLContext sdl_context)
+    explicit imgui_component(SDL_Window *sdl_window, SDL_GLContext sdl_context,
+                             const char *name = "imgui")
         : sdk::component(name)
     {
         imgui_subsdk::init_imgui(sdl_window, sdl_context);
@@ -136,7 +140,6 @@ public:
 
     ~imgui_component() override = default;
 
-protected:
     void initialize_impl() override {}
 
     void render_impl() override
@@ -159,12 +162,12 @@ TEST(TriangleTest, LavaLampTriangle)
     auto *engine = new sdl_subsdk::engine("12", 1000, 1000);
     engine->initialize();
 
-    sdk::component_ptr shader =
-        std::make_unique<shader_component>("test_shader");
-    engine->add_component(std::move(shader));
+    auto shader = std::make_unique<shader_component>("test_shader");
 
-    sdk::component_ptr imgui = std::make_unique<imgui_component>(
-        "imgui", engine->access_window(), engine->access_context());
+    auto imgui = std::make_unique<imgui_component>(engine->get_window(),
+                                                   engine->get_context());
+
+    engine->add_component(std::move(shader));
     engine->add_component(std::move(imgui));
 
     SDL_Event event;
