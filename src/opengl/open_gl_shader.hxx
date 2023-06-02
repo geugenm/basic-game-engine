@@ -5,21 +5,21 @@
 #include <fstream>
 #include <iostream>
 
-namespace OpenGLWrapper
+namespace opengl_subsdk
 {
 
-class Shader
+class shader
 {
 public:
-    explicit Shader(const char *vertex_path, const char *fragment_path)
+    explicit shader(const char *vertex_path, const char *fragment_path)
         : vertex_source_path_(vertex_path), fragment_source_path_(fragment_path)
     {
         create_shader_program();
     }
 
-    explicit Shader(const std::string_view &vertex_path,
+    explicit shader(const std::string_view &vertex_path,
                     const std::string_view &fragment_path)
-        : Shader(vertex_path.data(), fragment_path.data())
+        : shader(vertex_path.data(), fragment_path.data())
     {
     }
 
@@ -51,25 +51,25 @@ public:
         return uniform_location;
     }
 
-    ~Shader() = default;
+    ~shader() = default;
 
 private:
     void create_shader_program()
     {
-        GLuint vertex = OpenGLWrapper::get_compiled_shader_from_file(
+        GLuint vertex = opengl_subsdk::get_compiled_shader_from_file(
             GL_VERTEX_SHADER, vertex_source_path_);
-        GLuint fragment = OpenGLWrapper::get_compiled_shader_from_file(
+        GLuint fragment = opengl_subsdk::get_compiled_shader_from_file(
             GL_FRAGMENT_SHADER, fragment_source_path_);
 
-        program_id_ = OpenGLWrapper::get_new_program();
+        program_id_ = opengl_subsdk::get_new_program();
 
-        OpenGLWrapper::attach_shader(program_id_, vertex);
-        OpenGLWrapper::attach_shader(program_id_, fragment);
+        opengl_subsdk::attach_shader(program_id_, vertex);
+        opengl_subsdk::attach_shader(program_id_, fragment);
 
-        OpenGLWrapper::link_shader_program(program_id_);
+        opengl_subsdk::link_shader_program(program_id_);
 
-        OpenGLWrapper::delete_shader(vertex);
-        OpenGLWrapper::delete_shader(fragment);
+        opengl_subsdk::delete_shader(vertex);
+        opengl_subsdk::delete_shader(fragment);
     }
 
     GLuint program_id_{};
@@ -78,4 +78,4 @@ private:
     const char *fragment_source_path_;
 };
 
-} // namespace OpenGLWrapper
+} // namespace opengl_subsdk

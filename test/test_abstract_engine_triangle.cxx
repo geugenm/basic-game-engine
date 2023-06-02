@@ -28,19 +28,19 @@ public:
 
     void initialize_impl()
     {
-        if (!OpenGLWrapper::init_sdl())
+        if (!opengl_subsdk::init_sdl())
         {
             FAIL();
         }
 
-        window_ = OpenGLWrapper::get_new_sdl_window("Test", 1000, 1000);
+        window_ = opengl_subsdk::get_new_sdl_window("Test", 1000, 1000);
         if (!window_)
         {
             SDL_Quit();
             FAIL();
         }
 
-        context_ = OpenGLWrapper::get_new_sdl_gl_context(window_);
+        context_ = opengl_subsdk::get_new_sdl_gl_context(window_);
         if (!context_)
         {
             SDL_DestroyWindow(window_);
@@ -48,8 +48,8 @@ public:
             FAIL();
         }
 
-        if (!OpenGLWrapper::load_opengl_functions() ||
-            !OpenGLWrapper::is_opengl_version_supported())
+        if (!opengl_subsdk::load_opengl_functions() ||
+            !opengl_subsdk::is_opengl_version_supported())
         {
             SDL_GL_DeleteContext(context_);
             SDL_DestroyWindow(window_);
@@ -66,9 +66,9 @@ public:
         static std::time_t vertex_shader_last_modified   = 0;
         static std::time_t fragment_shader_last_modified = 0;
 
-        bool vertex_shader_changed = OpenGLWrapper::file_has_changed(
+        bool vertex_shader_changed = opengl_subsdk::file_has_changed(
             k_vertex_shader_path_.data(), vertex_shader_last_modified);
-        bool fragment_shader_changed = OpenGLWrapper::file_has_changed(
+        bool fragment_shader_changed = opengl_subsdk::file_has_changed(
             k_fragment_shader_path_.data(), fragment_shader_last_modified);
 
         if (vertex_shader_changed || fragment_shader_changed)
@@ -143,9 +143,9 @@ private:
 
     void compile_shaders()
     {
-        GLuint vertexShader = OpenGLWrapper::get_compiled_shader(
+        GLuint vertexShader = opengl_subsdk::get_compiled_shader(
             GL_VERTEX_SHADER, get_file_content(k_vertex_shader_path_.data()));
-        GLuint fragmentShader = OpenGLWrapper::get_compiled_shader(
+        GLuint fragmentShader = opengl_subsdk::get_compiled_shader(
             GL_FRAGMENT_SHADER,
             get_file_content(k_fragment_shader_path_.data()));
 
@@ -198,7 +198,7 @@ TEST(TriangleTest, LavaLampTriangle)
             }
         }
 
-        auto vertices = OpenGLWrapper::get_vertices_from_glsl_file(
+        auto vertices = opengl_subsdk::get_vertices_from_glsl_file(
             "shaders/triangle_vertex.glsl");
 
         engine->render(vertices.data(), vertices.size());

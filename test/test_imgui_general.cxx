@@ -14,17 +14,17 @@ TEST(ImGuiGeneralTest, BasicTest)
 {
     try
     {
-        OpenGLWrapper::init_sdl();
+        opengl_subsdk::init_sdl();
 
-        SDL_Window *window = OpenGLWrapper::get_new_sdl_window(
+        SDL_Window *window = opengl_subsdk::get_new_sdl_window(
             "OpenGL 3.0 SDL ImGui Test", 1280, 720);
 
         SDL_GLContext gl_context =
-            OpenGLWrapper::get_new_sdl_gl_context(window);
+            opengl_subsdk::get_new_sdl_gl_context(window);
 
-        OpenGLWrapper::init_opengl();
-        OpenGLWrapper::enable_debug_mode();
-        ImWrapper::init_imgui(window, gl_context);
+        opengl_subsdk::init_opengl();
+        opengl_subsdk::enable_debug_mode();
+        imgui_subsdk::init_imgui(window, gl_context);
 
         bool running = true;
         SDL_Event event;
@@ -33,26 +33,26 @@ TEST(ImGuiGeneralTest, BasicTest)
         {
             while (SDL_PollEvent(&event))
             {
-                ImWrapper::process_event(event);
+                imgui_subsdk::process_event(event);
                 if (event.type == SDL_EVENT_QUIT)
                 {
                     running = false;
                 }
             }
 
-            ImWrapper::new_frame();
+            imgui_subsdk::new_frame();
 
             ImGui::ShowDemoWindow();
 
             glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            ImWrapper::render();
+            imgui_subsdk::render();
 
             SDL_GL_SwapWindow(window);
         }
 
-        ImWrapper::destroy();
+        imgui_subsdk::destroy();
     }
     catch (const std::exception &e)
     {

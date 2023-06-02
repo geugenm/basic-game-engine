@@ -10,7 +10,7 @@
 
 #include "glad/glad.h"
 
-void OpenGLWrapper::init_sdl()
+void opengl_subsdk::init_sdl()
 {
     constexpr Uint32 flags = SDL_INIT_VIDEO;
     if (SDL_Init(flags) != 0)
@@ -20,7 +20,7 @@ void OpenGLWrapper::init_sdl()
     }
 }
 
-SDL_Window *OpenGLWrapper::get_new_sdl_window(const char *window_title,
+SDL_Window *opengl_subsdk::get_new_sdl_window(const char *window_title,
                                               const int &window_width,
                                               const int &window_height)
 {
@@ -41,7 +41,7 @@ SDL_Window *OpenGLWrapper::get_new_sdl_window(const char *window_title,
     return window;
 }
 
-SDL_GLContext OpenGLWrapper::get_new_sdl_gl_context(SDL_Window *window)
+SDL_GLContext opengl_subsdk::get_new_sdl_gl_context(SDL_Window *window)
 {
     if (window == nullptr)
     {
@@ -59,7 +59,7 @@ SDL_GLContext OpenGLWrapper::get_new_sdl_gl_context(SDL_Window *window)
     return context;
 }
 
-void OpenGLWrapper::load_opengl_functions()
+void opengl_subsdk::load_opengl_functions()
 {
     if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
     {
@@ -69,7 +69,7 @@ void OpenGLWrapper::load_opengl_functions()
     }
 }
 
-bool OpenGLWrapper::is_opengl_version_supported()
+bool opengl_subsdk::is_opengl_version_supported()
 {
     int major, minor;
     glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -85,7 +85,7 @@ bool OpenGLWrapper::is_opengl_version_supported()
     return true;
 }
 
-void OpenGLWrapper::init_opengl()
+void opengl_subsdk::init_opengl()
 {
     load_opengl_functions();
 
@@ -95,7 +95,7 @@ void OpenGLWrapper::init_opengl()
     }
 }
 
-std::string OpenGLWrapper::glenum_to_string(GLenum value)
+std::string opengl_subsdk::glenum_to_string(GLenum value)
 {
     switch (value)
     {
@@ -142,7 +142,7 @@ std::string OpenGLWrapper::glenum_to_string(GLenum value)
     }
 }
 
-void OpenGLWrapper::opengl_debug_callback(GLenum source, GLenum type, GLuint id,
+void opengl_subsdk::opengl_debug_callback(GLenum source, GLenum type, GLuint id,
                                           GLenum severity, GLsizei length,
                                           const GLchar *message,
                                           const void *userParam)
@@ -165,7 +165,7 @@ void OpenGLWrapper::opengl_debug_callback(GLenum source, GLenum type, GLuint id,
     std::cerr << msg.str() << std::flush;
 }
 
-void OpenGLWrapper::enable_debug_mode()
+void opengl_subsdk::enable_debug_mode()
 {
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -174,7 +174,7 @@ void OpenGLWrapper::enable_debug_mode()
                           GL_TRUE);
 }
 
-void OpenGLWrapper::disable_debug_mode()
+void opengl_subsdk::disable_debug_mode()
 {
     GLint flags;
     glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
@@ -186,7 +186,7 @@ void OpenGLWrapper::disable_debug_mode()
     }
 }
 
-bool OpenGLWrapper::file_has_changed(const std::string &file_path,
+bool opengl_subsdk::file_has_changed(const std::string &file_path,
                                      std::time_t &last_modified_time)
 {
     struct stat file_stat
@@ -207,7 +207,7 @@ bool OpenGLWrapper::file_has_changed(const std::string &file_path,
 }
 
 std::vector<GLfloat>
-OpenGLWrapper::get_vertices_from_glsl_file(const std::string &shader_path)
+opengl_subsdk::get_vertices_from_glsl_file(const std::string &shader_path)
 {
     std::ifstream file(shader_path);
     std::stringstream buf;
@@ -236,7 +236,7 @@ OpenGLWrapper::get_vertices_from_glsl_file(const std::string &shader_path)
     return vertices;
 }
 
-GLuint OpenGLWrapper::get_new_compiled_shader(GLenum shader_type,
+GLuint opengl_subsdk::get_new_compiled_shader(GLenum shader_type,
                                               const GLchar *shader_content)
 {
     GLenum result_shader = glCreateShader(shader_type);
@@ -261,7 +261,7 @@ GLuint OpenGLWrapper::get_new_compiled_shader(GLenum shader_type,
     return result_shader;
 }
 
-void OpenGLWrapper::link_shader_program(GLuint program)
+void opengl_subsdk::link_shader_program(GLuint program)
 {
     glLinkProgram(program);
 
@@ -279,7 +279,7 @@ void OpenGLWrapper::link_shader_program(GLuint program)
     }
 }
 
-GLuint OpenGLWrapper::get_new_program()
+GLuint opengl_subsdk::get_new_program()
 {
     GLuint program = glCreateProgram();
 
@@ -291,29 +291,29 @@ GLuint OpenGLWrapper::get_new_program()
     return program;
 }
 
-void OpenGLWrapper::attach_shader(GLuint program, GLuint shader)
+void opengl_subsdk::attach_shader(GLuint program, GLuint shader)
 {
     glAttachShader(program, shader);
 }
 
-void OpenGLWrapper::delete_shader(GLuint shader)
+void opengl_subsdk::delete_shader(GLuint shader)
 {
     glDeleteShader(shader);
 }
 
-void OpenGLWrapper::generate_vertex_array(GLsizei generated_names_amount,
+void opengl_subsdk::generate_vertex_array(GLsizei generated_names_amount,
                                           GLuint *buffer_array)
 {
     glGenVertexArrays(generated_names_amount, buffer_array);
 }
 
-void OpenGLWrapper::generate_buffer_object_name(GLsizei generated_names_amount,
+void opengl_subsdk::generate_buffer_object_name(GLsizei generated_names_amount,
                                                 GLuint *buffer_array)
 {
     glGenBuffers(generated_names_amount, buffer_array);
 }
 
-char *OpenGLWrapper::get_file_content(const std::string &file_path)
+char *opengl_subsdk::get_file_content(const std::string &file_path)
 {
     std::ifstream input_file(file_path);
 
@@ -339,18 +339,18 @@ char *OpenGLWrapper::get_file_content(const std::string &file_path)
     return result;
 }
 
-GLuint OpenGLWrapper::get_compiled_shader_from_file(GLenum shader_type,
+GLuint opengl_subsdk::get_compiled_shader_from_file(GLenum shader_type,
                                                     const char *shader_path)
 {
-    GLchar *shader_content = OpenGLWrapper::get_file_content(shader_path);
+    GLchar *shader_content = opengl_subsdk::get_file_content(shader_path);
 
     GLuint result =
-        OpenGLWrapper::get_new_compiled_shader(shader_type, shader_content);
+        opengl_subsdk::get_new_compiled_shader(shader_type, shader_content);
 
     return result;
 }
 
-void OpenGLWrapper::unbind_texture(GLenum texture_type)
+void opengl_subsdk::unbind_texture(GLenum texture_type)
 {
     glBindTexture(texture_type,0);
 }

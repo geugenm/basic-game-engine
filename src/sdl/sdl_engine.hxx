@@ -5,59 +5,20 @@
 
 #include <glad/glad.h>
 
-namespace sdl_sdk
+namespace sdl_subsdk
 {
 
 class engine : public sdk::engine
 {
 public:
-    engine(const char *window_title, const int &height, const int width)
-        : k_window_title_(window_title), k_window_height_(height),
-          k_window_width_(width)
+    engine(const char *window_title, const int &height, const int width,
+           const char *engine_name = "sdl_engine")
+        : sdk::engine(engine_name), k_window_title_(window_title),
+          k_window_height_(height), k_window_width_(width)
     {
     }
 
     ~engine() override = default;
-
-    void initialize() override
-    {
-        OpenGLWrapper::init_sdl();
-
-        window_ = OpenGLWrapper::get_new_sdl_window(
-            k_window_title_, k_window_width_, k_window_height_);
-        if (!window_)
-        {
-            SDL_Quit();
-            throw std::invalid_argument("Failed to create SDL window");
-        }
-
-        context_ = OpenGLWrapper::get_new_sdl_gl_context(window_);
-        if (!context_)
-        {
-            SDL_DestroyWindow(window_);
-            SDL_Quit();
-            throw std::invalid_argument("Failed to create OpenGL context");
-        }
-
-        OpenGLWrapper::init_opengl();
-
-        sdk::engine::initialize();
-    }
-
-    void render() override
-    {
-        sdk::engine::render();
-        SDL_GL_SwapWindow(window_);
-    }
-
-    void destroy() override
-    {
-        SDL_GL_DeleteContext(context_);
-        SDL_DestroyWindow(window_);
-        SDL_Quit();
-
-        sdk::engine::destroy();
-    }
 
     [[nodiscard]] SDL_Window *access_window()
     {
@@ -79,6 +40,42 @@ public:
         return context_;
     }
 
+protected:
+    void initialize_impl() override
+    {
+        opengl_subsdk::init_sdl();
+
+        window_ = opengl_subsdk::get_new_sdl_window(
+            k_window_title_, k_window_width_, k_window_height_);
+        if (!window_)
+        {
+            SDL_Quit();
+            throw std::invalid_argument("Failed to create SDL window");
+        }
+
+        context_ = opengl_subsdk::get_new_sdl_gl_context(window_);
+        if (!context_)
+        {
+            SDL_DestroyWindow(window_);
+            SDL_Quit();
+            throw std::invalid_argument("Failed to create OpenGL context");
+        }
+
+        opengl_subsdk::init_opengl();
+    }
+
+    void render_impl() override
+    {
+        SDL_GL_SwapWindow(window_);
+    }
+
+    void destroy_impl() override
+    {
+        SDL_GL_DeleteContext(context_);
+        SDL_DestroyWindow(window_);
+        SDL_Quit();
+    }
+
 private:
     SDL_Window *window_    = nullptr;
     SDL_GLContext context_ = nullptr;
@@ -88,4 +85,4 @@ private:
     const int k_window_width_;
 };
 
-} // namespace sdl_sdk
+} // namespace sdl_subsdk

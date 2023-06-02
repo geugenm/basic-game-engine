@@ -49,14 +49,14 @@ std::string get_file_content(const std::string &file_path)
 
 TEST(ShaderTest, ShaderOutput)
 {
-    OpenGLWrapper::init_sdl();
+    opengl_subsdk::init_sdl();
 
-    SDL_Window *window = OpenGLWrapper::get_new_sdl_window(
+    SDL_Window *window = opengl_subsdk::get_new_sdl_window(
         "Test", k_window_width, k_window_height);
-    SDL_GLContext context = OpenGLWrapper::get_new_sdl_gl_context(window);
+    SDL_GLContext context = opengl_subsdk::get_new_sdl_gl_context(window);
 
-    OpenGLWrapper::init_opengl();
-    OpenGLWrapper::enable_debug_mode();
+    opengl_subsdk::init_opengl();
+    opengl_subsdk::enable_debug_mode();
 
     glViewport(0, 0, k_window_width, k_window_height);
 
@@ -69,19 +69,19 @@ TEST(ShaderTest, ShaderOutput)
     const char *fragment_shader = fragmentShaderSource.data();
 
     GLuint vertexShader =
-        OpenGLWrapper::get_new_compiled_shader(GL_VERTEX_SHADER, vertex_shader);
+        opengl_subsdk::get_new_compiled_shader(GL_VERTEX_SHADER, vertex_shader);
 
-    GLuint fragmentShader = OpenGLWrapper::get_new_compiled_shader(
+    GLuint fragmentShader = opengl_subsdk::get_new_compiled_shader(
         GL_FRAGMENT_SHADER, fragment_shader);
 
-    GLuint shaderProgram = OpenGLWrapper::get_new_program();
-    OpenGLWrapper::attach_shader(shaderProgram, vertexShader);
-    OpenGLWrapper::attach_shader(shaderProgram, fragmentShader);
+    GLuint shaderProgram = opengl_subsdk::get_new_program();
+    opengl_subsdk::attach_shader(shaderProgram, vertexShader);
+    opengl_subsdk::attach_shader(shaderProgram, fragmentShader);
 
-    OpenGLWrapper::link_shader_program(shaderProgram);
+    opengl_subsdk::link_shader_program(shaderProgram);
 
-    OpenGLWrapper::delete_shader(vertexShader);
-    OpenGLWrapper::delete_shader(fragmentShader);
+    opengl_subsdk::delete_shader(vertexShader);
+    opengl_subsdk::delete_shader(fragmentShader);
 
     GLfloat vertices[] = {-1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  -1.0f, 1.0f, 0.0f,
                           1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 1.0f,  0.0f, 0.0f};

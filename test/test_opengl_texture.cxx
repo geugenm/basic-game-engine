@@ -19,7 +19,7 @@ TEST(SDLEngineTest, Init)
         Engine::create_instance<SDL::Engine>();
     engine->initialize(window_title, window_height, window_width);
 
-    OpenGLWrapper::Shader shader("shaders/texture_vertex.glsl",
+    opengl_subsdk::Shader shader("shaders/texture_vertex.glsl",
                                  "shaders/texture_fragment.glsl");
 
     // Set up vertex data (and buffer(s)) and attribute pointers
@@ -129,7 +129,7 @@ TEST(SDLEngineTest, Init)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, png_data.data());
 
-    OpenGLWrapper::unbind_texture(GL_TEXTURE_2D);
+    opengl_subsdk::unbind_texture(GL_TEXTURE_2D);
 
     shader.use();
 

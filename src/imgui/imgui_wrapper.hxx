@@ -8,7 +8,7 @@
 
 #include "imgui_style.hxx"
 
-namespace ImWrapper
+namespace imgui_subsdk
 {
 
 void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
@@ -69,4 +69,4 @@ void render(ImDrawData *draw_data)
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-} // namespace ImWrapper
+} // namespace imgui_subsdk

@@ -8,12 +8,12 @@ class OpenGLShaderTest : public ::testing::Test
 public:
     OpenGLShaderTest()
     {
-        if (!OpenGLWrapper::init_sdl())
+        if (!opengl_subsdk::init_sdl())
         {
             throw std::runtime_error("Failed to init sdl.");
         }
 
-        window_ = OpenGLWrapper::get_new_sdl_window("", 100, 200);
+        window_ = opengl_subsdk::get_new_sdl_window("", 100, 200);
 
         if (!window_)
         {
@@ -21,7 +21,7 @@ public:
             throw std::runtime_error("Failed to init window.");
         }
 
-        context_ = OpenGLWrapper::get_new_sdl_gl_context(window_);
+        context_ = opengl_subsdk::get_new_sdl_gl_context(window_);
         if (!context_)
         {
             SDL_DestroyWindow(window_);
@@ -29,8 +29,8 @@ public:
             throw std::runtime_error("Failed to init create OpenGL context.");
         }
 
-        if (!OpenGLWrapper::load_opengl_functions() ||
-            !OpenGLWrapper::is_opengl_version_supported())
+        if (!opengl_subsdk::load_opengl_functions() ||
+            !opengl_subsdk::is_opengl_version_supported())
         {
             SDL_GL_DeleteContext(context_);
             SDL_DestroyWindow(window_);

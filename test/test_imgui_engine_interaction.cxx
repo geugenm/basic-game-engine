@@ -8,61 +8,35 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-class my_engine : public sdl_sdk::engine
-{
-public:
-    my_engine(const char *window_title, const int &height, const int width)
-        : sdl_sdk::engine(window_title, height, width)
-    {
-    }
-
-    ~my_engine() override = default;
-
-    void initialize() override
-    {
-        sdl_sdk::engine::initialize();
-    }
-
-    void render() override
-    {
-        sdl_sdk::engine::render();
-    }
-
-    void destroy() override
-    {
-
-        sdl_sdk::engine::destroy();
-    }
-};
-
 class shader_component : public sdk::component
 {
 public:
     explicit shader_component(const char *name) : sdk::component(name)
     {
-        shader_ = new OpenGLWrapper::Shader(k_vertex_shader_path_,
+        shader_ = new opengl_subsdk::shader(k_vertex_shader_path_,
                                             k_fragment_shader_path_);
     }
 
     ~shader_component() override = default;
 
-    void initialize() override
+protected:
+    void initialize_impl() override
     {
         init_buffers();
     }
 
-    void render() override
+    void render_impl() override
     {
         shader_change_daemon();
 
         // Update the vertex buffer with the new vertices
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
 
-        const auto vertices = OpenGLWrapper::get_vertices_from_glsl_file(
+        const auto vertices = opengl_subsdk::get_vertices_from_glsl_file(
             "test/shaders/triangle_vertex.glsl");
 
-        glBufferData(GL_ARRAY_BUFFER, vertices.size(), vertices.data(),
-                     GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size()),
+                     vertices.data(), GL_DYNAMIC_DRAW);
 
         // Re-bind the VAO after updating the vertex buffer
         glBindVertexArray(VAO_);
@@ -90,7 +64,7 @@ public:
         glBindVertexArray(0);
     }
 
-    void destroy() override
+    void destroy_impl() override
     {
         glDeleteVertexArrays(1, &VAO_);
 
@@ -126,9 +100,9 @@ private:
         static std::time_t vertex_shader_last_modified   = 0;
         static std::time_t fragment_shader_last_modified = 0;
 
-        const bool vertex_shader_changed = OpenGLWrapper::file_has_changed(
+        const bool vertex_shader_changed = opengl_subsdk::file_has_changed(
             k_vertex_shader_path_.data(), vertex_shader_last_modified);
-        const bool fragment_shader_changed = OpenGLWrapper::file_has_changed(
+        const bool fragment_shader_changed = opengl_subsdk::file_has_changed(
             k_fragment_shader_path_.data(), fragment_shader_last_modified);
 
         if (vertex_shader_changed || fragment_shader_changed)
@@ -139,7 +113,7 @@ private:
         }
     }
 
-    OpenGLWrapper::Shader *shader_ = nullptr;
+    opengl_subsdk::shader *shader_ = nullptr;
 
     static constexpr std::string_view k_vertex_shader_path_ =
         "shaders/triangle_vertex.glsl";
@@ -157,39 +131,40 @@ public:
                              SDL_GLContext sdl_context)
         : sdk::component(name)
     {
-        ImWrapper::init_imgui(sdl_window, sdl_context);
+        imgui_subsdk::init_imgui(sdl_window, sdl_context);
     }
 
     ~imgui_component() override = default;
 
-    void initialize() override {}
+protected:
+    void initialize_impl() override {}
 
-    void render() override
+    void render_impl() override
     {
-        ImWrapper::new_frame();
+        imgui_subsdk::new_frame();
 
         ImGui::ShowDemoWindow();
 
-        ImWrapper::render();
+        imgui_subsdk::render();
     }
 
-    void destroy() override
+    void destroy_impl() override
     {
-        ImWrapper::destroy();
+        imgui_subsdk::destroy();
     }
 };
 
 TEST(TriangleTest, LavaLampTriangle)
 {
-    sdl_sdk::engine *engine = new my_engine("12", 1000, 1000);
+    auto *engine = new sdl_subsdk::engine("12", 1000, 1000);
     engine->initialize();
 
     sdk::component_ptr shader =
         std::make_unique<shader_component>("test_shader");
     engine->add_component(std::move(shader));
 
-    sdk::component_ptr imgui =
-        std::make_unique<imgui_component>("imgui", engine->access_window(), engine->access_context());
+    sdk::component_ptr imgui = std::make_unique<imgui_component>(
+        "imgui", engine->access_window(), engine->access_context());
     engine->add_component(std::move(imgui));
 
     SDL_Event event;
@@ -197,7 +172,7 @@ TEST(TriangleTest, LavaLampTriangle)
     {
         while (SDL_PollEvent(&event))
         {
-            ImWrapper::process_event(event);
+            imgui_subsdk::process_event(event);
             if (event.type == SDL_EVENT_QUIT)
             {
                 goto cleanup;

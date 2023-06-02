@@ -8,7 +8,7 @@
 #include <fstream>
 #include <glad/glad.h>
 
-namespace OpenGLWrapper
+namespace opengl_subsdk
 {
 
 constexpr uint16_t k_opengl_major_version = 3;
@@ -71,4 +71,4 @@ void generate_buffer_object_name(GLsizei generated_names_amount,
 
 void unbind_texture(GLenum texture_type);
 
-} // namespace OpenGLWrapper
+} // namespace opengl_subsdk
