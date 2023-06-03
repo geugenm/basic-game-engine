@@ -5,6 +5,10 @@
 
 #include <glad/glad.h>
 
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
+
 namespace sdl_subsdk
 {
 
@@ -16,6 +20,7 @@ public:
         : sdk::engine(engine_name), k_window_title_(window_title),
           k_window_height_(height), k_window_width_(width)
     {
+        LOG(INFO) << "Engine created";
     }
 
     ~engine() override = default;

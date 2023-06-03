@@ -63,7 +63,7 @@ target_sources(
         PRIVATE src/sdl/misc/dll_reloader.cxx src/opengl/opengl_functions.cxx
         src/sdl/sdl_engine.cxx)
 target_link_libraries(sdl-engine PUBLIC SDL3::SDL3-shared opengl-glad
-        engine-includes)
+        engine-includes EasyLogging::EasyLogging)
 target_include_directories(
         sdl-engine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/src/sdl)
 
