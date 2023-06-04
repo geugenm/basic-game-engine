@@ -1,10 +1,7 @@
 ## Installation
 
-1. Clone the repository via `git clone --recurse-submodules <repository URL>`
-2. Install the required dependencies:
-    - `cmake 3.25.0+`
-    - `cpp compiler with cpp 23 support`
-    - `ninja`
+1. Clone the repository via `git clone https://github.com/geugenm/basic-game-engine.git`
+NOTE: CMake will automatically download all required submodules and dependencies, [implemented here.](https://github.com/geugenm/basic-game-engine/blob/main/cmake/git_update_submodules.cmake)
 
 ## Build & Deployment
 
@@ -21,7 +18,8 @@ see [CMakePresets.json](https://github.com/geugenm/sdl-overview/blob/master/CMak
 
 Also,
 you can use an automized [build.sh](https://github.com/geugenm/sdl-overview/blob/master/scripts/build.sh)
-in `scripts` folder changing directory to `..` by default.
+in `scripts` folder. This is universal script, so when launched type `..` to cd upper, to the project root by default,
+and then you'll need to type the build type from the list that will be printed (case is important, type as it printed).
 
 ### Docker build on manjaro
 
@@ -39,7 +37,7 @@ cd scripts
 sh build_docs.sh
 ```
 
-It'll open your default app for viewing html files
+It will build docs in `build/docs`. After that you can build docs with latex if required manually via `make` command in `build/docs/latex/`.
 
 ## Contributing
 
@@ -49,7 +47,7 @@ different language.
 
 ## License
 
-This project is licensed under the AGPL-3.0 License — see the `LICENSE` file for details.
+This project is licensed under the AGPL-3.0 License — see the [`LICENSE`](https://github.com/geugenm/basic-game-engine/blob/main/LICENSE.md) file for details.
 
 ## Acknowledgments
 
