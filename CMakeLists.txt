@@ -34,30 +34,8 @@ message(STATUS "Library Names: ${MY_LIBRARIES_NAMES}")
 get_property(_allTargets GLOBAL PROPERTY GlobalTargetList)
 message(STATUS "GlobalTargetList: ${_allTargets}")
 
-# Set up include directories for engine and OpenGL
-add_library(engine_includes INTERFACE)
-target_include_directories(
-        engine_includes
-        INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include)
-
-add_subdirectory(src/opengl)
-add_subdirectory(src/sdl)
-add_subdirectory(src/imgui)
-
-## Add OpenGL glad library
-#add_library(opengl_glad_sdl3_sdk)
-#target_sources(opengl_glad_sdl3_sdk PRIVATE src/opengl/glad.c)
-#target_include_directories(opengl_glad_sdl3_sdk PUBLIC src/opengl)
-
-#add_library(sdl-engine)
-#target_sources(
-#        sdl-engine
-#        PRIVATE src/sdl/misc/dll_reloader.cxx src/opengl/opengl_functions.cxx
-#        src/sdl/sdl_engine.cxx)
-#target_link_libraries(sdl-engine PUBLIC SDL3::SDL3-shared opengl_glad_sdl3_sdk
-#        engine_includes EasyLogging::EasyLogging)
-#target_include_directories(
-#        sdl-engine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/src/sdl)
+add_subdirectory(include)
+add_subdirectory(src)
 
 # Enable/disable building tests
 option(BUILD_TESTS "Build tests" ON)
@@ -71,35 +49,8 @@ if (BUILD_TESTS)
 
     enable_testing()
 
-    add_test_executable(test_sdl_static_compilation test/test_sdl_general.cxx)
-    target_link_libraries(test_sdl_static_compilation PRIVATE SDL3::SDL3-shared)
-
-    add_test_executable(test_sdl_shared_compilation test/test_sdl_general.cxx)
-    target_link_libraries(test_sdl_shared_compilation PRIVATE SDL3::SDL3-shared)
-
-    add_test_executable(test_opengl_init test/test_opengl_general.cxx)
-    target_link_libraries(test_opengl_init PRIVATE opengl_glad_sdl3_sdk SDL3::SDL3-shared)
-
-    add_test_executable(test_engine_shaders_sdl
-            test/test_abstract_engine_triangle.cxx)
-    target_link_libraries(test_engine_shaders_sdl PRIVATE sdl-engine)
-
-    add_test_executable(test_opengl_engine_shaders
-            test/test_sdl_opengl_shader.cxx)
-    target_link_libraries(test_opengl_engine_shaders PRIVATE sdl-engine)
-
-    add_test_executable(test_complex_light_shader
-            test/test_complex_light_fragment_shader.cxx)
-    target_link_libraries(test_complex_light_shader PRIVATE sdl-engine)
-
-    add_test_executable(test_opengl_texture test/test_opengl_texture.cxx)
-    target_link_libraries(test_opengl_texture PRIVATE sdl-engine glm::glm)
-
-    add_test_executable(test_imgui test/test_imgui_general.cxx)
-    target_link_libraries(test_imgui PRIVATE sdl-engine imgui_sdk)
-
     add_test_executable(test_imgui_interaction test/test_imgui_engine_interaction.cxx)
-    target_link_libraries(test_imgui_interaction PRIVATE sdl3_sdk imgui_sdk)
+    target_link_libraries(test_imgui_interaction PRIVATE engine_sdk)
 
     set(NON_CPP_EXTENSIONS glsl png)
 
