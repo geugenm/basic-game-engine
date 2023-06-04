@@ -10,64 +10,6 @@
 
 #include "glad/glad.h"
 
-void opengl_subsdk::init_sdl()
-{
-    constexpr Uint32 flags = SDL_INIT_VIDEO;
-    if (SDL_Init(flags) != 0)
-    {
-        throw std::runtime_error(
-            "Failed to init SDL (SDL_INIT_VIDEO flag given)");
-    }
-}
-
-SDL_Window *opengl_subsdk::get_new_sdl_window(const char *window_title,
-                                              const int &window_width,
-                                              const int &window_height)
-{
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, k_opengl_major_version);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, k_opengl_minor_version);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                        SDL_GL_CONTEXT_PROFILE_CORE);
-
-    constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
-
-    SDL_Window *window = SDL_CreateWindow(window_title, window_width, window_height, flags);
-    if (!window)
-    {
-        std::cerr << SDL_GetError() << std::endl;
-        throw std::runtime_error("Failed to init SDL window with OpenGL.");
-    }
-
-    return window;
-}
-
-SDL_GLContext opengl_subsdk::get_new_sdl_gl_context(SDL_Window *window)
-{
-    if (window == nullptr)
-    {
-        throw std::invalid_argument(
-            "Can't create context from uninitialized SDL window.");
-    }
-
-    SDL_GLContext context = SDL_GL_CreateContext(window);
-    if (!context)
-    {
-        std::cerr << SDL_GetError() << std::endl;
-        throw std::invalid_argument("Failed to create OpenGL context.");
-    }
-
-    return context;
-}
-
-void opengl_subsdk::load_opengl_functions()
-{
-    if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
-    {
-        std::cerr << "Failed to load OpenGL functions with glad: "
-                  << glGetError() << std::endl;
-        throw std::runtime_error("Can't load opengl functions.");
-    }
-}
 
 bool opengl_subsdk::is_opengl_version_supported()
 {
@@ -76,23 +18,13 @@ bool opengl_subsdk::is_opengl_version_supported()
 
     glGetIntegerv(GL_MINOR_VERSION, &minor);
 
-    if (major < k_opengl_major_version ||
-        (major == k_opengl_major_version && minor < k_opengl_minor_version))
+    if (major < OPENGL_MAJOR_VERSION ||
+        (major == OPENGL_MAJOR_VERSION && minor < OPENGL_MINOR_VERSION))
     {
         return false;
     }
 
     return true;
-}
-
-void opengl_subsdk::init_opengl()
-{
-    load_opengl_functions();
-
-    if (!is_opengl_version_supported())
-    {
-        throw std::runtime_error("OpenGL version is not supported.");
-    }
 }
 
 std::string opengl_subsdk::glenum_to_string(GLenum value)
@@ -250,8 +182,8 @@ GLuint opengl_subsdk::get_new_compiled_shader(GLenum shader_type,
 
     if (!success)
     {
-        GLchar info_log[k_info_log_size];
-        glGetShaderInfoLog(result_shader, k_info_log_size, nullptr, info_log);
+        GLchar info_log[OPENGL_INFO_LOG_SIZE];
+        glGetShaderInfoLog(result_shader, OPENGL_INFO_LOG_SIZE, nullptr, info_log);
 
         std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n"
                   << info_log << std::endl;
@@ -270,8 +202,8 @@ void opengl_subsdk::link_shader_program(GLuint program)
 
     if (!success)
     {
-        GLchar info_log[k_info_log_size];
-        glGetProgramInfoLog(program, k_info_log_size, nullptr, info_log);
+        GLchar info_log[OPENGL_INFO_LOG_SIZE];
+        glGetProgramInfoLog(program, OPENGL_INFO_LOG_SIZE, nullptr, info_log);
 
         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
                   << info_log << std::endl;
@@ -332,7 +264,7 @@ char *opengl_subsdk::get_file_content(const std::string &file_path)
     }
 
     const size_t content_size = content.size();
-    char *result = static_cast<char *>(std::malloc(content_size + 1));
+    auto *result = static_cast<char *>(std::malloc(content_size + 1));
     std::copy(content.begin(), content.end(), result);
     result[content_size] = '\0';
 
@@ -342,7 +274,7 @@ char *opengl_subsdk::get_file_content(const std::string &file_path)
 GLuint opengl_subsdk::get_compiled_shader_from_file(GLenum shader_type,
                                                     const char *shader_path)
 {
-    GLchar *shader_content = opengl_subsdk::get_file_content(shader_path);
+    GLchar const *shader_content = opengl_subsdk::get_file_content(shader_path);
 
     GLuint result =
         opengl_subsdk::get_new_compiled_shader(shader_type, shader_content);

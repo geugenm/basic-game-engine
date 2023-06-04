@@ -1,11 +1,9 @@
 #pragma once
 
 #include "iengine.hxx"
-#include "opengl_functions.hxx"
+#include "sdl_functions.hxx"
 
 #include <glad/glad.h>
-
-
 
 namespace sdl_subsdk
 {
@@ -45,9 +43,9 @@ public:
 protected:
     void initialize_impl() override
     {
-        opengl_subsdk::init_sdl();
+        sdl_subsdk::init_sdl();
 
-        window_ = opengl_subsdk::get_new_sdl_window(
+        window_ = sdl_subsdk::get_new_sdl_window(
             k_window_title_, k_window_width_, k_window_height_);
         if (!window_)
         {
@@ -55,7 +53,7 @@ protected:
             throw std::invalid_argument("Failed to create SDL window");
         }
 
-        context_ = opengl_subsdk::get_new_sdl_gl_context(window_);
+        context_ = sdl_subsdk::get_new_sdl_gl_context(window_);
         if (!context_)
         {
             SDL_DestroyWindow(window_);
@@ -63,7 +61,7 @@ protected:
             throw std::invalid_argument("Failed to create OpenGL context");
         }
 
-        opengl_subsdk::init_opengl();
+        sdl_subsdk::init_opengl();
     }
 
     void render_impl() override

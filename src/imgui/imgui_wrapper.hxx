@@ -3,6 +3,9 @@
 #include <SDL3/SDL.h>
 #include <imgui.h>
 
+#include <string_view>
+#include <stdexcept>
+
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
 
@@ -18,20 +21,18 @@ void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 {
     if (window == nullptr)
     {
-        throw sdk::engine_error("Given SDL window is nullptr.", "init_imgui");
+        throw std::runtime_error("Given SDL window is nullptr.");
     }
 
     if (gl_context == nullptr)
     {
-        throw sdk::engine_error("Given SDL GL context is nullptr.",
-                                "init_imgui");
+        throw std::runtime_error("Given SDL GL context is nullptr.");
     }
 
     IMGUI_CHECKVERSION();
     if (ImGui::CreateContext() == nullptr)
     {
-        throw sdk::engine_error("Failed to create ImGui context.",
-                                "init_imgui");
+        throw std::runtime_error("Failed to create ImGui context.");
     }
 
     ImStyle::setup_style(k_use_dark_style, k_window_alpha);
@@ -69,7 +70,7 @@ void render(ImDrawData *draw_data)
 {
     if (draw_data == nullptr)
     {
-        throw sdk::engine_error("Given nullptr draw data.", "imgui::render");
+        throw std::runtime_error("Given nullptr draw data.");
     }
 
     ImGuiIO const &io = ImGui::GetIO();

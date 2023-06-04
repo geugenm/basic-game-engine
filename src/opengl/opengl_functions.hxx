@@ -1,32 +1,30 @@
 #pragma once
 
+#include "glad/glad.h"
+
 #include <filesystem>
 #include <string>
 #include <vector>
 
-#include <SDL3/SDL.h>
 #include <fstream>
-#include <glad/glad.h>
+
+#ifndef OPENGL_MAJOR_VERSION
+#define OPENGL_MAJOR_VERSION 3
+#endif
+
+#ifndef OPENGL_MINOR_VERSION
+#define OPENGL_MINOR_VERSION 2
+#endif
+
+#ifndef OPENGL_INFO_LOG_SIZE
+#define OPENGL_INFO_LOG_SIZE 512
+#endif
+
 
 namespace opengl_subsdk
 {
 
-constexpr uint16_t k_opengl_major_version = 3;
-constexpr uint16_t k_opengl_minor_version = 2;
-constexpr uint32_t k_info_log_size        = 512;
-
-void init_sdl();
-
-SDL_Window *get_new_sdl_window(const char *window_title, const int &window_width,
-                               const int &window_height);
-
-SDL_GLContext get_new_sdl_gl_context(SDL_Window *window);
-
-void load_opengl_functions();
-
 bool is_opengl_version_supported();
-
-void init_opengl();
 
 std::string glenum_to_string(GLenum value);
 
