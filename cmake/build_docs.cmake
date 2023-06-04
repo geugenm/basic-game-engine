@@ -23,5 +23,5 @@ if (DOXYGEN_FOUND)
             COMMAND ${CMAKE_COMMAND} -E echo "Also, you can build latex at ${PROJECT_SOURCE_DIR}/${DOCS_LATEX_PATH}/${LATEX_MAKE_FILE}"
             )
 else ()
-    message(WARNING "Doxygen needs to be installed to generate the documentation")
+    message(FATAL_ERROR "Doxygen needs to be installed to generate the documentation")
 endif ()

@@ -50,7 +50,7 @@ protected:
         if (!window_)
         {
             SDL_Quit();
-            throw std::invalid_argument("Failed to create SDL window");
+            throw sdk::engine_error("Failed to create SDL window");
         }
 
         context_ = sdl_subsdk::get_new_sdl_gl_context(window_);
@@ -58,7 +58,7 @@ protected:
         {
             SDL_DestroyWindow(window_);
             SDL_Quit();
-            throw std::invalid_argument("Failed to create OpenGL context");
+            throw sdk::engine_error("Failed to create OpenGL context");
         }
 
         sdl_subsdk::init_opengl();

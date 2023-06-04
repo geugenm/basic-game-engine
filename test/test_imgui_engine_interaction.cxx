@@ -109,7 +109,8 @@ private:
         }
     }
 
-    void update_vertex_buffer() const {
+    void update_vertex_buffer() const
+    {
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
 
         const auto vertices = opengl_subsdk::get_vertices_from_glsl_file(
@@ -119,7 +120,8 @@ private:
                      vertices.data(), GL_DYNAMIC_DRAW);
     }
 
-    void rebind_vertex_array() const {
+    void rebind_vertex_array() const
+    {
         glBindVertexArray(VAO_);
 
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
@@ -260,7 +262,8 @@ TEST(TriangleTest, LavaLampTriangle)
         new imgui_component(engine->get_window(), engine->get_context());
     engine->add_component(imgui);
 
-    auto shader_editor = new imgui_shader_editor(*imgui, shader->get_shader());
+    auto shader_editor =
+        new imgui_shader_editor(*imgui, shader->get_shader(), "shader_editor");
     imgui->add_window(shader_editor);
 
     SDL_Event event;
