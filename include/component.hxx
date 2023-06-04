@@ -14,6 +14,4 @@ public:
     {
     }
 };
-
-using component_ptr = std::unique_ptr<component>;
 } // namespace sdk

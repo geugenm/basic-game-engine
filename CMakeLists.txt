@@ -40,17 +40,7 @@ target_include_directories(
         engine-includes
         INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include)
 
-add_library(imgui-engine)
-target_include_directories(imgui-engine
-        PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src/imgui")
-
-target_sources(
-        imgui-engine
-        PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/imgui/imgui_wrapper.cxx"
-        "${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp"
-        "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp")
-target_link_libraries(imgui-engine PUBLIC opengl-glad SDL3::SDL3-shared
-        engine-includes opengl-glad imgui)
+add_subdirectory(src/imgui)
 
 # Add OpenGL glad library
 add_library(opengl-glad)
@@ -104,10 +94,10 @@ if (BUILD_TESTS)
     target_link_libraries(test_opengl_texture PRIVATE sdl-engine glm::glm)
 
     add_test_executable(test_imgui test/test_imgui_general.cxx)
-    target_link_libraries(test_imgui PRIVATE sdl-engine imgui-engine)
+    target_link_libraries(test_imgui PRIVATE sdl-engine imgui_sdk)
 
     add_test_executable(test_imgui_interaction test/test_imgui_engine_interaction.cxx)
-    target_link_libraries(test_imgui_interaction PRIVATE sdl-engine imgui-engine)
+    target_link_libraries(test_imgui_interaction PRIVATE sdl-engine imgui_sdk)
 
     set(NON_CPP_EXTENSIONS glsl png)
 

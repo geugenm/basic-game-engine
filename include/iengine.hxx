@@ -1,9 +1,8 @@
 #pragma once
 
-#include "render_object.hxx"
 #include "component.hxx"
-
-#include <easylogging++.h>
+#include "logger.hxx"
+#include "render_object.hxx"
 
 #include <iostream>
 #include <memory>
@@ -12,8 +11,6 @@
 #include <sstream>
 #include <utility>
 #include <vector>
-
-INITIALIZE_EASYLOGGINGPP
 
 namespace sdk
 {
@@ -26,14 +23,23 @@ public:
 
     ~iengine() override = default;
 
-    void init()
+    void initialize()
     {
+        if (is_initialized())
+        {
+            LOG(WARNING) << "Reinitializing engine and all its components";
+        }
+
         object::initialize();
 
         for (auto const &component : components_)
         {
             component->initialize();
+            LOG(INFO) << "Component '" << component->get_name()
+                      << "' initialized";
         }
+
+        LOG(INFO) << "Engine initialized";
     }
 
     void render()
@@ -53,17 +59,11 @@ public:
         for (auto const &component : components_)
         {
             component->destroy();
+            LOG(INFO) << "Component '" << component->get_name()
+                      << "' destroyed";
         }
-    }
 
-    void add_component(std::unique_ptr<component> component)
-    {
-        if (component == nullptr)
-        {
-            throw engine_error("Trying to add null component", "add_component");
-        }
-        component->initialize();
-        components_.push_back(std::move(component));
+        LOG(INFO) << "Engine destroyed";
     }
 
     void add_component(component *component)
@@ -73,7 +73,10 @@ public:
             throw engine_error("Trying to add null component", "add_component");
         }
         component->initialize();
+
         components_.push_back(std::unique_ptr<sdk::component>(component));
+
+        LOG(INFO) << "Component '" << component->get_name() << "' added";
     }
 
 private:
