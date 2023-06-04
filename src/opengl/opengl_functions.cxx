@@ -274,6 +274,10 @@ char *opengl_subsdk::get_file_content(const std::string &file_path)
 GLuint opengl_subsdk::get_compiled_shader_from_file(GLenum shader_type,
                                                     const char *shader_path)
 {
+    if (shader_path == nullptr) {
+        throw std::invalid_argument("Shader path is null");
+    }
+
     GLchar const *shader_content = opengl_subsdk::get_file_content(shader_path);
 
     GLuint result =

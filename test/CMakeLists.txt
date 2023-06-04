@@ -12,16 +12,28 @@ if (BUILD_TESTS)
 
     enable_testing()
 
+    add_test_executable(test_sdl_static_compilation test_sdl_general.cxx)
+    target_link_libraries(test_sdl_static_compilation PRIVATE SDL3::SDL3-static)
+
+    add_test_executable(test_sdl_shared_compilation test_sdl_general.cxx)
+    target_link_libraries(test_sdl_shared_compilation PRIVATE SDL3::SDL3-shared)
+
+
+    add_test_executable(test_imgui test_imgui_general.cxx)
+    target_link_libraries(test_imgui PRIVATE engine_sdk)
+
+
+
     add_test_executable(test_imgui_interaction test_imgui_engine_interaction.cxx)
     target_link_libraries(test_imgui_interaction PRIVATE engine_sdk)
 
     set(NON_CPP_EXTENSIONS glsl png)
 
     foreach (EXTENSION ${NON_CPP_EXTENSIONS})
-        file(GLOB_RECURSE NON_CPP_FILES "test/*.${EXTENSION}")
+        file(GLOB_RECURSE NON_CPP_FILES "*.${EXTENSION}")
         foreach (NON_CPP_FILE ${NON_CPP_FILES})
-            file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR}/test ${NON_CPP_FILE})
-            configure_file(${NON_CPP_FILE} "${CMAKE_BINARY_DIR}/test/${REL_PATH}"
+            file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR} ${NON_CPP_FILE})
+            configure_file(${NON_CPP_FILE} "${CMAKE_BINARY_DIR}/${REL_PATH}"
                     COPYONLY)
         endforeach ()
     endforeach ()

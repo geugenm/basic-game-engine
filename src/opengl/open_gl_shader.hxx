@@ -14,13 +14,10 @@ public:
     explicit shader(const char *vertex_path, const char *fragment_path)
         : vertex_source_path_(vertex_path), fragment_source_path_(fragment_path)
     {
+        if (!vertex_source_path_ || !fragment_source_path_) {
+            throw std::invalid_argument("Vertex and fragment shader paths are empty.");
+        }
         create_shader_program();
-    }
-
-    explicit shader(const std::string_view &vertex_path,
-                    const std::string_view &fragment_path)
-        : shader(vertex_path.data(), fragment_path.data())
-    {
     }
 
     void recompile()
