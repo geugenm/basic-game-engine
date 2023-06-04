@@ -259,12 +259,11 @@ char *opengl_subsdk::get_file_content(const std::string &file_path)
 
     if (content.empty())
     {
-        std::cerr << "Trying to read empty file: " << file_path << std::endl;
-        return nullptr;
+        throw std::invalid_argument("File is empty");
     }
 
     const size_t content_size = content.size();
-    auto *result = static_cast<char *>(std::malloc(content_size + 1));
+    auto *result = new char[content_size + 1];
     std::copy(content.begin(), content.end(), result);
     result[content_size] = '\0';
 

@@ -12,8 +12,8 @@ class shader_component : public sdk::component
 public:
     explicit shader_component(const char *name) : sdk::component(name)
     {
-        shader_ = new opengl_subsdk::shader(k_vertex_shader_path_,
-                                            k_fragment_shader_path_);
+        shader_ = new opengl_subsdk::shader(k_vertex_shader_path_.data(),
+                                            k_fragment_shader_path_.data());
     }
 
     ~shader_component() override = default;
