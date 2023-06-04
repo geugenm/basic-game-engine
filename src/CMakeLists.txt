@@ -4,11 +4,12 @@ add_subdirectory(opengl)
 add_subdirectory(sdl)
 add_subdirectory(imgui)
 
-add_library(engine_sdk INTERFACE)
-target_link_libraries(engine_sdk INTERFACE
+add_library(engine_sdk STATIC)
+target_link_libraries(engine_sdk PUBLIC
         sdl3_sdk
         opengl_sdk
         imgui_sdk
+        engine_includes
 )
 
 
