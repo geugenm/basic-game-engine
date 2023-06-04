@@ -1,4 +1,4 @@
-#include "abstract_engine.hxx"
+#include "iengine.hxx"
 #include "opengl_functions.hxx"
 #include <gtest/gtest.h>
 

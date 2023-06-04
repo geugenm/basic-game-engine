@@ -1,23 +1,21 @@
 #pragma once
 
+#include "iengine.hxx"
 #include "opengl_functions.hxx"
-#include <abstract_engine.hxx>
 
 #include <glad/glad.h>
 
-#include <easylogging++.h>
 
-INITIALIZE_EASYLOGGINGPP
 
 namespace sdl_subsdk
 {
 
-class engine : public sdk::engine
+class engine : public sdk::iengine
 {
 public:
     engine(const char *window_title, const int &height, const int width,
            const char *engine_name = "sdl_engine")
-        : sdk::engine(engine_name), k_window_title_(window_title),
+        : sdk::iengine(engine_name), k_window_title_(window_title),
           k_window_height_(height), k_window_width_(width)
     {
         LOG(INFO) << "Engine created";

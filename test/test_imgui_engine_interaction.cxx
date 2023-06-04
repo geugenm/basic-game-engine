@@ -1,4 +1,4 @@
-#include "abstract_engine.hxx"
+#include "iengine.hxx"
 #include "imgui_wrapper.hxx"
 #include "opengl_functions.hxx"
 
@@ -28,24 +28,9 @@ public:
     {
         shader_change_daemon();
 
-        // Update the vertex buffer with the new vertices
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
+        update_vertex_buffer();
 
-        const auto vertices = opengl_subsdk::get_vertices_from_glsl_file(
-            "test/shaders/triangle_vertex.glsl");
-
-        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size()),
-                     vertices.data(), GL_DYNAMIC_DRAW);
-
-        // Re-bind the VAO after updating the vertex buffer
-        glBindVertexArray(VAO_);
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
-                              static_cast<GLvoid *>(nullptr));
-
-        glEnableVertexAttribArray(0);
-
-        glBindVertexArray(0);
+        rebind_vertex_array();
 
         // Clear the screen and draw the new triangle
         glClear(GL_COLOR_BUFFER_BIT);
@@ -101,6 +86,12 @@ private:
 
     void shader_change_daemon()
     {
+        if (shader_ == nullptr)
+        {
+            throw sdk::engine_error("Shader is null", "shader_change_daemon",
+                                    "shader");
+        }
+
         static std::time_t vertex_shader_last_modified   = 0;
         static std::time_t fragment_shader_last_modified = 0;
 
@@ -114,7 +105,30 @@ private:
             glDeleteProgram(shader_->get_program_id());
 
             shader_->recompile();
+
+            LOG(INFO) << "Shader recompiled";
         }
+    }
+
+    void update_vertex_buffer() const {
+        glBindBuffer(GL_ARRAY_BUFFER, VBO_);
+
+        const auto vertices = opengl_subsdk::get_vertices_from_glsl_file(
+            "test/shaders/triangle_vertex.glsl");
+
+        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size()),
+                     vertices.data(), GL_DYNAMIC_DRAW);
+    }
+
+    void rebind_vertex_array() const {
+        glBindVertexArray(VAO_);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
+                              static_cast<GLvoid *>(nullptr));
+
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(0);
     }
 
     opengl_subsdk::shader *shader_ = nullptr;
