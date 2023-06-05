@@ -24,7 +24,10 @@ if (BUILD_TESTS)
     add_test_executable(test_imgui_interaction test_imgui_engine_interaction.cxx)
     target_link_libraries(test_imgui_interaction PRIVATE engine_sdk)
 
-    set(NON_CPP_EXTENSIONS glsl png)
+    add_test_executable(test_sdl_sound test_sdl_sound.cxx)
+    target_link_libraries(test_sdl_sound PRIVATE engine_sdk)
+
+    set(NON_CPP_EXTENSIONS glsl png wav)
 
     foreach (EXTENSION ${NON_CPP_EXTENSIONS})
         file(GLOB_RECURSE NON_CPP_FILES "*.${EXTENSION}")
