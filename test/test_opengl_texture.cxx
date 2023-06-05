@@ -7,156 +7,172 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "sdl_engine.hxx"
 #include "open_gl_shader.hxx"
+#include "sdl_engine.hxx"
 
 #include "open_gl_shader.hxx"
 #include "render/picopng.hxx"
 
-namespace opengl_subsdk {
-    class texture {
-    public:
-        explicit texture(const char * image_path) : image_path_(image_path) {
-            if (image_path_ == nullptr) {
-                throw std::invalid_argument("Given image path is empty");
-            }
+namespace opengl_subsdk
+{
+class texture
+{
+public:
+    explicit texture(const char *image_path) : image_path_(image_path)
+    {
+        if (image_path_ == nullptr)
+        {
+            throw std::invalid_argument("Given image path is empty");
+        }
+    }
+
+    void initialize()
+    {
+        glGenVertexArrays(1, &VAO);
+
+        glGenBuffers(1, &VBO);
+
+        glGenBuffers(1, &EBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_), vertices_,
+                     GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_), indices_,
+                     GL_STATIC_DRAW);
+
+        // Position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                              nullptr);
+
+        glEnableVertexAttribArray(0);
+
+        // Color attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                              (GLvoid *)(3 * sizeof(GLfloat)));
+
+        glEnableVertexAttribArray(1);
+
+        // TexCoord attribute
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
+                              (GLvoid *)(6 * sizeof(GLfloat)));
+
+        glEnableVertexAttribArray(2);
+
+        glBindVertexArray(0);
+
+        // Load and create a texture
+        glGenTextures(1, &texture_);
+
+        // All upcoming GL_TEXTURE_2D operations now have an effect on this
+        // texture object
+        glBindTexture(GL_TEXTURE_2D, texture_);
+
+        // set the texture wrapping parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                        GL_REPEAT); // set texture wrapping to GL_REPEAT
+                                    // (default wrapping method)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        // Set texture filtering parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // Load image, create texture and generate mipmaps
+        unsigned long width;
+        unsigned long height;
+        const auto png_data = get_png_data(image_path_, width, height);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+                     GL_UNSIGNED_BYTE, png_data.data());
+
+        glActiveTexture(GL_TEXTURE0);
+    }
+
+    void render()
+    {
+        glBindVertexArray(VAO);
+    }
+
+    void destroy()
+    {
+        glDeleteVertexArrays(1, &VAO);
+
+        glDeleteBuffers(1, &VBO);
+
+        glDeleteBuffers(1, &EBO);
+    }
+
+private:
+    static std::vector<unsigned char> get_png_data(const char *image_path,
+                                                   unsigned long &width,
+                                                   unsigned long &height)
+    {
+        std::ifstream file(image_path, std::ios::binary | std::ios::ate);
+        if (!file.is_open())
+        {
+            throw std::invalid_argument("Failed to open PNG image");
         }
 
-        void init() {
-            // Set up vertex data (and buffer(s)) and attribute pointers
-            GLfloat vertices[] = {
-                // Positions          // Colors           // Texture Coords
-                0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-            };
-            GLuint indices[] = {
-                // Note that we start from 0!
-                0, 1, 3, // First Triangle
-                1, 2, 3  // Second Triangle
-            };
-            glGenVertexArrays(1, &VAO);
+        std::streamsize size = file.tellg();
+        file.seekg(0, std::ios::beg);
 
-            glGenBuffers(1, &VBO);
-
-            glGenBuffers(1, &EBO);
-
-            glBindVertexArray(VAO);
-
-            glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-                         GL_STATIC_DRAW);
-
-            // Position attribute
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
-                                  nullptr);
-
-            glEnableVertexAttribArray(0);
-
-            // Color attribute
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
-                                  (GLvoid *)(3 * sizeof(GLfloat)));
-
-            glEnableVertexAttribArray(1);
-
-            // TexCoord attribute
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
-                                  (GLvoid *)(6 * sizeof(GLfloat)));
-
-            glEnableVertexAttribArray(2);
-
-            glBindVertexArray(0);
-
-            std::ifstream file(image_path_,
-                               std::ios::binary | std::ios::ate);
-            if (!file.is_open())
-            {
-                throw std::invalid_argument("Failed to open PNG image");
-            }
-
-            std::streamsize size = file.tellg();
-            file.seekg(0, std::ios::beg);
-
-            std::vector<unsigned char> buffer(static_cast<unsigned long>(size));
-            if (!file.read(reinterpret_cast<char *>(buffer.data()), size))
-            {
-                throw std::runtime_error("Failed to read PNG image");
-            }
-
-            std::vector<unsigned char> png_data;
-            unsigned long width, height;
-
-            // Decode PNG data using picopng
-            auto error = static_cast<unsigned int>(
-                decodePNG(png_data, width, height, buffer.data(), buffer.size()));
-            if (error != 0)
-            {
-                throw std::runtime_error("Failed to decode PNG image");
-            }
-
-            if (png_data.empty())
-            {
-                throw std::runtime_error("Empty png result");
-            }
-
-            // Load and create a texture
-            glGenTextures(1, &texture_);
-
-            // All upcoming GL_TEXTURE_2D operations now have an effect on this texture
-            // object
-            glBindTexture(GL_TEXTURE_2D, texture_);
-
-            // set the texture wrapping parameters
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                            GL_REPEAT); // set texture wrapping to GL_REPEAT (default
-                                        // wrapping method)
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-            // Set texture filtering parameters
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            // Load image, create texture and generate mipmaps
-
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-                         GL_UNSIGNED_BYTE, png_data.data());
-
-            opengl_subsdk::unbind_texture(GL_TEXTURE_2D);
+        std::vector<unsigned char> buffer(static_cast<unsigned long>(size));
+        if (!file.read(reinterpret_cast<char *>(buffer.data()), size))
+        {
+            throw std::invalid_argument("Failed to read PNG image");
         }
 
-        void render() {
-            glActiveTexture(GL_TEXTURE0);
+        std::vector<unsigned char> png_data;
 
-            glBindTexture(GL_TEXTURE_2D, texture_);
-
-            glBindVertexArray(VAO);
+        // Decode PNG data using picopng
+        auto error = static_cast<unsigned int>(
+            decodePNG(png_data, width, height, buffer.data(), buffer.size()));
+        if (error != 0)
+        {
+            throw std::runtime_error("Failed to decode PNG image");
         }
 
-        void destroy() {
-            glDeleteVertexArrays(1, &VAO);
-
-            glDeleteBuffers(1, &VBO);
-
-            glDeleteBuffers(1, &EBO);
+        if (png_data.empty())
+        {
+            throw std::runtime_error("Empty png result");
         }
-    private:
-        const char * image_path_;
 
-        GLuint VBO{};
-        GLuint VAO{};
-        GLuint EBO{};
+        return png_data;
+    }
 
-        GLuint texture_{};
+    const char *image_path_;
 
+    GLuint VBO{};
+    GLuint VAO{};
+    GLuint EBO{};
+
+    GLuint texture_{};
+
+    unsigned long width_{};
+    unsigned long height_{};
+
+    static constexpr GLfloat vertices_[] = {
+        // Positions          // Colors           // Texture Coords
+        0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+        0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+        -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
     };
-}
+
+    static constexpr GLuint indices_[] = {
+        // Note that we start from 0!
+        0, 1, 3, // First Triangle
+        1, 2, 3  // Second Triangle
+    };
+};
+} // namespace opengl_subsdk
 
 TEST(SDLEngineTest, Init)
 {
@@ -172,7 +188,7 @@ TEST(SDLEngineTest, Init)
                                         "shaders/texture_fragment.glsl");
 
     auto texture = new opengl_subsdk::texture("textures/texture.png");
-    texture->init();
+    texture->initialize();
 
     shader.use();
 
@@ -190,7 +206,6 @@ TEST(SDLEngineTest, Init)
                 goto cleanup;
             }
         }
-
 
         texture->render();
         shader.use();
@@ -211,7 +226,6 @@ TEST(SDLEngineTest, Init)
         // Get matrix's uniform location and set matrix
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE,
                            glm::value_ptr(transform));
-
 
         glClear(GL_COLOR_BUFFER_BIT);
 
