@@ -57,6 +57,10 @@ public:
     void render()
     {
         glBindVertexArray(VAO);
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        glBindVertexArray(0);
     }
 
     void destroy()

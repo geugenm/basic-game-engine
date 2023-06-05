@@ -7,17 +7,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "open_gl_shader.hxx"
-#include "sdl_engine.hxx"
-
-#include "open_gl_shader.hxx"
-#include "render/picopng.hxx"
-
+#include <open_gl_shader.hxx>
 #include <opengl_texture.hxx>
 
 TEST(SDLEngineTest, Init)
 {
-    const char *window_title        = "TestSDLEngine";
+    static const char *window_title        = "TestSDLEngine";
     constexpr int32_t window_height = 1000;
     constexpr int32_t window_width  = 1000;
 
@@ -31,9 +26,7 @@ TEST(SDLEngineTest, Init)
     auto texture = new opengl_subsdk::texture("textures/texture.png");
     texture->initialize();
 
-    shader.use();
-
-    auto transformLoc = shader.get_uniform_location("transform");
+    const auto transformLoc = shader.get_uniform_location("transform");
 
     SDL_Event event;
     while (true)
@@ -48,16 +41,15 @@ TEST(SDLEngineTest, Init)
             }
         }
 
-        texture->render();
         shader.use();
 
-        GLint textureUniformLocation =
+        const GLint textureUniformLocation =
             glGetUniformLocation(shader.get_program_id(), "ourTexture");
 
         glUniform1i(textureUniformLocation,
                     0); // Set the texture uniform to use texture unit 0
 
-        glm::mat4 transform = glm::mat4(1.0f);
+        auto transform = glm::mat4(1.0f);
         const float time    = static_cast<float>(SDL_GetTicks()) / 1000.0f;
         transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
         transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
@@ -70,9 +62,7 @@ TEST(SDLEngineTest, Init)
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-        glBindVertexArray(0);
+        texture->render();
 
         engine->render();
     }
