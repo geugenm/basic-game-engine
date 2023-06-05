@@ -3,6 +3,9 @@
 #include <SDL3/SDL.h>
 #include <string>
 
+#include "logger.hxx"
+#include "opengl_functions.hxx"
+#include "sdl_engine.hxx"
 #include <gtest/gtest.h>
 
 #include <cassert>
@@ -11,12 +14,10 @@
 #include <cstring>
 #include <iostream>
 
-constexpr int32_t AUDIO_FORMAT = SDL_AUDIO_S16LSB;
-
-static void audio_callback(void *userdata, uint8_t *stream, int len);
-
+namespace sdl_subsdk
+{
 #pragma pack(push, 1)
-struct audio_buff
+struct audio_buffer
 {
     uint8_t *start     = nullptr;
     size_t size        = 0;
@@ -31,227 +32,28 @@ struct audio_buff
 };
 #pragma pack(pop)
 
-std::ostream &operator<<(std::ostream &o, const SDL_AudioSpec &spec);
-
-static auto start             = std::chrono::high_resolution_clock::now();
-static auto finish            = start;
-static uint32_t default_delay = 0;
-
-enum class play_channel
+enum class stereo_audio_channel
 {
     left,
     right,
     left_and_right
 };
 
-static play_channel channels{play_channel::left_and_right};
-
-TEST(SDL_Audio, audio_callback)
-{
-    using namespace std;
-
-    clog << "start sdl init" << endl;
-
-    if (SDL_Init(SDL_INIT_AUDIO) < 0)
-    {
-        cerr << "error: can't init audio: " << SDL_GetError();
-        FAIL();
-    }
-
-    const char *file_name = "wav/machine_gun_loop.wav";
-
-    clog << "read file: " << file_name << endl;
-
-    SDL_RWops *file = SDL_RWFromFile(file_name, "rb");
-    if (file == nullptr)
-    {
-        cerr << "error: can't open file: " << file_name << "\n";
-        FAIL();
-    }
-
-    SDL_AudioSpec audio_spec_from_file{};
-    const int32_t auto_delete_file       = 1;
-    uint8_t *sample_buffer_from_file     = nullptr;
-    uint32_t sample_buffer_len_from_file = 0;
-
-    clog << "loading sample buffer from file: " << file_name << endl;
-
-    SDL_AudioSpec const *audio_spec =
-        SDL_LoadWAV_RW(file, auto_delete_file, &audio_spec_from_file,
-                       &sample_buffer_from_file, &sample_buffer_len_from_file);
-
-    if (audio_spec == nullptr)
-    {
-        cerr << "error: can't parse and load audio samples from file\n";
-        FAIL();
-    }
-
-    clog << "loaded file audio spec:\n" << audio_spec_from_file << endl;
-
-    // clang-format off
-    audio_buff loaded_audio_buff
-    {
-        .start = sample_buffer_from_file,
-        .size = sample_buffer_len_from_file,
-        .current_pos = 0,
-        .note = {
-         .frequency = 0,
-         .time = 0,
-         .use_note = false
-        }
-    };
-    // clang-format on
-
-    clog << "audio buffer from file size: " << sample_buffer_len_from_file
-         << " B (" << sample_buffer_len_from_file / double(1024 * 1024)
-         << ") MB" << endl;
-
-    const char *device_name         = nullptr; // device name or nullptr
-    const int32_t is_capture_device = 0; // 0 - play device, 1 - microphone
-    SDL_AudioSpec desired{.freq     = 48000,
-                          .format   = AUDIO_FORMAT,
-                          .channels = 2,    // stereo
-                          .silence  = 0,
-                          .samples  = 4096, // must be power of 2
-                          .padding  = 0,
-                          .size     = 0,
-                          .callback = audio_callback,
-                          .userdata = &loaded_audio_buff};
-
-    clog << "prepare desired audio specs for output device:\n"
-         << desired << endl;
-
-    SDL_AudioSpec returned{};
-
-    const int32_t allow_changes = 0;
-
-    SDL_AudioDeviceID audio_device_id = SDL_OpenAudioDevice(
-        device_name, is_capture_device, &desired, &returned, allow_changes);
-    if (audio_device_id == 0)
-    {
-        cerr << "error: failed to open audio device: " << SDL_GetError()
-             << std::endl;
-        FAIL();
-    }
-
-    clog << "returned audio spec for output device:\n" << returned << endl;
-
-    if (desired.format != returned.format ||
-        desired.channels != returned.channels || desired.freq != returned.freq)
-    {
-        cerr << "error: desired != returned audio device settings!";
-        FAIL();
-    }
-
-    // start playing audio thread
-    // now callback is firing
-    SDL_PlayAudioDevice(audio_device_id);
-
-    clog << "unpause audio device (start audio thread)" << endl;
-
-    bool continue_loop = true;
-    while (continue_loop)
-    {
-        clog << "1. stop and exit\n"
-             << "2. print current music position\n"
-             << "3. print music time (length)\n"
-             << "4. print device buffer play length\n"
-             << "5. experimental device buffer play length(time between "
-                "callbacks)\n"
-             << "6. set default delay for audio callback(current val: "
-             << default_delay << " ms)\n"
-             << "7. play note(current val: " << loaded_audio_buff.note.frequency
-             << ")\n"
-             << "8. play note on channel (0 - left, 1 - right, 2 "
-                "left_and_right)\n"
-             << ">" << flush;
-
-        int choice = 0;
-        cin >> choice;
-        switch (choice)
-        {
-            case 1:
-                continue_loop = false;
-                break;
-            case 2:
-                clog << "current music pos: "
-                     << static_cast<double>(loaded_audio_buff.current_pos) /
-                            double(loaded_audio_buff.size) * 100
-                     << " %" << endl;
-                break;
-            case 3: {
-                size_t format_size =
-                    audio_spec_from_file.format == AUDIO_FORMAT ? 2 : 0;
-
-                double time_in_minutes = double(loaded_audio_buff.size) /
-                                         audio_spec_from_file.channels /
-                                         static_cast<double>(format_size) /
-                                         audio_spec_from_file.freq / 60;
-
-                double minutes;
-                double rest_minute = modf(time_in_minutes, &minutes);
-                double seconds = rest_minute * 60; // 60 seconds in one minute
-                clog << "music length: " << time_in_minutes << " minutes or ("
-                     << minutes << ":" << seconds << ")" << endl;
-                break;
-            }
-            case 4: {
-                clog << "device buffer play length: "
-                     << returned.samples / double(returned.freq) << " seconds"
-                     << endl;
-                break;
-            }
-            case 5: {
-                double elapsed_seconds =
-                    std::chrono::duration_cast<std::chrono::duration<double>>(
-                        finish - start)
-                        .count();
-                clog << "time between last two audio_callbacks: "
-                     << elapsed_seconds << " seconds" << endl;
-                break;
-            }
-            case 6: {
-                clog << "input delay in milliseconds:>" << flush;
-                cin >> default_delay;
-                break;
-            }
-            case 7: {
-                clog << "input note frequency: " << flush;
-                cin >> loaded_audio_buff.note.frequency;
-            }
-            break;
-            case 8: {
-                clog << "input play_channel: " << flush;
-                int i{};
-                cin >> i;
-                channels = static_cast<play_channel>(i);
-            }
-            default:
-                break;
-        }
-    }
-
-    clog << "pause audio device (stop audio thread)" << endl;
-    // stop an audio device and stop thread call our callback function
-    SDL_PauseAudioDevice(audio_device_id);
-
-    clog << "close audio device" << endl;
-
-    SDL_CloseAudioDevice(audio_device_id);
-
-    SDL_free(loaded_audio_buff.start);
-
-    SDL_Quit();
-}
-
 static void audio_callback(void *userdata, uint8_t *stream, int len)
 {
+    static auto start             = std::chrono::high_resolution_clock::now();
+    static auto finish            = start;
+    static uint32_t default_delay = 0;
+    static stereo_audio_channel channels{stereo_audio_channel::left_and_right};
+
     static bool first_time = true;
     if (first_time)
     {
         std::clog << "start audio_callback!" << std::endl;
         first_time = false;
     }
+
+    static constexpr int32_t AUDIO_FORMAT = SDL_AUDIO_S16LSB;
 
     // simulate long calculation (just test)
     SDL_Delay(default_delay);
@@ -264,7 +66,7 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
     // silence
     std::memset(stream, 0, static_cast<size_t>(len));
 
-    auto audio_buff_data = static_cast<audio_buff *>(userdata);
+    auto audio_buff_data = static_cast<audio_buffer *>(userdata);
     assert(audio_buff_data != nullptr);
 
     if (audio_buff_data->note.frequency != 0)
@@ -285,21 +87,21 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
 
             switch (channels)
             {
-                case play_channel::left_and_right: {
+                case stereo_audio_channel::left_and_right: {
                     *output = curr_val;
                     output++;
                     *output = curr_val;
                     output++;
                     break;
                 }
-                case play_channel::left: {
+                case stereo_audio_channel::left: {
                     *output = curr_val;
                     output++;
                     *output = 0;
                     output++;
                     break;
                 }
-                case play_channel::right: {
+                case stereo_audio_channel::right: {
                     *output = 0;
                     output++;
                     *output = curr_val;
@@ -344,19 +146,175 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
     }
 }
 
-std::ostream &operator<<(std::ostream &o, const SDL_AudioSpec &spec)
+class audio_mixer
 {
-    std::string tab(4, ' ');
-    o << tab << "freq: " << spec.freq << '\n'
-      << tab << "format: " << std::hex << spec.format << '\n'
-      << tab << "channels: " << std::dec << int(spec.channels) << '\n'
-      << tab << "silence: " << int(spec.silence) << '\n'
-      << tab << "samples: " << spec.samples << '\n'
-      << tab << "size: " << spec.size << '\n'
-      << tab << "callback: " << reinterpret_cast<const void *>(spec.callback)
-      << '\n'
-      << tab << "userdata: " << spec.userdata;
-    return o;
+public:
+    explicit audio_mixer(const char *sound_file) : sound_file_name_(sound_file)
+    {
+        if (sound_file_name_ == nullptr)
+        {
+            throw std::invalid_argument("Sound file is nullptr");
+        }
+    }
+    ~audio_mixer() = default;
+
+    void initialize()
+    {
+        LOG(INFO) << "Initializing audio mixer";
+
+        if (SDL_Init(SDL_INIT_AUDIO) < 0)
+        {
+            LOG(ERROR) << "Can't init audio: " << SDL_GetError();
+            throw std::invalid_argument("Failed to initialize SDL audio");
+        }
+
+        LOG(INFO) << "SDL audio initialized";
+
+        LOG(INFO) << "Loading sound file: " << sound_file_name_;
+
+        sound_file_ = SDL_RWFromFile(sound_file_name_, "rb");
+        if (sound_file_ == nullptr)
+        {
+            LOG(ERROR) << "Can't open file: " << sound_file_name_;
+            throw std::invalid_argument("Failed to open sound file");
+        }
+
+        LOG(INFO) << "Loaded sound file: " << sound_file_name_;
+
+        LOG(INFO) << "Loading audio spec from file: " << sound_file_name_;
+
+        audio_spec_ = SDL_LoadWAV_RW(
+            sound_file_, auto_delete_file_, &audio_spec_from_file_,
+            &sample_buffer_from_file_, &sample_buffer_len_from_file_);
+
+        if (audio_spec_ == nullptr)
+        {
+            LOG(INFO) << "Can't parse audio spec from file: "
+                      << sound_file_name_;
+            throw std::invalid_argument("Failed to parse audio spec");
+        }
+
+        LOG(INFO) << "Loaded audio spec from file: " << sound_file_name_;
+
+        loaded_audio_buff_ = {
+            .start       = sample_buffer_from_file_,
+            .size        = sample_buffer_len_from_file_,
+            .current_pos = 0,
+            .note        = {.frequency = 0, .time = 0, .use_note = false}};
+
+        LOG(INFO) << "Audio buffer from file size: "
+                  << sample_buffer_len_from_file_ << " B ("
+                  << sample_buffer_len_from_file_ / double(1024 * 1024)
+                  << ") MB";
+
+        const char *device_name         = nullptr; // device name or nullptr
+        const int32_t is_capture_device = 0; // 0 - play device, 1 - microphone
+        SDL_AudioSpec desired{.freq     = 48000,
+                              .format   = AUDIO_FORMAT,
+                              .channels = 2,    // stereo
+                              .silence  = 0,
+                              .samples  = 4096, // must be power of 2
+                              .padding  = 0,
+                              .size     = 0,
+                              .callback = audio_callback,
+                              .userdata = &loaded_audio_buff_};
+
+        SDL_AudioSpec returned{};
+
+        const int32_t allow_changes = 0;
+
+        audio_device_id_ = SDL_OpenAudioDevice(
+            device_name, is_capture_device, &desired, &returned, allow_changes);
+        if (audio_device_id_ == 0)
+        {
+            LOG(INFO) << "Failed to open audio device: " << SDL_GetError();
+            throw std::invalid_argument("Failed to open audio device");
+        }
+
+        LOG(INFO) << "Audio device opened: " << audio_device_id_;
+
+        if (desired.format != returned.format ||
+            desired.channels != returned.channels ||
+            desired.freq != returned.freq)
+        {
+            LOG(INFO) << "Audio device settings are not equal:";
+            throw std::invalid_argument("Failed to open audio device");
+        }
+
+        // start playing audio thread
+        // now callback is firing
+        SDL_PlayAudioDevice(audio_device_id_);
+
+        LOG(INFO) << "Audio device started";
+    }
+
+    void destroy()
+    {
+        LOG(INFO) << "Pause audio device (stop audio thread)";
+
+        SDL_PauseAudioDevice(audio_device_id_);
+
+        LOG(INFO) << "Close audio device";
+
+        SDL_CloseAudioDevice(audio_device_id_);
+
+        SDL_free(loaded_audio_buff_.start);
+
+        SDL_Quit();
+    }
+
+    static constexpr int32_t AUDIO_FORMAT = SDL_AUDIO_S16LSB;
+
+private:
+    SDL_RWops *sound_file_;
+
+    SDL_AudioSpec audio_spec_from_file_{};
+    const int32_t auto_delete_file_       = 1;
+    uint8_t *sample_buffer_from_file_     = nullptr;
+    uint32_t sample_buffer_len_from_file_ = 0;
+
+    SDL_AudioDeviceID audio_device_id_;
+
+    SDL_AudioSpec const *audio_spec_;
+
+    audio_buffer loaded_audio_buff_;
+
+    const char *sound_file_name_;
+};
+} // namespace sdl_subsdk
+
+TEST(SDL_Audio, test_audio_mixer_class)
+{
+    auto mixer = new sdl_subsdk::audio_mixer("wav/car_on.WAV");
+    mixer->initialize();
+
+    sdl_subsdk::init_sdl();
+
+    SDL_Window *window =
+        sdl_subsdk::get_new_sdl_window("OpenGL 3.0 SDL ImGui Test", 1280, 720);
+
+    SDL_GLContext gl_context = sdl_subsdk::get_new_sdl_gl_context(window);
+
+    sdl_subsdk::init_opengl();
+    opengl_subsdk::enable_debug_mode();
+
+    bool running = true;
+    SDL_Event event;
+
+    while (running)
+    {
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_EVENT_QUIT)
+            {
+                running = false;
+            }
+        }
+
+        SDL_GL_SwapWindow(window);
+    }
+
+    mixer->destroy();
 }
 
 auto main(int argc, char **argv) -> int
