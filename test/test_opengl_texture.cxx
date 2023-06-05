@@ -49,12 +49,17 @@ TEST(SDLEngineTest, Init)
         glUniform1i(textureUniformLocation,
                     0); // Set the texture uniform to use texture unit 0
 
+        constexpr float aspectRatio = 1.0f;
+        glm::mat4 aspectMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(aspectRatio, 1.0f, 1.0f));
+
         auto transform = glm::mat4(1.0f);
-        const float time    = static_cast<float>(SDL_GetTicks()) / 1000.0f;
-        transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+        const float time    = static_cast<float>(SDL_GetTicks()) / 100.0f;
+        transform = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
         transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
         transform =
             glm::rotate(transform, time * 0.05f, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = transform * aspectMatrix;
 
         // Get matrix's uniform location and set matrix
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE,

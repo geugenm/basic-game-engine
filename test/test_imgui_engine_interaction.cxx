@@ -267,7 +267,7 @@ public:
     {
         if (event == sdk::event::keyboard_M)
         {
-            LOG(INFO) << "Keyboard T";
+            LOG(INFO) << "Keyboard M";
             // destroy();
         }
     }

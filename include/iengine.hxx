@@ -66,7 +66,8 @@ public:
         LOG(INFO) << "Engine destroyed";
     }
 
-    void handle_event(const event & event) {
+    void handle_event(const event &event)
+    {
         object::handle_event(event);
 
         for (auto const &component : components_)
