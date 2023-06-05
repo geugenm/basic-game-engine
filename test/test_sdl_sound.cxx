@@ -62,7 +62,7 @@ TEST(SDL_Audio, audio_callback)
     }
 
     const char *file_name =
-        "wav/buy.wav";
+        "wav/machine_gun_loop.WAV";
 
     clog << "read file: " << file_name << endl;
 

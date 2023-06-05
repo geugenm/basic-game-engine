@@ -27,7 +27,7 @@ if (BUILD_TESTS)
     add_test_executable(test_sdl_sound test_sdl_sound.cxx)
     target_link_libraries(test_sdl_sound PRIVATE engine_sdk)
 
-    set(NON_CPP_EXTENSIONS glsl png wav)
+    set(NON_CPP_EXTENSIONS glsl png wav WAV)
 
     foreach (EXTENSION ${NON_CPP_EXTENSIONS})
         file(GLOB_RECURSE NON_CPP_FILES "*.${EXTENSION}")
