@@ -18,11 +18,8 @@ if (BUILD_TESTS)
     add_test_executable(test_sdl_shared_compilation test_sdl_general.cxx)
     target_link_libraries(test_sdl_shared_compilation PRIVATE SDL3::SDL3-shared)
 
-
-    add_test_executable(test_imgui test_imgui_general.cxx)
-    target_link_libraries(test_imgui PRIVATE engine_sdk)
-
-
+    add_test_executable(test_opengl_texture test_opengl_texture.cxx)
+    target_link_libraries(test_opengl_texture PRIVATE engine_sdk)
 
     add_test_executable(test_imgui_interaction test_imgui_engine_interaction.cxx)
     target_link_libraries(test_imgui_interaction PRIVATE engine_sdk)
