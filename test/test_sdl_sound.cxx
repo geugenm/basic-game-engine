@@ -149,14 +149,23 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
 class audio_mixer
 {
 public:
-    explicit audio_mixer(const char *sound_file) : sound_file_name_(sound_file)
+    explicit audio_mixer(const char *sound_file_name) : sound_file_name_(sound_file_name)
     {
         if (sound_file_name_ == nullptr)
         {
             throw std::invalid_argument("Sound file is nullptr");
         }
     }
+
     ~audio_mixer() = default;
+
+    void change_sound(const char *sound_file_name) {
+        if (sound_file_name_ == nullptr) {
+            throw std::invalid_argument("Sound file is nullptr");
+        }
+        sound_file_name_ = sound_file_name;
+        initialize();
+    }
 
     void initialize()
     {
@@ -266,16 +275,16 @@ public:
     static constexpr int32_t AUDIO_FORMAT = SDL_AUDIO_S16LSB;
 
 private:
-    SDL_RWops *sound_file_;
+    SDL_RWops *sound_file_{};
 
     SDL_AudioSpec audio_spec_from_file_{};
     const int32_t auto_delete_file_       = 1;
     uint8_t *sample_buffer_from_file_     = nullptr;
     uint32_t sample_buffer_len_from_file_ = 0;
 
-    SDL_AudioDeviceID audio_device_id_;
+    SDL_AudioDeviceID audio_device_id_{};
 
-    SDL_AudioSpec const *audio_spec_;
+    SDL_AudioSpec const *audio_spec_{};
 
     audio_buffer loaded_audio_buff_;
 
@@ -288,14 +297,9 @@ TEST(SDL_Audio, test_audio_mixer_class)
     auto mixer = new sdl_subsdk::audio_mixer("wav/car_on.WAV");
     mixer->initialize();
 
-    sdl_subsdk::init_sdl();
+    auto * engine = new sdl_subsdk::engine("OpenGL 3.0 SDL Sound Test", 1280, 720);
 
-    SDL_Window *window =
-        sdl_subsdk::get_new_sdl_window("OpenGL 3.0 SDL ImGui Test", 1280, 720);
-
-    SDL_GLContext gl_context = sdl_subsdk::get_new_sdl_gl_context(window);
-
-    sdl_subsdk::init_opengl();
+    engine->initialize();
     opengl_subsdk::enable_debug_mode();
 
     bool running = true;
@@ -311,10 +315,11 @@ TEST(SDL_Audio, test_audio_mixer_class)
             }
         }
 
-        SDL_GL_SwapWindow(window);
+        engine->render();
     }
 
     mixer->destroy();
+    engine->destroy();
 }
 
 auto main(int argc, char **argv) -> int
