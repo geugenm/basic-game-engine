@@ -27,14 +27,17 @@ if (BUILD_TESTS)
     add_test_executable(test_sdl_sound test_sdl_sound.cxx)
     target_link_libraries(test_sdl_sound PRIVATE engine_sdk)
 
-    set(NON_CPP_EXTENSIONS glsl png wav WAV)
+    set(EXCLUDED_EXTENSIONS cpp cxx c hpp hxx h txt)
 
-    foreach (EXTENSION ${NON_CPP_EXTENSIONS})
-        file(GLOB_RECURSE NON_CPP_FILES "*.${EXTENSION}")
-        foreach (NON_CPP_FILE ${NON_CPP_FILES})
-            file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR} ${NON_CPP_FILE})
-            configure_file(${NON_CPP_FILE} "${CMAKE_BINARY_DIR}/${REL_PATH}"
-                    COPYONLY)
-        endforeach ()
-    endforeach ()
+    file(GLOB_RECURSE ALL_FILES *)
+
+    foreach(FILE ${ALL_FILES})
+        get_filename_component(EXTENSION ${FILE} EXT)
+        list(FIND EXCLUDED_EXTENSIONS ${EXTENSION} IS_EXCLUDED)
+        if(IS_EXCLUDED EQUAL -1)
+            file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR} ${FILE})
+            configure_file(${FILE} "${CMAKE_BINARY_DIR}/${REL_PATH}" COPYONLY)
+        endif()
+    endforeach()
+
 endif ()
