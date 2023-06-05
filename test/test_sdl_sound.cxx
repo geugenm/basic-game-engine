@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-#include <stdio.h>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -11,8 +10,6 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
-
-#include <SDL3/SDL.h>
 
 constexpr int32_t AUDIO_FORMAT = SDL_AUDIO_S16LSB;
 
@@ -27,9 +24,9 @@ struct audio_buff
 
     struct
     {
-        size_t frequncy = 0;
-        double time     = 0.0;
-        bool use_note   = false;
+        size_t frequency = 0;
+        double time      = 0.0;
+        bool use_note    = false;
     } note;
 };
 #pragma pack(pop)
@@ -61,8 +58,7 @@ TEST(SDL_Audio, audio_callback)
         FAIL();
     }
 
-    const char *file_name =
-        "wav/machine_gun_loop.WAV";
+    const char *file_name = "wav/machine_gun_loop.wav";
 
     clog << "read file: " << file_name << endl;
 
@@ -80,7 +76,7 @@ TEST(SDL_Audio, audio_callback)
 
     clog << "loading sample buffer from file: " << file_name << endl;
 
-    SDL_AudioSpec *audio_spec =
+    SDL_AudioSpec const *audio_spec =
         SDL_LoadWAV_RW(file, auto_delete_file, &audio_spec_from_file,
                        &sample_buffer_from_file, &sample_buffer_len_from_file);
 
@@ -99,7 +95,7 @@ TEST(SDL_Audio, audio_callback)
         .size = sample_buffer_len_from_file,
         .current_pos = 0,
         .note = {
-         .frequncy = 0,
+         .frequency = 0,
          .time = 0,
          .use_note = false
         }
@@ -112,7 +108,7 @@ TEST(SDL_Audio, audio_callback)
 
     const char *device_name         = nullptr; // device name or nullptr
     const int32_t is_capture_device = 0; // 0 - play device, 1 - microphone
-    SDL_AudioSpec disired{.freq     = 48000,
+    SDL_AudioSpec desired{.freq     = 48000,
                           .format   = AUDIO_FORMAT,
                           .channels = 2,    // stereo
                           .silence  = 0,
@@ -122,15 +118,15 @@ TEST(SDL_Audio, audio_callback)
                           .callback = audio_callback,
                           .userdata = &loaded_audio_buff};
 
-    clog << "prepare disired audio specs for output device:\n"
-         << disired << endl;
+    clog << "prepare desired audio specs for output device:\n"
+         << desired << endl;
 
     SDL_AudioSpec returned{};
 
     const int32_t allow_changes = 0;
 
     SDL_AudioDeviceID audio_device_id = SDL_OpenAudioDevice(
-        device_name, is_capture_device, &disired, &returned, allow_changes);
+        device_name, is_capture_device, &desired, &returned, allow_changes);
     if (audio_device_id == 0)
     {
         cerr << "error: failed to open audio device: " << SDL_GetError()
@@ -140,10 +136,10 @@ TEST(SDL_Audio, audio_callback)
 
     clog << "returned audio spec for output device:\n" << returned << endl;
 
-    if (disired.format != returned.format ||
-        disired.channels != returned.channels || disired.freq != returned.freq)
+    if (desired.format != returned.format ||
+        desired.channels != returned.channels || desired.freq != returned.freq)
     {
-        cerr << "error: disired != returned audio device settings!";
+        cerr << "error: desired != returned audio device settings!";
         FAIL();
     }
 
@@ -164,22 +160,22 @@ TEST(SDL_Audio, audio_callback)
                 "callbacks)\n"
              << "6. set default delay for audio callback(current val: "
              << default_delay << " ms)\n"
-             << "7. play note(current val: " << loaded_audio_buff.note.frequncy
+             << "7. play note(current val: " << loaded_audio_buff.note.frequency
              << ")\n"
              << "8. play note on channel (0 - left, 1 - right, 2 "
                 "left_and_right)\n"
              << ">" << flush;
 
-        int choise = 0;
-        cin >> choise;
-        switch (choise)
+        int choice = 0;
+        cin >> choice;
+        switch (choice)
         {
             case 1:
                 continue_loop = false;
                 break;
             case 2:
                 clog << "current music pos: "
-                     << loaded_audio_buff.current_pos /
+                     << static_cast<double>(loaded_audio_buff.current_pos) /
                             double(loaded_audio_buff.size) * 100
                      << " %" << endl;
                 break;
@@ -189,7 +185,7 @@ TEST(SDL_Audio, audio_callback)
 
                 double time_in_minutes = double(loaded_audio_buff.size) /
                                          audio_spec_from_file.channels /
-                                         format_size /
+                                         static_cast<double>(format_size) /
                                          audio_spec_from_file.freq / 60;
 
                 double minutes;
@@ -220,8 +216,8 @@ TEST(SDL_Audio, audio_callback)
                 break;
             }
             case 7: {
-                clog << "input note frequncy: " << flush;
-                cin >> loaded_audio_buff.note.frequncy;
+                clog << "input note frequency: " << flush;
+                cin >> loaded_audio_buff.note.frequency;
             }
             break;
             case 8: {
@@ -260,31 +256,32 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
     // simulate long calculation (just test)
     SDL_Delay(default_delay);
 
-    // experimental check two continius callback delta time
+    // experimental check two continuous callback delta time
     start  = finish;
     finish = std::chrono::high_resolution_clock::now();
 
-    size_t stream_len = static_cast<size_t>(len);
+    auto stream_len = static_cast<size_t>(len);
     // silence
     std::memset(stream, 0, static_cast<size_t>(len));
 
-    audio_buff *audio_buff_data = reinterpret_cast<audio_buff *>(userdata);
+    auto audio_buff_data = static_cast<audio_buff *>(userdata);
     assert(audio_buff_data != nullptr);
 
-    if (audio_buff_data->note.frequncy != 0)
+    if (audio_buff_data->note.frequency != 0)
     {
         size_t num_samples = stream_len / 2 / 2;
         double dt          = 1.0 / 48000.0;
 
-        int16_t *output = reinterpret_cast<int16_t *>(stream);
+        auto output = reinterpret_cast<int16_t *>(stream);
 
         for (size_t sample = 0; sample < num_samples; ++sample)
         {
-            double omega_t = audio_buff_data->note.time * 2.0 * 3.1415926 *
-                             audio_buff_data->note.frequncy;
+            double omega_t =
+                audio_buff_data->note.time * 2.0 * 3.1415926 *
+                static_cast<double>(audio_buff_data->note.frequency);
             double curr_sample =
                 std::numeric_limits<int16_t>::max() * sin(omega_t);
-            int16_t curr_val = static_cast<int16_t>(curr_sample);
+            auto curr_val = static_cast<int16_t>(curr_sample);
 
             switch (channels)
             {
@@ -309,7 +306,9 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
                     output++;
                     break;
                 }
-            };
+                default:
+                    break;
+            }
 
             audio_buff_data->note.time += dt;
         }
@@ -327,17 +326,17 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
 
             if (left_in_buffer > stream_len)
             {
-                SDL_MixAudioFormat(stream, current_sound_pos, AUDIO_FORMAT, len,
-                                   128);
+                SDL_MixAudioFormat(stream, current_sound_pos, AUDIO_FORMAT,
+                                   static_cast<Uint32>(len), 128);
                 audio_buff_data->current_pos += stream_len;
                 break;
             }
             else
             {
-                // first copy rest from buffer and repeat sound from begining
+                // first copy rest from buffer and repeat sound from beginning
                 SDL_MixAudioFormat(stream, current_sound_pos, AUDIO_FORMAT,
-                                   left_in_buffer, 128);
-                // start buffer from begining
+                                   static_cast<Uint32>(left_in_buffer), 128);
+                // start buffer from beginning
                 audio_buff_data->current_pos = 0;
                 stream_len -= left_in_buffer;
             }
