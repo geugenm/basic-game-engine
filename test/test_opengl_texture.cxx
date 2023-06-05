@@ -58,6 +58,10 @@ TEST(SDLEngineTest, Init)
                     case SDLK_d: rotationAngle -= rotateSpeed; break;
                 }
             }
+
+            if (event.type == SDL_EVENT_QUIT) {
+                goto cleanup;
+            }
         }
 
 
