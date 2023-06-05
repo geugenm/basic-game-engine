@@ -28,18 +28,38 @@ TEST(SDLEngineTest, Init)
 
     const auto transformLoc = shader.get_uniform_location("transform");
 
+    glm::vec2 position(0.5f, -0.5f);
+    float rotationAngle = 0.0f;
+
+    float moveSpeed = 0.01f;
+    float rotateSpeed = 0.01f;
+
+
     SDL_Event event;
     while (true)
     {
         glViewport(0, 0, window_width, window_height);
-
+        
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_EVENT_QUIT)
+            if (event.type == SDL_EVENT_KEY_DOWN)
             {
-                goto cleanup;
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_w:
+                        position.x += moveSpeed * cos(rotationAngle);
+                        position.y += moveSpeed * sin(rotationAngle);
+                        break;
+                    case SDLK_s:
+                        position.x -= moveSpeed * cos(rotationAngle);
+                        position.y -= moveSpeed * sin(rotationAngle);
+                        break;
+                    case SDLK_a: rotationAngle += rotateSpeed; break;
+                    case SDLK_d: rotationAngle -= rotateSpeed; break;
+                }
             }
         }
+
 
         shader.use();
 
@@ -53,12 +73,9 @@ TEST(SDLEngineTest, Init)
         glm::mat4 aspectMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(aspectRatio, 1.0f, 1.0f));
 
         auto transform = glm::mat4(1.0f);
-        const float time    = static_cast<float>(SDL_GetTicks()) / 100.0f;
         transform = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform =
-            glm::rotate(transform, time * 0.05f, glm::vec3(0.0f, 0.0f, 1.0f));
-
+        transform = glm::translate(transform, glm::vec3(position.x, position.y, 0.0f));
+        transform = glm::rotate(transform, rotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
         transform = transform * aspectMatrix;
 
         // Get matrix's uniform location and set matrix
