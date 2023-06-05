@@ -89,12 +89,12 @@ private:
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_), vertices_,
-                     GL_STATIC_DRAW);
+                     GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_), indices_,
-                     GL_STATIC_DRAW);
+                     GL_DYNAMIC_DRAW);
     }
 
     void enable_attributes()
