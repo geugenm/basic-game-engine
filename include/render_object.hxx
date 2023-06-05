@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine_error.hxx"
+#include "event.hxx"
 
 namespace sdk
 {
@@ -13,7 +14,7 @@ public:
 
     void initialize()
     {
-        if (is_initialized_)
+        if (is_initialized())
         {
             return;
         }
@@ -25,7 +26,7 @@ public:
 
     void render()
     {
-        if (!is_initialized_)
+        if (!is_initialized())
         {
             throw engine_error(
                 "The object is not initialized. Use initialize(...) before "
@@ -38,7 +39,7 @@ public:
 
     void destroy()
     {
-        if (!is_initialized_)
+        if (!is_initialized())
         {
             throw engine_error("Trying to destroy already destroyed object.",
                                "sdk::object::destroy");
@@ -47,6 +48,15 @@ public:
         destroy_impl();
 
         is_initialized_ = false;
+    }
+
+    void handle_event(const event &event)
+    {
+        if (!is_initialized())
+        {
+            throw std::invalid_argument("The object is not initialized.");
+        }
+        handle_event_impl(event);
     }
 
     [[nodiscard]] const char *get_name() const
@@ -63,6 +73,8 @@ protected:
     virtual void initialize_impl() = 0;
     virtual void render_impl()     = 0;
     virtual void destroy_impl()    = 0;
+
+    virtual void handle_event_impl(const event &event) = 0;
 
 private:
     const char *name_;

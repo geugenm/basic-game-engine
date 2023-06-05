@@ -66,6 +66,17 @@ public:
         LOG(INFO) << "Engine destroyed";
     }
 
+    void handle_event(const event & event) {
+        object::handle_event(event);
+
+        for (auto const &component : components_)
+        {
+            component->handle_event(event);
+            LOG(INFO) << "Component '" << component->get_name()
+                      << "' handled event";
+        }
+    }
+
     void add_component(component *component)
     {
         if (component == nullptr)

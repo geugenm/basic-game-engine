@@ -69,6 +69,8 @@ protected:
         SDL_GL_SwapWindow(window_);
     }
 
+    void handle_event_impl(const sdk::event &event) override {}
+
     void destroy_impl() override
     {
         SDL_GL_DeleteContext(context_);

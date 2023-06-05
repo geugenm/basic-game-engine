@@ -3,9 +3,11 @@
 
 #include "open_gl_shader.hxx"
 #include "sdl_engine.hxx"
+#include "sdl_functions.hxx"
 
 #include <fstream>
 #include <gtest/gtest.h>
+#include <stack>
 
 class shader_component : public sdk::component
 {
@@ -57,6 +59,14 @@ public:
         {
             glDeleteProgram(shader_->get_program_id());
             delete shader_;
+        }
+    }
+
+    void handle_event_impl(const sdk::event &event) override
+    {
+        if (event == sdk::event::keyboard_E)
+        {
+            LOG(INFO) << "Keyboard E";
         }
     }
 
@@ -187,6 +197,14 @@ public:
         imgui_subsdk::destroy();
     }
 
+    void handle_event_impl(const sdk::event &event) override
+    {
+        for (auto const &window : windows_)
+        {
+            window->handle_event(event);
+        }
+    }
+
     void add_window(sdk::component *imgui_window)
     {
         if (imgui_window == nullptr)
@@ -245,6 +263,15 @@ public:
 
     void destroy_impl() override {}
 
+    void handle_event_impl(const sdk::event &event) override
+    {
+        if (event == sdk::event::keyboard_M)
+        {
+            LOG(INFO) << "Keyboard T";
+            // destroy();
+        }
+    }
+
 private:
     const imgui_component &imgui_;
     opengl_subsdk::shader *shader_;
@@ -269,13 +296,28 @@ TEST(TriangleTest, LavaLampTriangle)
     SDL_Event event;
     while (true)
     {
+        std::stack<sdk::event> components;
+
         while (SDL_PollEvent(&event))
         {
+            if (event.type == SDL_EVENT_KEY_UP)
+            {
+                components.push(
+                    sdl_subsdk::sdl_key_to_sdk_key(event.key.keysym.sym));
+            }
+
             imgui_subsdk::process_event(event);
+
             if (event.type == SDL_EVENT_QUIT)
             {
                 goto cleanup;
             }
+        }
+
+        while (!components.empty())
+        {
+            engine->handle_event(components.top());
+            components.pop();
         }
 
         engine->render();

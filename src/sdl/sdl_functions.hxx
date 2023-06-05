@@ -1,5 +1,7 @@
 #pragma once
 
+#include "event.hxx"
+
 #include <SDL3/SDL.h>
 #include <iostream>
 #include <stdexcept>
@@ -24,8 +26,8 @@ SDL_GLContext get_new_sdl_gl_context(SDL_Window *window);
 
 void load_opengl_functions();
 
-
 void init_opengl();
 
+sdk::event sdl_key_to_sdk_key(const int &keycode);
 
 } // namespace sdl_subsdk
