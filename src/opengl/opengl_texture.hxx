@@ -57,12 +57,12 @@ public:
 
         // Generate mipmaps
         glGenerateMipmap(GL_TEXTURE_2D);
-
-        glActiveTexture(GL_TEXTURE0);
     }
 
     void render()
     {
+        glBindTexture(GL_TEXTURE_2D, texture_);
+
         glBindVertexArray(VAO);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
@@ -160,7 +160,7 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
         // Set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
@@ -186,7 +186,7 @@ private:
         png_data.reserve(static_cast<size_t>(file_size));
 
         if (decodePNG(png_data, width_, height_, buffer.data(),
-                      static_cast<size_t>(file_size)) != 0)
+                      static_cast<size_t>(file_size), true) != 0)
         {
             throw std::invalid_argument("Failed to decode PNG image");
         }

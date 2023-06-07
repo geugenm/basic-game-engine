@@ -22,12 +22,20 @@ TEST(SDLEngineTest, Init)
         new sdl_subsdk::engine(window_title, window_height, window_width);
     engine->initialize();
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
     auto shader = opengl_subsdk::shader("shaders/texture_vertex.glsl",
                                         "shaders/texture_fragment.glsl");
 
 
+
     auto texture = new opengl_subsdk::texture("textures/tank_full.png", window_width, window_height);
     texture->initialize();
+
+    auto turret = new opengl_subsdk::texture("textures/turret.png", window_width, window_height);
+    turret->initialize();
 
 
     const auto transformLoc = shader.get_uniform_location("transform");
@@ -35,11 +43,29 @@ TEST(SDLEngineTest, Init)
     glm::vec2 position(0.5f, -0.5f);
     float rotationAngle = 0.0f;
 
-    float moveSpeed   = 0.01f;
-    float rotateSpeed = 0.01f;
+    const float moveSpeed   = 0.05f;
+    const float rotateSpeed = 0.05f;
 
     glViewport(0, 0, window_width, window_height);
 
+    shader.use();
+
+    {
+        const GLint textureUniformLocation =
+            glGetUniformLocation(shader.get_program_id(), "ourTexture");
+
+        glUniform1i(textureUniformLocation, 0);
+    }
+
+    {
+        const GLint textureUniformLocation =
+            glGetUniformLocation(shader.get_program_id(), "topTexture");
+
+        glUniform1i(textureUniformLocation, 1);
+    }
+
+    constexpr float aspectRatio = static_cast<float>(window_width) / static_cast<float>(window_height);
+    glm::mat4 aspectMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(aspectRatio, 1.0f, 1.0f));
 
     SDL_Event event;
     while (true)
@@ -80,36 +106,30 @@ TEST(SDLEngineTest, Init)
             }
         }
 
-        shader.use();
-
-        const GLint textureUniformLocation =
-            glGetUniformLocation(shader.get_program_id(), "ourTexture");
-
-        glUniform1i(textureUniformLocation,
-                    0); // Set the texture uniform to use texture unit 0
-
-        constexpr float aspectRatio = static_cast<float>(window_width) / static_cast<float>(window_height);
-        glm::mat4 aspectMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(aspectRatio, 1.0f, 1.0f));
-
-        auto transform = glm::mat4(1.0f);
-        transform = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
-        transform = glm::translate(transform, glm::vec3(position.x, position.y, 0.0f));
-        transform = glm::rotate(transform, rotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-        transform = transform * aspectMatrix;
-
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-
-        glm::vec4 aabbMin = transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-        glm::vec4 aabbMax = transform * glm::vec4(0.5f, 0.5f, 0.0f, 1.0f);
-
-        if (aabbMin.x < -1.0f || aabbMin.y < -1.0f || aabbMax.x > 1.0f || aabbMax.y > 1.0f)
-        {
-            // Handle collision with screen borders.
-        }
-
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glActiveTexture(GL_TEXTURE0);
+
         texture->render();
+
+        glActiveTexture(GL_TEXTURE1);
+
+        turret->render();
+
+        shader.use();
+
+        {
+            auto transform = glm::mat4(1.0f);
+            transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
+            transform      = glm::translate(transform,
+                                            glm::vec3(position.x, position.y, 0.0f));
+            transform      = glm::rotate(transform, rotationAngle,
+                                         glm::vec3(0.0f, 0.0f, 1.0f));
+            transform      = transform * aspectMatrix;
+
+            glUniformMatrix4fv(transformLoc, 1, GL_FALSE,
+                               glm::value_ptr(transform));
+        }
 
         engine->render();
     }
