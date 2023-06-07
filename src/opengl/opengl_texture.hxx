@@ -14,7 +14,10 @@ namespace opengl_subsdk
 class texture
 {
 public:
-    explicit texture(const char *image_path) : image_path_(image_path)
+    explicit texture(const char *image_path, const size_t &window_width,
+                     const size_t &window_height)
+        : image_path_(image_path), window_width_(window_width),
+          window_height_(window_height)
     {
         if (image_path_ == nullptr)
         {
@@ -24,6 +27,16 @@ public:
 
     void initialize()
     {
+        // Load image, create texture and generate mipmaps
+        const auto png_data = get_png_data();
+
+        if (width_ == 0 || height_ == 0)
+        {
+            throw std::invalid_argument(
+                "Given image bound are not determined. and Use get_png_data() "
+                "before glTexImage2D.");
+        }
+
         generate_buffers();
         bind_buffers();
 
@@ -38,16 +51,6 @@ public:
         glBindTexture(GL_TEXTURE_2D, texture_);
 
         set_texture_parameters();
-
-        // Load image, create texture and generate mipmaps
-        const auto png_data = get_png_data();
-
-        if (width_ == 0 || height_ == 0)
-        {
-            throw std::invalid_argument("Given image bound are not determined. and Use get_png_data() "
-                                        "before glTexImage2D.");
-        }
-
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA,
                      GL_UNSIGNED_BYTE, png_data.data());
@@ -88,15 +91,29 @@ private:
 
     void bind_buffers()
     {
-        GLfloat vertices_[] = {
+        float image_aspect_ratio = static_cast<float>(width_) / static_cast<float>(height_);
+        float window_aspect_ratio = static_cast<float>(window_width_) / static_cast<float>(window_height_);
+
+        float scale_x, scale_y;
+
+        if (image_aspect_ratio > window_aspect_ratio) {
+            scale_x = 1.0f;
+            scale_y = window_aspect_ratio / image_aspect_ratio;
+        } else {
+            scale_x = image_aspect_ratio / window_aspect_ratio;
+            scale_y = 1.0f;
+        }
+
+
+        const GLfloat vertices_[] = {
             // Positions          // Colors           // Texture Coords
-            0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-            0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-            -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
+            0.5f * scale_x,  0.5f * scale_y,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+            0.5f * scale_x,  -0.5f * scale_y, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+            -0.5f * scale_x, -0.5f * scale_y, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+            -0.5f * scale_x, 0.5f * scale_y,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
         };
 
-        GLuint indices_[] = {
+        const GLuint indices_[] = {
             // Note that we start from 0!
             0, 1, 3, // First Triangle
             1, 2, 3  // Second Triangle
@@ -147,7 +164,6 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
-
     [[nodiscard]] std::vector<unsigned char> get_png_data()
     {
         std::ifstream file(image_path_, std::ios::binary | std::ios::ate);
@@ -193,5 +209,8 @@ private:
 
     unsigned long width_{};
     unsigned long height_{};
+
+    const size_t window_width_;
+    const size_t window_height_;
 };
 } // namespace opengl_subsdk

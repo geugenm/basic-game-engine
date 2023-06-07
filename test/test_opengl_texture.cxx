@@ -26,7 +26,7 @@ TEST(SDLEngineTest, Init)
                                         "shaders/texture_fragment.glsl");
 
 
-    auto texture = new opengl_subsdk::texture("textures/tank_full.png");
+    auto texture = new opengl_subsdk::texture("textures/tank_full.png", window_width, window_height);
     texture->initialize();
 
 
