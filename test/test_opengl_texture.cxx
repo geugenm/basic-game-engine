@@ -10,6 +10,8 @@
 #include <open_gl_shader.hxx>
 #include <opengl_texture.hxx>
 
+#include <sdl_sound.hxx>
+
 TEST(SDLEngineTest, Init)
 {
     static const char *window_title = "TestSDLEngine";
@@ -23,8 +25,10 @@ TEST(SDLEngineTest, Init)
     auto shader = opengl_subsdk::shader("shaders/texture_vertex.glsl",
                                         "shaders/texture_fragment.glsl");
 
+
     auto texture = new opengl_subsdk::texture("textures/tank_full.png");
     texture->initialize();
+
 
     const auto transformLoc = shader.get_uniform_location("transform");
 
@@ -34,11 +38,12 @@ TEST(SDLEngineTest, Init)
     float moveSpeed   = 0.01f;
     float rotateSpeed = 0.01f;
 
+    glViewport(0, 0, window_width, window_height);
+
+
     SDL_Event event;
     while (true)
     {
-        glViewport(0, 0, window_width, window_height);
-
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_EVENT_KEY_DOWN)

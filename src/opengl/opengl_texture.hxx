@@ -4,9 +4,10 @@
 
 #include <render/picopng.hxx>
 
-#include <stdexcept>
-#include <vector>
 #include <fstream>
+#include <stdexcept>
+#include <valarray>
+#include <vector>
 
 namespace opengl_subsdk
 {
@@ -27,7 +28,6 @@ public:
         bind_buffers();
 
         enable_attributes();
-
         glBindVertexArray(0);
 
         // Load and create a texture
@@ -44,12 +44,16 @@ public:
 
         if (width_ == 0 || height_ == 0)
         {
-            throw std::invalid_argument(
-                "Given image bound are not determined. Use get_png_data() "
-                "before glTexImage2D.");
+            throw std::invalid_argument("Given image bound are not determined. and Use get_png_data() "
+                                        "before glTexImage2D.");
         }
+
+
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA,
                      GL_UNSIGNED_BYTE, png_data.data());
+
+        // Generate mipmaps
+        glGenerateMipmap(GL_TEXTURE_2D);
 
         glActiveTexture(GL_TEXTURE0);
     }
@@ -84,6 +88,20 @@ private:
 
     void bind_buffers()
     {
+        GLfloat vertices_[] = {
+            // Positions          // Colors           // Texture Coords
+            0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+            0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+            -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
+        };
+
+        GLuint indices_[] = {
+            // Note that we start from 0!
+            0, 1, 3, // First Triangle
+            1, 2, 3  // Second Triangle
+        };
+
         glBindVertexArray(VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -121,16 +139,14 @@ private:
     static void set_texture_parameters()
     {
         // Set the texture wrapping parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                        GL_REPEAT); // set texture wrapping to GL_REPEAT
-                                    // (default wrapping method)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
         // Set texture filtering parameters
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
+
 
     [[nodiscard]] std::vector<unsigned char> get_png_data()
     {
@@ -177,19 +193,5 @@ private:
 
     unsigned long width_{};
     unsigned long height_{};
-
-    static constexpr GLfloat vertices_[] = {
-        // Positions          // Colors           // Texture Coords
-        0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-        0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-        -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-    };
-
-    static constexpr GLuint indices_[] = {
-        // Note that we start from 0!
-        0, 1, 3, // First Triangle
-        1, 2, 3  // Second Triangle
-    };
 };
 } // namespace opengl_subsdk
