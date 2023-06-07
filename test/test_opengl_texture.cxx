@@ -13,8 +13,8 @@
 TEST(SDLEngineTest, Init)
 {
     static const char *window_title = "TestSDLEngine";
-    constexpr int32_t window_height = 800;
-    constexpr int32_t window_width  = 400;
+    constexpr int32_t window_height = 1000;
+    constexpr int32_t window_width  = 1000;
 
     auto engine =
         new sdl_subsdk::engine(window_title, window_height, window_width);
@@ -23,7 +23,7 @@ TEST(SDLEngineTest, Init)
     auto shader = opengl_subsdk::shader("shaders/texture_vertex.glsl",
                                         "shaders/texture_fragment.glsl");
 
-    auto texture = new opengl_subsdk::texture("textures/texture.png");
+    auto texture = new opengl_subsdk::texture("textures/tank_full.png");
     texture->initialize();
 
     const auto transformLoc = shader.get_uniform_location("transform");

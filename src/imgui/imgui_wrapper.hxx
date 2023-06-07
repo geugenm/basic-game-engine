@@ -21,18 +21,18 @@ void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 {
     if (window == nullptr)
     {
-        throw std::runtime_error("Given SDL window is nullptr.");
+        throw std::invalid_argument("Given SDL window is nullptr.");
     }
 
     if (gl_context == nullptr)
     {
-        throw std::runtime_error("Given SDL GL context is nullptr.");
+        throw std::invalid_argument("Given SDL GL context is nullptr.");
     }
 
     IMGUI_CHECKVERSION();
     if (ImGui::CreateContext() == nullptr)
     {
-        throw std::runtime_error("Failed to create ImGui context.");
+        throw std::invalid_argument("Failed to create ImGui context.");
     }
 
     ImStyle::setup_style(k_use_dark_style, k_window_alpha);
@@ -70,7 +70,7 @@ void render(ImDrawData *draw_data)
 {
     if (draw_data == nullptr)
     {
-        throw std::runtime_error("Given nullptr draw data.");
+        throw std::invalid_argument("Given nullptr draw data.");
     }
 
     ImGuiIO const &io = ImGui::GetIO();
