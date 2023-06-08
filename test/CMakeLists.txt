@@ -27,6 +27,9 @@ if (BUILD_TESTS)
     add_test_executable(test_sdl_sound test_sdl_sound.cxx)
     target_link_libraries(test_sdl_sound PRIVATE engine_sdk)
 
+    add_test_executable(test_entt test_entt.cxx)
+    target_link_libraries(test_entt PRIVATE engine_sdk EnTT::EnTT)
+
     set(EXCLUDED_EXTENSIONS cpp cxx c hpp hxx h txt)
 
     file(GLOB_RECURSE ALL_FILES *)
