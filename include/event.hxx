@@ -2,7 +2,7 @@
 
 namespace sdk
 {
-enum class event : int
+enum class keyboard : int
 {
     keyboard_None = 0,
     keyboard_Tab  = 512,
@@ -111,5 +111,10 @@ enum class event : int
     keyboard_KeypadAdd,
     keyboard_KeypadEnter,
     keyboard_KeypadEqual
+};
+
+struct event
+{
+    keyboard _keyboard;
 };
 } // namespace sdk

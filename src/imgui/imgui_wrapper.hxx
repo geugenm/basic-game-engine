@@ -11,6 +11,8 @@
 
 #include "imgui_style.hxx"
 
+#include "event.hxx"
+
 namespace imgui_subsdk
 {
 constexpr bool k_use_dark_style             = true;

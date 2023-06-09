@@ -28,6 +28,6 @@ void load_opengl_functions();
 
 void init_opengl();
 
-sdk::event sdl_key_to_sdk_key(const int &keycode);
+sdk::keyboard sdl_key_to_sdk_key(const int &keycode);
 
 } // namespace sdl_subsdk
