@@ -1,6 +1,9 @@
 #pragma once
 
-#include "sdl_engine.hxx"
+#include "sdl_functions.hxx"
+#include "logger.hxx"
+
+#include <filesystem>
 
 #include <chrono>
 #include <cmath>
@@ -149,6 +152,8 @@ public:
         {
             throw std::invalid_argument("Sound file is nullptr");
         }
+
+        initialize();
     }
 
     ~audio_mixer() = default;
@@ -181,7 +186,8 @@ public:
         if (sound_file_ == nullptr)
         {
             LOG(ERROR) << "Can't open file: " << sound_file_name_;
-            throw std::invalid_argument("Failed to open sound file");
+            throw std::invalid_argument("Failed to open sound file '" + std::string(sound_file_name_) +
+                                        "', current directory: " + std::filesystem::current_path().string());
         }
 
         LOG(INFO) << "Loaded sound file: " << sound_file_name_;

@@ -8,9 +8,8 @@
 namespace sdk
 {
 
-struct imgui_window
-{
-    const char *_name;
+struct imgui_window {
+    void update();
 };
 
 struct imgui_system
@@ -26,6 +25,53 @@ struct imgui_system
     void update(entt::registry &registry)
     {
         imgui_subsdk::new_frame();
+
+        {
+            // Add UI elements
+            ImGui::SetNextWindowSize(ImVec2(400, 200));
+            ImGui::SetNextWindowPos(ImVec2(0, 0));
+            ImGui::Begin("Game UI", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+            ImGui::ProgressBar(0.7f, ImVec2(-1, 0), "HP");
+            if (ImGui::Button("Pause", ImVec2(80, 40))) {
+                ImGui::OpenPopup("My Popup");
+            }
+
+            if (ImGui::BeginPopupModal("Pause", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::Text("Pause menu");
+                ImGui::Separator();
+
+                if (ImGui::Button("Settings", ImVec2(120, 0))) {
+                    // Do something
+                }
+
+                ImGui::Separator();
+
+                // Exit button
+                if (ImGui::Button("Exit", ImVec2(120, 0))) {
+                    ImGui::CloseCurrentPopup();
+                    // Do something
+                }
+
+                // Resume button
+                ImGui::SameLine();
+                if (ImGui::Button("Resume", ImVec2(120, 0))) {
+                    ImGui::CloseCurrentPopup();
+                    // Do something
+                }
+
+                ImGui::EndPopup();
+            }
+
+            ImGui::SameLine(ImGui::GetWindowWidth() - 80);
+            ImGui::Text("<WeaponID>");
+
+            ImGui::End();
+
+        }
+
+        //ImGui::ShowDemoWindow();
+
         // TODO: implement a normal event system
         //        auto view = registry.view<sdk::event>();
         //        imgui_subsdk::new_frame();
@@ -34,8 +80,6 @@ struct imgui_system
         //            auto const &sdk_event = view.get<sdk::event>(event);
         //            imgui_subsdk::process_event(sdk_event);
         //        }
-
-        ImGui::ShowDemoWindow();
 
         imgui_subsdk::render();
     }
