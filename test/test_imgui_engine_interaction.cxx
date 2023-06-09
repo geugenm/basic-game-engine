@@ -152,7 +152,7 @@ class imgui_component : public sdk::component
 {
 public:
     explicit imgui_component(SDL_Window *sdl_window, SDL_GLContext sdl_context,
-                             const char *name = "imgui")
+                             const char *name = "imgui_system")
         : sdk::component(name)
     {
         imgui_subsdk::init_imgui(sdl_window, sdl_context);

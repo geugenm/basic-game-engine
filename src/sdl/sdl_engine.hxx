@@ -19,7 +19,7 @@ public:
         if (!window_)
         {
             SDL_Quit();
-            throw sdk::engine_error("Failed to create SDL window");
+            throw sdk::engine_error("Failed to create SDL _window");
         }
 
         context_ = sdl_subsdk::get_new_sdl_gl_context(window_);
@@ -27,7 +27,7 @@ public:
         {
             SDL_DestroyWindow(window_);
             SDL_Quit();
-            throw sdk::engine_error("Failed to create OpenGL context");
+            throw sdk::engine_error("Failed to create OpenGL _context");
         }
 
         sdl_subsdk::init_opengl();
@@ -45,7 +45,7 @@ public:
         if (!is_initialized())
         {
             LOG(WARNING)
-                << "Trying to get the uninitialized window or/and context.";
+                << "Trying to get the uninitialized _window or/and _context.";
         }
         return window_;
     }
@@ -55,7 +55,7 @@ public:
         if (!is_initialized())
         {
             LOG(WARNING)
-                << "Trying to get the uninitialized window or/and context.";
+                << "Trying to get the uninitialized _window or/and _context.";
         }
         return context_;
     }

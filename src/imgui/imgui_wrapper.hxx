@@ -21,18 +21,18 @@ void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
 {
     if (window == nullptr)
     {
-        throw std::invalid_argument("Given SDL window is nullptr.");
+        throw std::invalid_argument("Given SDL _window is nullptr.");
     }
 
     if (gl_context == nullptr)
     {
-        throw std::invalid_argument("Given SDL GL context is nullptr.");
+        throw std::invalid_argument("Given SDL GL _context is nullptr.");
     }
 
     IMGUI_CHECKVERSION();
     if (ImGui::CreateContext() == nullptr)
     {
-        throw std::invalid_argument("Failed to create ImGui context.");
+        throw std::invalid_argument("Failed to create ImGui _context.");
     }
 
     ImStyle::setup_style(k_use_dark_style, k_window_alpha);

@@ -10,6 +10,7 @@ target_include_directories(sdk_systems PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(sdk_systems PUBLIC
         engine_includes
         opengl_sdk
+        imgui_sdk
         sdl3_sdk
         SDL3::SDL3-static
         EasyLogging::EasyLogging

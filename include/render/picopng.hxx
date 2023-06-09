@@ -502,7 +502,7 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
             if (CM != 8 || CINFO > 7)
             {
                 return 25;
-            } // error: only compression method 8: inflate with sliding window
+            } // error: only compression method 8: inflate with sliding _window
               // of 32k is supported by the PNG spec
             if (FDICT != 0)
             {

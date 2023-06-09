@@ -31,7 +31,7 @@ SDL_Window *get_new_sdl_window(const char *window_title,
     if (!window)
     {
         std::cerr << SDL_GetError() << std::endl;
-        throw std::runtime_error("Failed to init SDL window with OpenGL.");
+        throw std::runtime_error("Failed to init SDL _window with OpenGL.");
     }
 
     return window;
@@ -42,14 +42,14 @@ SDL_GLContext get_new_sdl_gl_context(SDL_Window *window)
     if (window == nullptr)
     {
         throw std::invalid_argument(
-            "Can't create context from uninitialized SDL window.");
+            "Can't create _context from uninitialized SDL _window.");
     }
 
     SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context)
     {
         std::cerr << SDL_GetError() << std::endl;
-        throw std::invalid_argument("Failed to create OpenGL context.");
+        throw std::invalid_argument("Failed to create OpenGL _context.");
     }
 
     return context;
