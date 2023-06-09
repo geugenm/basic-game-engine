@@ -8,45 +8,14 @@
 namespace sdl_subsdk
 {
 
-class engine : public sdk::iengine
+class engine
 {
 public:
-    engine(const char *window_title, const int &height, const int width,
-           const char *engine_name = "sdl_engine")
-        : sdk::iengine(engine_name), k_window_title_(window_title),
-          k_window_height_(height), k_window_width_(width)
-    {
-    }
-
-    ~engine() override = default;
-
-    [[nodiscard]] SDL_Window *get_window()
-    {
-        if (!is_initialized())
-        {
-            throw sdk::engine_error("Trying to get the uninitialized window.",
-                                    "get_window");
-        }
-        return window_;
-    }
-
-    [[nodiscard]] SDL_GLContext get_context()
-    {
-        if (!is_initialized())
-        {
-            throw sdk::engine_error("Trying to get the uninitialized window.",
-                                    "get_window");
-        }
-        return context_;
-    }
-
-protected:
-    void initialize_impl() override
+    engine(const char *window_title, const int &height, const int width)
     {
         sdl_subsdk::init_sdl();
 
-        window_ = sdl_subsdk::get_new_sdl_window(
-            k_window_title_, k_window_width_, k_window_height_);
+        window_ = sdl_subsdk::get_new_sdl_window(window_title, height, width);
         if (!window_)
         {
             SDL_Quit();
@@ -64,14 +33,39 @@ protected:
         sdl_subsdk::init_opengl();
     }
 
-    void render_impl() override
+    ~engine() = default;
+
+    [[nodiscard]] bool is_initialized() const
+    {
+        return window_ != nullptr && context_ != nullptr;
+    }
+
+    [[nodiscard]] SDL_Window *get_window() const
+    {
+        if (!is_initialized())
+        {
+            LOG(WARNING)
+                << "Trying to get the uninitialized window or/and context.";
+        }
+        return window_;
+    }
+
+    [[nodiscard]] SDL_GLContext get_context() const
+    {
+        if (!is_initialized())
+        {
+            LOG(WARNING)
+                << "Trying to get the uninitialized window or/and context.";
+        }
+        return context_;
+    }
+
+    void render()
     {
         SDL_GL_SwapWindow(window_);
     }
 
-    void handle_event_impl(const sdk::event &event) override {}
-
-    void destroy_impl() override
+    void destroy()
     {
         SDL_GL_DeleteContext(context_);
         SDL_DestroyWindow(window_);
@@ -81,10 +75,6 @@ protected:
 private:
     SDL_Window *window_    = nullptr;
     SDL_GLContext context_ = nullptr;
-
-    const char *k_window_title_;
-    const int k_window_height_;
-    const int k_window_width_;
 };
 
 } // namespace sdl_subsdk

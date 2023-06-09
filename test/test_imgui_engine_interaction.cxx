@@ -1,9 +1,4 @@
-#include "imgui_wrapper.hxx"
-#include "opengl_functions.hxx"
-
-#include "open_gl_shader.hxx"
-#include "sdl_engine.hxx"
-#include "sdl_functions.hxx"
+#include <gengine_core.hxx>
 
 #include <fstream>
 #include <gtest/gtest.h>

@@ -17,7 +17,7 @@ namespace sdk
 class iengine : public object
 {
 public:
-    explicit iengine(const char *engine_name = "engine") : object(engine_name)
+    explicit iengine(const char *engine_name = "sdl_engine") : object(engine_name)
     {
     }
 
@@ -27,7 +27,7 @@ public:
     {
         if (is_initialized())
         {
-            LOG(WARNING) << "Reinitializing engine and all its components";
+            LOG(WARNING) << "Reinitializing sdl_engine and all its components";
         }
 
         object::initialize();

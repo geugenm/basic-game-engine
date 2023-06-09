@@ -7,6 +7,7 @@ CPMAddPackage(
 )
 
 if(easyloggingpp_ADDED)
+    message(STATUS "easyloggingpp added to CPM")
     add_library(easyloggingpp STATIC)
     target_sources(easyloggingpp PRIVATE ${easyloggingpp_SOURCE_DIR}/src/easylogging++.cc)
     target_include_directories(easyloggingpp PUBLIC ${easyloggingpp_SOURCE_DIR}/src)

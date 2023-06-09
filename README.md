@@ -1,7 +1,7 @@
 ## Installation
 
-1. Clone the repository via `git clone https://github.com/geugenm/basic-game-engine.git`
-NOTE: CMake will automatically download all required submodules and dependencies, [implemented here.](https://github.com/geugenm/basic-game-engine/blob/main/cmake/git_update_submodules.cmake)
+1. Clone the repository via `git clone https://github.com/geugenm/basic-game-sdl_engine.git`
+NOTE: CMake will automatically download all required submodules and dependencies, [implemented here.](https://github.com/geugenm/basic-game-sdl_engine/blob/main/cmake/git_update_submodules.cmake)
 
 ## Build & Deployment
 
@@ -47,7 +47,7 @@ different language.
 
 ## License
 
-This project is licensed under the AGPL-3.0 License — see the [`LICENSE`](https://github.com/geugenm/basic-game-engine/blob/main/LICENSE.md) file for details.
+This project is licensed under the AGPL-3.0 License — see the [`LICENSE`](https://github.com/geugenm/basic-game-sdl_engine/blob/main/LICENSE.md) file for details.
 
 ## Acknowledgments
 

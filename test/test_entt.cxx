@@ -1,44 +1,15 @@
-#include <entt/entt.hpp>
+#include <gengine_core.hxx> // include header file for the sdl_engine class
 
-struct position {
-    float x;
-    float y;
-};
+int main(int argc, char *argv[], char *envp[])
+{
+    // create an instance of the game_system struct
+    sdk::game_system system("My Window", 800, 600);
 
-struct velocity {
-    float dx;
-    float dy;
-};
-
-void update(entt::registry &registry) {
-    auto view = registry.view<const position, velocity>();
-
-    // use a callback
-    view.each([](const auto &pos, auto &vel) { /* ... */ });
-
-    // use an extended callback
-    view.each([](const auto entity, const auto &pos, auto &vel) { /* ... */ });
-
-    // use a range-for
-    for(auto [entity, pos, vel]: view.each()) {
-        // ...
+    // run the update method in a loop until the quit event occurs
+    while (system.render_engine.is_initialized())
+    {
+        system.update();
     }
 
-    // use forward iterators and get only the components of interest
-    for(auto entity: view) {
-        auto &vel = view.get<velocity>(entity);
-        // ...
-    }
-}
-
-int main() {
-    entt::registry registry;
-
-    for(auto i = 0u; i < 10u; ++i) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity, i * 1.f, i * 1.f);
-        if(i % 2 == 0) { registry.emplace<velocity>(entity, i * .1f, i * .1f); }
-    }
-
-    update(registry);
+    return EXIT_SUCCESS;
 }
