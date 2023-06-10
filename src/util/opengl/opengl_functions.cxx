@@ -170,6 +170,11 @@ opengl_subsdk::get_vertices_from_glsl_file(const std::string &shader_path)
 GLuint opengl_subsdk::get_new_compiled_shader(GLenum shader_type,
                                               const GLchar *shader_content)
 {
+    if (shader_content == nullptr)
+    {
+        throw std::invalid_argument("Shader content is nullptr");
+    }
+
     GLenum result_shader = glCreateShader(shader_type);
 
     glShaderSource(result_shader, 1, &shader_content, nullptr);
@@ -240,7 +245,7 @@ char *opengl_subsdk::get_file_content(const std::filesystem::path &file_path)
         throw std::invalid_argument("File '" + file_path.string() +
                                     "' does not exist");
     }
-    
+
     std::ifstream input_file(file_path);
 
     if (!input_file.is_open())
@@ -265,12 +270,13 @@ char *opengl_subsdk::get_file_content(const std::filesystem::path &file_path)
     return result;
 }
 
-GLuint opengl_subsdk::get_compiled_shader_from_file(GLenum shader_type,
-                                                    const char *shader_path)
+GLuint opengl_subsdk::get_compiled_shader_from_file(
+    GLenum shader_type, const std::filesystem::path &shader_path)
 {
-    if (shader_path == nullptr)
+    if (!exists(shader_path))
     {
-        throw std::invalid_argument("Shader path is null");
+        throw std::invalid_argument("File '" + shader_path.string() +
+                                    "' does not exist");
     }
 
     GLchar const *shader_content = opengl_subsdk::get_file_content(shader_path);

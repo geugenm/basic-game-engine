@@ -18,13 +18,15 @@ struct sdl_render_context
         return _window != nullptr && _context != nullptr;
     }
 
-    [[nodiscard]] int get_width() const {
+    [[nodiscard]] int get_width() const
+    {
         int width;
         SDL_GetWindowSize(_window, &width, nullptr);
         return width;
     }
 
-    [[nodiscard]] int get_height() const {
+    [[nodiscard]] int get_height() const
+    {
         int height;
         SDL_GetWindowSize(_window, nullptr, &height);
         return height;
@@ -57,6 +59,8 @@ struct sdl_gl_engine
         }
 
         sdl_subsdk::init_opengl();
+
+        glViewport(0, 0, width, height);
     }
 
     void update(entt::registry &registry)

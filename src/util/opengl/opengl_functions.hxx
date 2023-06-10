@@ -49,7 +49,7 @@ GLuint get_new_compiled_shader(GLenum shader_type,
                                const GLchar *shader_content);
 
 GLuint get_compiled_shader_from_file(GLenum shader_type,
-                                     const char *shader_path);
+                                     const std::filesystem::path &shader_path);
 
 GLuint get_new_program();
 

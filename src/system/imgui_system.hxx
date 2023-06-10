@@ -38,6 +38,7 @@ struct imgui_system
             ImGui::ProgressBar(0.7f, ImVec2(-1, 0), "HP");
             if (ImGui::Button("Pause", ImVec2(80, 40)))
             {
+                LOG(INFO) << "Pressed";
                 ImGui::OpenPopup("My Popup");
             }
 
@@ -78,7 +79,7 @@ struct imgui_system
             ImGui::End();
         }
 
-        // ImGui::ShowDemoWindow();
+        ImGui::ShowDemoWindow();
 
         // TODO: implement a normal event system
         //        auto view = registry.view<sdk::event>();

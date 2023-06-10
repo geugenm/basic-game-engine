@@ -25,18 +25,16 @@ TEST(SDLEngineTest, Init)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    auto shader =
+        opengl_subsdk::shader("shaders/texture.vert", "shaders/texture.frag");
 
-    auto shader = opengl_subsdk::shader("shaders/texture_vertex.glsl",
-                                        "shaders/texture_fragment.glsl");
-
-
-
-    auto texture = new opengl_subsdk::texture("textures/tank_full.png", window_width, window_height);
+    auto texture = new opengl_subsdk::texture("textures/tank_full.png",
+                                              window_width, window_height);
     texture->initialize();
 
-    auto turret = new opengl_subsdk::texture("textures/turret.png", window_width, window_height);
+    auto turret = new opengl_subsdk::texture("textures/turret.png",
+                                             window_width, window_height);
     turret->initialize();
-
 
     const auto transformLoc = shader.get_uniform_location("transform");
 
@@ -64,8 +62,10 @@ TEST(SDLEngineTest, Init)
         glUniform1i(textureUniformLocation, 1);
     }
 
-    constexpr float aspectRatio = static_cast<float>(window_width) / static_cast<float>(window_height);
-    glm::mat4 aspectMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(aspectRatio, 1.0f, 1.0f));
+    constexpr float aspectRatio =
+        static_cast<float>(window_width) / static_cast<float>(window_height);
+    glm::mat4 aspectMatrix =
+        glm::scale(glm::mat4(1.0f), glm::vec3(aspectRatio, 1.0f, 1.0f));
 
     SDL_Event event;
     while (true)
@@ -74,7 +74,7 @@ TEST(SDLEngineTest, Init)
         {
             if (event.type == SDL_EVENT_KEY_DOWN)
             {
-                float halfWidth = 0.6f * 0.5f;
+                float halfWidth  = 0.6f * 0.5f;
                 float halfHeight = 0.6f * 0.5f;
 
                 switch (event.key.keysym.sym)
@@ -82,14 +82,18 @@ TEST(SDLEngineTest, Init)
                     case SDLK_w:
                         position.x += moveSpeed * cos(rotationAngle);
                         position.y += moveSpeed * sin(rotationAngle);
-                        position.x = std::clamp(position.x, -1.0f + halfWidth, 1.0f - halfWidth);
-                        position.y = std::clamp(position.y, -1.0f + halfHeight, 1.0f - halfHeight);
+                        position.x = std::clamp(position.x, -1.0f + halfWidth,
+                                                1.0f - halfWidth);
+                        position.y = std::clamp(position.y, -1.0f + halfHeight,
+                                                1.0f - halfHeight);
                         break;
                     case SDLK_s:
                         position.x -= moveSpeed * cos(rotationAngle);
                         position.y -= moveSpeed * sin(rotationAngle);
-                        position.x = std::clamp(position.x, -1.0f + halfWidth, 1.0f - halfWidth);
-                        position.y = std::clamp(position.y, -1.0f + halfHeight, 1.0f - halfHeight);
+                        position.x = std::clamp(position.x, -1.0f + halfWidth,
+                                                1.0f - halfWidth);
+                        position.y = std::clamp(position.y, -1.0f + halfHeight,
+                                                1.0f - halfHeight);
                         break;
                     case SDLK_a:
                         rotationAngle += rotateSpeed;

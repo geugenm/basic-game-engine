@@ -31,25 +31,9 @@ struct opengl_shader
     }
 };
 
-struct example_triangle_shader
-{
-    opengl_shader _shader{
-        ._vertex_source_path   = "../resources/shaders/triangle.vert",
-        ._fragment_source_path = "../resources/shaders/triangle.frag",
-    };
-};
-
 class opengl_shader_system
 {
 public:
-    void example_shader(entt::registry &registry)
-    {
-        const auto entity = registry.create();
-        example_triangle_shader triangle_shader;
-        create_shader_program(triangle_shader._shader);
-        registry.emplace<example_triangle_shader>(entity, triangle_shader);
-    }
-
     void init(entt::registry &registry)
     {
         auto view = registry.view<opengl_shader>();
@@ -63,19 +47,18 @@ public:
 
     void update(entt::registry &registry)
     {
-        auto view = registry.view<example_triangle_shader>();
+        auto view = registry.view<opengl_shader>();
 
         for (auto entity : view)
         {
-            auto &shader = view.get<example_triangle_shader>(entity);
-            use(shader._shader);
+            auto &shader = view.get<opengl_shader>(entity);
+            use(shader);
         }
     }
 
 private:
     static void create_shader_program(opengl_shader &shader)
     {
-        opengl_subsdk::enable_debug_mode();
         if (!exists(shader._vertex_source_path))
         {
             throw std::invalid_argument("Vertex shader file '" +
@@ -110,7 +93,6 @@ private:
         opengl_subsdk::delete_shader(fragment);
 
         shader._is_initialized = true;
-        opengl_subsdk::disable_debug_mode();
     }
 
     static void use(opengl_shader &shader)

@@ -12,7 +12,7 @@ namespace sdk
 
 struct opengl_texture
 {
-    const char *_image_path;
+    std::filesystem::path _image_path;
 
     GLuint _VBO{};
     GLuint _VAO{};
@@ -28,6 +28,8 @@ struct opengl_texture
 
     bool _is_initialized = false;
 
+    GLint _number{};
+
     sdl_render_context _attached_context;
 
     [[nodiscard]] float image_aspect_ratio() const
@@ -38,6 +40,27 @@ struct opengl_texture
 
 struct opengl_texture_system
 {
+    entt::entity my_entity;
+
+    void test(entt::registry &registry)
+    {
+        my_entity = registry.create();
+
+        opengl_shader shader;
+        shader = {
+            ._vertex_source_path   = "../resources/shaders/texture.vert",
+            ._fragment_source_path = "../resources/shaders/texture.frag",
+        };
+
+        opengl_texture texture{
+            ._image_path = "../resources/textures/brick.png",
+            ._number     = 0,
+        };
+
+        registry.emplace<opengl_shader>(my_entity, shader);
+        registry.emplace<opengl_texture>(my_entity, texture);
+    }
+
     void init_on(entt::registry &registry, const sdl_render_context &context)
     {
         auto view = registry.view<opengl_texture>();
@@ -46,18 +69,30 @@ struct opengl_texture_system
         {
             auto &texture = view.get<opengl_texture>(entity);
             initialize(texture, context);
+            LOG(INFO) << "Texture initialized.";
         }
+
+        auto &shader =
+            registry.view<opengl_shader>().get<opengl_shader>(my_entity);
+
+        const auto &texture = view.get<opengl_texture>(my_entity);
+
+        glUniform1i(shader.get_uniform_location("ourTexture"), texture._number);
     }
 
     void update(entt::registry &registry)
     {
-        registry.view<opengl_texture>().each(
-            [this](auto entity, auto &texture) {
-                if (texture._is_initialized)
-                {
-                    render(texture);
-                }
-            });
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        auto view = registry.view<opengl_texture>();
+
+        for (auto entity : view)
+        {
+            auto &texture = view.get<opengl_texture>(entity);
+            render(texture);
+            LOG(INFO) << "Texture rendered. Size:" << texture._width << "x"
+                      << texture._height;
+        }
     }
 
 private:
@@ -120,6 +155,12 @@ private:
     [[nodiscard]] static std::vector<unsigned char>
     get_png_data(opengl_texture &texture)
     {
+        if (!exists(texture._image_path))
+        {
+            throw std::invalid_argument("Failed to open PNG image: " +
+                                        texture._image_path.string());
+        }
+
         std::ifstream file(texture._image_path,
                            std::ios::binary | std::ios::ate);
 
@@ -163,15 +204,16 @@ private:
         glGenBuffers(1, &texture._EBO);
     }
 
-    void bind_buffers(opengl_texture &texture, sdl_render_context sdl_context)
+    void bind_buffers(opengl_texture &texture,
+                      const sdl_render_context &sdl_context)
     {
-        float image_aspect_ratio = static_cast<float>(texture._width) /
-                                   static_cast<float>(texture._height);
+        float image_aspect_ratio = texture.image_aspect_ratio();
         float window_aspect_ratio =
             static_cast<float>(sdl_context.get_width()) /
             static_cast<float>(sdl_context.get_height());
 
-        float scale_x, scale_y;
+        float scale_x;
+        float scale_y;
 
         if (image_aspect_ratio > window_aspect_ratio)
         {
@@ -184,61 +226,33 @@ private:
             scale_y = 1.0f;
         }
 
-        texture._vertices = {
+        // clang-format off
+        const GLfloat vertices_[] = {
             // Positions          // Colors           // Texture Coords
-            0.5f * scale_x,
-            0.5f * scale_y,
-            0.0f,
-            0.0f,
-            0.0f,
-            0.0f,
-            1.0f,
-            1.0f, // Top Right
-            0.5f * scale_x,
-            -0.5f * scale_y,
-            0.0f,
-            0.0f,
-            1.0f,
-            0.0f,
-            1.0f,
-            0.0f, // Bottom Right
-            -0.5f * scale_x,
-            -0.5f * scale_y,
-            0.0f,
-            0.0f,
-            0.0f,
-            1.0f,
-            0.0f,
-            0.0f, // Bottom Left
-            -0.5f * scale_x,
-            0.5f * scale_y,
-            0.0f,
-            0.0f,
-            1.0f,
-            0.0f,
-            0.0f,
-            1.0f // Top Left
+            0.5f * scale_x,  0.5f * scale_y,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+            0.5f * scale_x,  -0.5f * scale_y, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+            -0.5f * scale_x, -0.5f * scale_y, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+            -0.5f * scale_x, 0.5f * scale_y,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
         };
 
-        texture._indices = {
-            // Note that we start from 0.
+        const GLuint indices_[] = {
+            // Note that we start from 0!
             0, 1, 3, // First Triangle
             1, 2, 3  // Second Triangle
         };
+        // clang-format on
 
         glBindVertexArray(texture._VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, texture._VBO);
 
-        glBufferData(GL_ARRAY_BUFFER,
-                     static_cast<GLsizeiptr>(size(texture._vertices)),
-                     texture._vertices.data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_), vertices_,
+                     GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texture._EBO);
 
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     static_cast<GLsizeiptr>(size(texture._indices)),
-                     texture._indices.data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_), indices_,
+                     GL_DYNAMIC_DRAW);
     }
 
     void enable_attributes()

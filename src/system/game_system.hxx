@@ -25,17 +25,18 @@ struct game_system
                 int width)
         : render_engine(title, height, width), imgui(render_engine.sdl_context)
     {
+        opengl_subsdk::enable_debug_mode();
+        texture_system.test(registry);
+        shader_system.init(registry);
         texture_system.init_on(registry, render_engine.sdl_context);
-        // shader_system.init(registry);
-        shader_system.example_shader(registry);
-
-        // set up any other necessary variables for the system
+        shader_system.update(registry);
     }
 
     void update(entt::registry &registry)
     {
-        texture_system.update(registry);
         render_engine.update(registry);
+        shader_system.update(registry);
+        texture_system.update(registry);
         imgui.update(registry);
     }
 };
