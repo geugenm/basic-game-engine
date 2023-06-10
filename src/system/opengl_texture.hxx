@@ -90,7 +90,7 @@ struct opengl_texture_system
         };
 
         opengl_texture turret_texture{
-            ._image_path = "../resources/textures/brick.png",
+            ._image_path = "../resources/textures/turret.png",
             // clang-format off
             ._vertices = {
                 // Positions          // Colors           // Texture Coords
@@ -118,7 +118,6 @@ struct opengl_texture_system
 
     void init_on(entt::registry &registry, entt::entity &window_entity)
     {
-        opengl_subsdk::enable_debug_mode();
 
         glEnable(GL_BLEND);
 
@@ -137,17 +136,29 @@ struct opengl_texture_system
 
         auto &shader =
             registry.view<opengl_shader>().get<opengl_shader>(_tank_hull);
+        glUseProgram(shader._program_id);
 
-        const auto &tank_hull_texture = view.get<opengl_texture>(_tank_hull);
+        {
+            const auto &tank_hull_texture =
+                view.get<opengl_texture>(_tank_hull);
 
-        glUniform1i(shader.get_uniform_location("bottom_texture"),
-                    tank_hull_texture._number);
+            LOG(INFO) << "Tank hull texture number: "
+                      << tank_hull_texture._number;
 
-        const auto &tank_turret_texture =
-            view.get<opengl_texture>(_tank_turret);
+            glUniform1i(shader.get_uniform_location("ourTexture"),
+                        tank_hull_texture._number);
+        }
 
-        glUniform1i(shader.get_uniform_location("top_texture"),
-                    tank_turret_texture._number);
+        {
+            const auto &tank_turret_texture =
+                view.get<opengl_texture>(_tank_turret);
+
+            LOG(INFO) << "Tank turret texture number: "
+                      << tank_turret_texture._number;
+
+            glUniform1i(shader.get_uniform_location("topTexture"),
+                        tank_turret_texture._number);
+        }
     }
 
     void update(entt::registry &registry, entt::entity &window_entity)
