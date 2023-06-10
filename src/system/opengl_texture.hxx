@@ -5,6 +5,10 @@
 #include <entt/entt.hpp>
 #include <opengl_functions.hxx>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "sdl_render_engine.hxx"
 
 namespace sdk
@@ -36,6 +40,18 @@ struct opengl_texture
     {
         return static_cast<float>(_width) / static_cast<float>(_height);
     }
+};
+
+struct texture_params
+{
+    glm::vec2 position{0.5f, -0.5f};
+    float rotationAngle = 0.0f;
+
+    const float moveSpeed   = 0.05f;
+    const float rotateSpeed = 0.05f;
+
+    float halfWidth  = 0.6f * 0.5f;
+    float halfHeight = 0.6f * 0.5f;
 };
 
 struct opengl_texture_system
@@ -83,7 +99,7 @@ struct opengl_texture_system
         glUniform1i(shader.get_uniform_location("ourTexture"), texture._number);
     }
 
-    void update(entt::registry &registry)
+    void update(entt::registry &registry, entt::entity &window_entity)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -96,6 +112,73 @@ struct opengl_texture_system
             LOG(INFO) << "Texture rendered. Size:" << texture._width << "x"
                       << texture._height;
         }
+
+        auto event_view = registry.view<sdk::keyboard>();
+
+        auto view_context = registry.view<sdl_render_context>();
+        auto &sdl_context = view_context.get<sdl_render_context>(window_entity);
+
+        const float aspect_ratio = static_cast<float>(sdl_context.get_width()) /
+                                   static_cast<float>(sdl_context.get_height());
+        glm::mat4 aspect_matrix =
+            glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
+
+        static texture_params params;
+
+        for (auto entity : event_view)
+        {
+            auto &keyboard = event_view.get<sdk::keyboard>(entity);
+            switch (keyboard)
+            {
+                case sdk::keyboard::keyboard_W:
+                    params.position.x +=
+                        params.moveSpeed * cos(params.rotationAngle);
+                    params.position.y +=
+                        params.moveSpeed * sin(params.rotationAngle);
+                    params.position.x =
+                        std::clamp(params.position.x, -1.0f + params.halfWidth,
+                                   1.0f - params.halfWidth);
+                    params.position.y =
+                        std::clamp(params.position.y, -1.0f + params.halfHeight,
+                                   1.0f - params.halfHeight);
+                    break;
+                case sdk::keyboard::keyboard_S:
+                    params.position.x -=
+                        params.moveSpeed * cos(params.rotationAngle);
+                    params.position.y -=
+                        params.moveSpeed * sin(params.rotationAngle);
+                    params.position.x =
+                        std::clamp(params.position.x, -1.0f + params.halfWidth,
+                                   1.0f - params.halfWidth);
+                    params.position.y =
+                        std::clamp(params.position.y, -1.0f + params.halfHeight,
+                                   1.0f - params.halfHeight);
+                    break;
+                case sdk::keyboard::keyboard_A:
+                    params.rotationAngle += params.rotateSpeed;
+                    break;
+                case sdk::keyboard::keyboard_D:
+                    params.rotationAngle -= params.rotateSpeed;
+                    break;
+                default:
+                    break;
+            }
+            registry.destroy(entity);
+        }
+
+        auto transform = glm::mat4(1.0f);
+        transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
+        transform      = glm::translate(
+            transform, glm::vec3(params.position.x, params.position.y, 0.0f));
+        transform = glm::rotate(transform, params.rotationAngle,
+                                glm::vec3(0.0f, 0.0f, 1.0f));
+        transform = transform * aspect_matrix;
+
+        auto &shader =
+            registry.view<opengl_shader>().get<opengl_shader>(my_entity);
+
+        glUniformMatrix4fv(shader.get_uniform_location("transform"), 1,
+                           GL_FALSE, glm::value_ptr(transform));
     }
 
 private:

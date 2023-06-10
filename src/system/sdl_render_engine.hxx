@@ -88,6 +88,11 @@ struct sdl_gl_engine
         while (SDL_PollEvent(&event))
         {
             imgui_subsdk::process_event(event);
+            
+            entt::entity event_ent = registry.create();
+            registry.emplace<sdk::keyboard>(
+                event_ent,
+                sdl_subsdk::sdl_key_to_sdk_key(event.key.keysym.sym));
 
             if (event.type == SDL_EVENT_QUIT)
             {

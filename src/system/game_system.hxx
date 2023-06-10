@@ -35,7 +35,7 @@ struct game_system
     {
         render_engine.update(registry);
         shader_system.update(registry);
-        texture_system.update(registry);
+        texture_system.update(registry, render_engine._window_entity);
         imgui.update(registry);
     }
 };
