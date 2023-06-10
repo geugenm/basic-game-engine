@@ -38,10 +38,10 @@ struct opengl_texture_system
                 // clang-format off
             ._vertices = {
                 // Positions          // Colors           // Texture Coords
-                0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
+                0.5f,  0.5f,  0.1f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                0.5f,  -0.5f, 0.1f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+                -0.5f, -0.5f, 0.1f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+                -0.5f, 0.5f,  0.1f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
             },
 
             ._indices = {
@@ -66,10 +66,10 @@ struct opengl_texture_system
                 // clang-format off
             ._vertices = {
                 // Positions          // Colors           // Texture Coords
-                0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
+                0.5f,  0.5f,  0.2f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                0.5f,  -0.5f, 0.2f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+                -0.5f, -0.5f, 0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+                -0.5f, 0.5f,  0.2f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
             },
 
             ._indices = {
@@ -82,6 +82,7 @@ struct opengl_texture_system
             },
         };
 
+        // TODO: fix the deformation
         sprite battlefield{
             ._shader{
                 ._vertex_source_path = "../resources/shaders/battlefield.vert",
@@ -95,7 +96,7 @@ struct opengl_texture_system
             ._vertices = {
                 // Positions          // Colors           // Texture Coords
                 0.0f,  1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+                0.0f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
                 -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
                 -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
             },
@@ -106,7 +107,8 @@ struct opengl_texture_system
                 1, 2, 3  // Second Triangle
             },
                 // clang-format on
-                ._number = 0,
+                ._needs_to_be_cropped = true,
+                ._number              = 0,
             },
         };
 
@@ -132,10 +134,9 @@ struct opengl_texture_system
             glUseProgram(0);
         }
 
-        // TODO: Find blend function
-        //        glEnable(GL_BLEND);
-        //
-        //        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         {
             const auto &tank_hull_sprite = view.get<sprite>(_tank_hull);
@@ -275,7 +276,7 @@ struct opengl_texture_system
 
             glUniformMatrix4fv(
                 battlefield_sprite._shader.get_uniform_location("transform"), 1,
-                GL_FALSE, glm::value_ptr(transform));
+                GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
             glUseProgram(0);
         }
     }
@@ -396,7 +397,7 @@ private:
     void bind_buffers(opengl_texture &texture,
                       const sdl_render_context &sdl_context)
     {
-        if (texture._need_to_be_cropped)
+        if (texture._needs_to_be_cropped)
         {
             float image_aspect_ratio = texture.image_aspect_ratio();
             float window_aspect_ratio =

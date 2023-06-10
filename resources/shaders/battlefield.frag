@@ -15,7 +15,6 @@ bool near_line(vec2 point, vec2 a, vec2 b, float thickness) {
     return distance < thickness;
 }
 
-
 void main()
 {
     const vec4 light_purple = vec4(0.7, 0.3, 0.8, 1.0);
