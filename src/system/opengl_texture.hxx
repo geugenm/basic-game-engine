@@ -94,7 +94,7 @@ struct opengl_texture_system
                 // clang-format off
             ._vertices = {
                 // Positions          // Colors           // Texture Coords
-                0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                0.0f,  1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
                 0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
                 -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
                 -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
@@ -110,6 +110,7 @@ struct opengl_texture_system
             },
         };
 
+        // ! The order plays the role
         registry.emplace<sprite>(_tank_turret, tank_turret);
         registry.emplace<sprite>(_tank_hull, tank_hull);
         registry.emplace<sprite>(_battlefield, battlefield);
@@ -267,6 +268,7 @@ struct opengl_texture_system
         }
         {
             auto transform = glm::mat4(1.0f);
+            transform      = transform * aspect_matrix;
 
             auto &battlefield_sprite = view.get<sprite>(_battlefield);
             glUseProgram(battlefield_sprite._shader._program_id);
@@ -329,8 +331,10 @@ private:
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture._width, texture._height,
                      0, GL_RGBA, GL_UNSIGNED_BYTE, png_data.data());
 
-        // Generate mipmaps
-        glGenerateMipmap(GL_TEXTURE_2D);
+        if (texture._need_generate_mipmaps)
+        {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
 
         LOG(INFO) << "Texture loaded: " << texture._image_path.string();
 
@@ -392,37 +396,40 @@ private:
     void bind_buffers(opengl_texture &texture,
                       const sdl_render_context &sdl_context)
     {
-        float image_aspect_ratio = texture.image_aspect_ratio();
-        float window_aspect_ratio =
-            static_cast<float>(sdl_context.get_width()) /
-            static_cast<float>(sdl_context.get_height());
-
-        float scale_x;
-        float scale_y;
-
-        if (image_aspect_ratio > window_aspect_ratio)
+        if (texture._need_to_be_cropped)
         {
-            scale_x = 1.0f;
-            scale_y = window_aspect_ratio / image_aspect_ratio;
-        }
-        else
-        {
-            scale_x = image_aspect_ratio / window_aspect_ratio;
-            scale_y = 1.0f;
-        }
+            float image_aspect_ratio = texture.image_aspect_ratio();
+            float window_aspect_ratio =
+                static_cast<float>(sdl_context.get_width()) /
+                static_cast<float>(sdl_context.get_height());
 
-        // Apply scale to the vertices
-        for (size_t i = 0; i < texture._vertices.size() / 3; ++i)
-        {
-            texture._vertices[i * 3] *= scale_x;
-            texture._vertices[i * 3 + 1] *= scale_y;
-        }
+            float scale_x;
+            float scale_y;
 
-        // Apply scale to the texture coordinates
-        for (size_t i = 0; i < texture._vertices.size() / 3; ++i)
-        {
-            texture._vertices[i * 3 + 2] *= scale_x;
-            texture._vertices[i * 3 + 3] *= scale_y;
+            if (image_aspect_ratio > window_aspect_ratio)
+            {
+                scale_x = 1.0f;
+                scale_y = window_aspect_ratio / image_aspect_ratio;
+            }
+            else
+            {
+                scale_x = image_aspect_ratio / window_aspect_ratio;
+                scale_y = 1.0f;
+            }
+
+            // Apply scale to the vertices
+            for (size_t i = 0; i < texture._vertices.size() / 3; ++i)
+            {
+                texture._vertices[i * 3] *= scale_x;
+                texture._vertices[i * 3 + 1] *= scale_y;
+            }
+
+            // Apply scale to the texture coordinates
+            for (size_t i = 0; i < texture._vertices.size() / 3; ++i)
+            {
+                texture._vertices[i * 3 + 2] *= scale_x;
+                texture._vertices[i * 3 + 3] *= scale_y;
+            }
         }
 
         glBindVertexArray(texture._VAO);

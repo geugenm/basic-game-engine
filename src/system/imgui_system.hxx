@@ -71,7 +71,7 @@ struct imgui_system
 
         ImGui::End();
 
-        ImGui::ShowDemoWindow();
+        ImGui::ShowDebugLogWindow();
 
         imgui_subsdk::render();
     }

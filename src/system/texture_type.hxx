@@ -49,7 +49,9 @@ struct opengl_texture
     std::vector<GLfloat> _vertices;
     std::vector<GLuint> _indices;
 
-    bool _is_initialized = false;
+    bool _is_initialized        = false;
+    bool _need_generate_mipmaps = true;
+    bool _need_to_be_cropped    = true;
 
     GLint _number{};
 
