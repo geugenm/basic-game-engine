@@ -28,7 +28,7 @@ struct opengl_texture
     unsigned long _height{};
 
     std::vector<GLfloat> _vertices;
-    std::vector<GLfloat> _indices;
+    std::vector<GLuint> _indices;
 
     bool _is_initialized = false;
 
@@ -56,29 +56,44 @@ struct texture_params
 
 struct opengl_texture_system
 {
-    entt::entity my_entity;
+    entt::entity _tank_hull;
+    entt::entity _tank_turret;
 
     void test(entt::registry &registry)
     {
-        my_entity = registry.create();
+        _tank_hull   = registry.create();
+        _tank_turret = registry.create();
 
-        opengl_shader shader;
-        shader = {
+        opengl_shader shader{
             ._vertex_source_path   = "../resources/shaders/texture.vert",
             ._fragment_source_path = "../resources/shaders/texture.frag",
         };
 
-        opengl_texture texture{
-            ._image_path = "../resources/textures/brick.png",
+        opengl_texture hull_texture{
+            ._image_path = "../resources/textures/hull.png",
             ._number     = 0,
         };
 
-        registry.emplace<opengl_shader>(my_entity, shader);
-        registry.emplace<opengl_texture>(my_entity, texture);
+        opengl_texture turret_texture{
+            ._image_path = "../resources/textures/brick.png",
+            ._number     = 1,
+        };
+
+        registry.emplace<opengl_shader>(_tank_hull, shader);
+
+        registry.emplace<opengl_texture>(_tank_hull, hull_texture);
+
+        registry.emplace<opengl_texture>(_tank_turret, turret_texture);
     }
 
     void init_on(entt::registry &registry, entt::entity &window_entity)
     {
+        opengl_subsdk::enable_debug_mode();
+
+        glEnable(GL_BLEND);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         auto view_context = registry.view<sdl_render_context>();
         auto &sdl_context = view_context.get<sdl_render_context>(window_entity);
 
@@ -88,15 +103,21 @@ struct opengl_texture_system
         {
             auto &texture = view.get<opengl_texture>(entity);
             initialize(texture, sdl_context);
-            LOG(INFO) << "Texture initialized.";
         }
 
         auto &shader =
-            registry.view<opengl_shader>().get<opengl_shader>(my_entity);
+            registry.view<opengl_shader>().get<opengl_shader>(_tank_hull);
 
-        const auto &texture = view.get<opengl_texture>(my_entity);
+        const auto &tank_hull_texture = view.get<opengl_texture>(_tank_hull);
 
-        glUniform1i(shader.get_uniform_location("ourTexture"), texture._number);
+        glUniform1i(shader.get_uniform_location("bottom_texture"),
+                    tank_hull_texture._number);
+
+        const auto &tank_turret_texture =
+            view.get<opengl_texture>(_tank_turret);
+
+        glUniform1i(shader.get_uniform_location("top_texture"),
+                    tank_turret_texture._number);
     }
 
     void update(entt::registry &registry, entt::entity &window_entity)
@@ -108,9 +129,9 @@ struct opengl_texture_system
         for (auto entity : view)
         {
             auto &texture = view.get<opengl_texture>(entity);
+            GLenum target = GL_TEXTURE0 + texture._texture;
+            glActiveTexture(target);
             render(texture);
-            LOG(INFO) << "Texture rendered. Size:" << texture._width << "x"
-                      << texture._height;
         }
 
         auto event_view = registry.view<sdk::keyboard>();
@@ -166,19 +187,22 @@ struct opengl_texture_system
             registry.destroy(entity);
         }
 
-        auto transform = glm::mat4(1.0f);
-        transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
-        transform      = glm::translate(
-            transform, glm::vec3(params.position.x, params.position.y, 0.0f));
-        transform = glm::rotate(transform, params.rotationAngle,
-                                glm::vec3(0.0f, 0.0f, 1.0f));
-        transform = transform * aspect_matrix;
+        {
+            auto transform = glm::mat4(1.0f);
+            transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
+            transform =
+                glm::translate(transform, glm::vec3(params.position.x,
+                                                    params.position.y, 0.0f));
+            transform = glm::rotate(transform, params.rotationAngle,
+                                    glm::vec3(0.0f, 0.0f, 1.0f));
+            transform = transform * aspect_matrix;
 
-        auto &shader =
-            registry.view<opengl_shader>().get<opengl_shader>(my_entity);
+            auto &shader =
+                registry.view<opengl_shader>().get<opengl_shader>(_tank_hull);
 
-        glUniformMatrix4fv(shader.get_uniform_location("transform"), 1,
-                           GL_FALSE, glm::value_ptr(transform));
+            glUniformMatrix4fv(shader.get_uniform_location("transform"), 1,
+                               GL_FALSE, glm::value_ptr(transform));
+        }
     }
 
 private:
@@ -313,7 +337,7 @@ private:
         }
 
         // clang-format off
-        const GLfloat vertices_[] = {
+        texture._vertices = {
             // Positions          // Colors           // Texture Coords
             0.5f * scale_x,  0.5f * scale_y,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
             0.5f * scale_x,  -0.5f * scale_y, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
@@ -321,7 +345,7 @@ private:
             -0.5f * scale_x, 0.5f * scale_y,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
         };
 
-        const GLuint indices_[] = {
+        texture._indices = {
             // Note that we start from 0!
             0, 1, 3, // First Triangle
             1, 2, 3  // Second Triangle
@@ -332,13 +356,15 @@ private:
 
         glBindBuffer(GL_ARRAY_BUFFER, texture._VBO);
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_), vertices_,
-                     GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER,
+                     texture._vertices.size() * sizeof(GLfloat),
+                     texture._vertices.data(), GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texture._EBO);
 
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_), indices_,
-                     GL_DYNAMIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     texture._indices.size() * sizeof(GLuint),
+                     texture._indices.data(), GL_DYNAMIC_DRAW);
     }
 
     void enable_attributes()

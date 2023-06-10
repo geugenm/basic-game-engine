@@ -50,14 +50,14 @@ TEST(SDLEngineTest, Init)
 
     {
         const GLint textureUniformLocation =
-            glGetUniformLocation(shader.get_program_id(), "ourTexture");
+            glGetUniformLocation(shader.get_program_id(), "bottom_texture");
 
         glUniform1i(textureUniformLocation, 0);
     }
 
     {
         const GLint textureUniformLocation =
-            glGetUniformLocation(shader.get_program_id(), "topTexture");
+            glGetUniformLocation(shader.get_program_id(), "top_texture");
 
         glUniform1i(textureUniformLocation, 1);
     }
