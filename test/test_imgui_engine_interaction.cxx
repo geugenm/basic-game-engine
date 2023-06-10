@@ -119,7 +119,7 @@ private:
         glBindBuffer(GL_ARRAY_BUFFER, VBO_);
 
         const auto vertices = opengl_subsdk::get_vertices_from_glsl_file(
-            "test/shaders/triangle_vertex.glsl");
+            "test/shaders/triangle.vert");
 
         glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size()),
                      vertices.data(), GL_DYNAMIC_DRAW);
@@ -140,9 +140,9 @@ private:
     opengl_subsdk::shader *shader_ = nullptr;
 
     static constexpr std::string_view k_vertex_shader_path_ =
-        "shaders/triangle_vertex.glsl";
+        "shaders/triangle.vert";
     static constexpr std::string_view k_fragment_shader_path_ =
-        "shaders/triangle_fragment.glsl";
+        "shaders/triangle.frag";
 
     GLuint VBO_{};
     GLuint VAO_{};

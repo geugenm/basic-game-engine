@@ -26,7 +26,7 @@ struct opengl_texture
     std::vector<GLfloat> _vertices;
     std::vector<GLfloat> _indices;
 
-    bool _is_initialized;
+    bool _is_initialized = false;
 
     sdl_render_context _attached_context;
 

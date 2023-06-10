@@ -20,7 +20,6 @@
 #define OPENGL_INFO_LOG_SIZE 512
 #endif
 
-
 namespace opengl_subsdk
 {
 
@@ -41,7 +40,7 @@ void disable_debug_mode();
 bool file_has_changed(const std::string &file_path,
                       std::time_t &last_modified_time);
 
-char *get_file_content(const std::string &file_path);
+char *get_file_content(const std::filesystem::path &file_path);
 
 std::vector<GLfloat>
 get_vertices_from_glsl_file(const std::string &shader_path);

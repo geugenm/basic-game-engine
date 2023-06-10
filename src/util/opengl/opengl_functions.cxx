@@ -233,13 +233,20 @@ void opengl_subsdk::delete_shader(GLuint shader)
     glDeleteShader(shader);
 }
 
-char *opengl_subsdk::get_file_content(const std::string &file_path)
+char *opengl_subsdk::get_file_content(const std::filesystem::path &file_path)
 {
+    if (!exists(file_path))
+    {
+        throw std::invalid_argument("File '" + file_path.string() +
+                                    "' does not exist");
+    }
+    
     std::ifstream input_file(file_path);
 
     if (!input_file.is_open())
     {
-        throw std::invalid_argument("Unable to open file: " + file_path);
+        throw std::invalid_argument("Unable to open file: " +
+                                    file_path.string());
     }
 
     std::string content((std::istreambuf_iterator<char>(input_file)),
