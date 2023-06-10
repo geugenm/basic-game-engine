@@ -8,20 +8,15 @@
 namespace sdk
 {
 
-struct imgui_window
-{
-    void update();
-};
-
 struct imgui_system
 {
-    explicit imgui_system(const sdl_render_context &sdl_render_context)
+    void init(entt::registry &registry, entt::entity &entity)
     {
-        imgui_subsdk::init_imgui(sdl_render_context._window,
-                                 sdl_render_context._context);
-    }
+        auto view         = registry.view<sdl_render_context>();
+        auto &sdl_context = view.get<sdl_render_context>(entity);
 
-    ~imgui_system() = default;
+        imgui_subsdk::init_imgui(sdl_context._window, sdl_context._context);
+    }
 
     void update(entt::registry &registry)
     {
@@ -80,15 +75,6 @@ struct imgui_system
         }
 
         ImGui::ShowDemoWindow();
-
-        // TODO: implement a normal event system
-        //        auto view = registry.view<sdk::event>();
-        //        imgui_subsdk::new_frame();
-        //
-        //        for (auto event : view) {
-        //            auto const &sdk_event = view.get<sdk::event>(event);
-        //            imgui_subsdk::process_event(sdk_event);
-        //        }
 
         imgui_subsdk::render();
     }

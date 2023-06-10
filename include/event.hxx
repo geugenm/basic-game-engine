@@ -112,9 +112,4 @@ enum class keyboard : int
     keyboard_KeypadEnter,
     keyboard_KeypadEqual
 };
-
-struct event
-{
-    keyboard _keyboard;
-};
 } // namespace sdk

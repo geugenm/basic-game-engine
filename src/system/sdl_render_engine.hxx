@@ -35,10 +35,12 @@ struct sdl_render_context
 
 struct sdl_gl_engine
 {
-    sdl_render_context sdl_context;
+    entt::entity _window_entity;
 
-    sdl_gl_engine(const char *window_title, const int &height, const int &width)
+    sdl_gl_engine(entt::registry &registry, const char *window_title,
+                  const int &height, const int &width)
     {
+        sdl_render_context sdl_context;
         sdl_subsdk::init_sdl();
 
         sdl_context._window =
@@ -61,18 +63,21 @@ struct sdl_gl_engine
         sdl_subsdk::init_opengl();
 
         glViewport(0, 0, width, height);
+
+        _window_entity = registry.create();
+        registry.emplace<sdl_render_context>(_window_entity, sdl_context);
+    }
+
+    [[nodiscard]] bool is_initialized(entt::registry &registry) const
+    {
+        auto view = registry.view<sdl_render_context>();
+        return view.get<sdl_render_context>(_window_entity).is_initialized();
     }
 
     void update(entt::registry &registry)
     {
-        static bool is_first_update = true;
-
-        if (is_first_update)
-        {
-            is_first_update   = false;
-            const auto entity = registry.create();
-            registry.emplace<sdl_render_context>(entity, sdl_context);
-        }
+        auto view         = registry.view<sdl_render_context>();
+        auto &sdl_context = view.get<sdl_render_context>(_window_entity);
 
         if (!sdl_context.is_initialized())
         {
@@ -82,36 +87,28 @@ struct sdl_gl_engine
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            // TODO:
-            //            const auto sdk_event = registry.create();
-            //            registry.emplace<sdk::event>(
-            //                sdk_event,
-            //                sdl_subsdk::sdl_key_to_sdk_key(event.key.keysym.sym));
-
             imgui_subsdk::process_event(event);
 
             if (event.type == SDL_EVENT_QUIT)
             {
-                destroy();
+                destroy(registry);
             }
         }
 
         SDL_GL_SwapWindow(sdl_context._window);
     }
 
-    void destroy()
+    void destroy(entt::registry &registry)
     {
+        auto view         = registry.view<sdl_render_context>();
+        auto &sdl_context = view.get<sdl_render_context>(_window_entity);
+
         SDL_GL_DeleteContext(sdl_context._context);
         SDL_DestroyWindow(sdl_context._window);
         SDL_Quit();
 
         sdl_context._window  = nullptr;
         sdl_context._context = nullptr;
-    }
-
-    ~sdl_gl_engine()
-    {
-        destroy();
     }
 };
 

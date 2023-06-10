@@ -23,13 +23,12 @@ struct game_system
 
     game_system(entt::registry &registry, const char *title, int height,
                 int width)
-        : render_engine(title, height, width), imgui(render_engine.sdl_context)
+        : render_engine(registry, title, height, width)
     {
-        opengl_subsdk::enable_debug_mode();
+        imgui.init(registry, render_engine._window_entity);
         texture_system.test(registry);
         shader_system.init(registry);
-        texture_system.init_on(registry, render_engine.sdl_context);
-        shader_system.update(registry);
+        texture_system.init_on(registry, render_engine._window_entity);
     }
 
     void update(entt::registry &registry)

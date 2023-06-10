@@ -61,14 +61,17 @@ struct opengl_texture_system
         registry.emplace<opengl_texture>(my_entity, texture);
     }
 
-    void init_on(entt::registry &registry, const sdl_render_context &context)
+    void init_on(entt::registry &registry, entt::entity &window_entity)
     {
+        auto view_context = registry.view<sdl_render_context>();
+        auto &sdl_context = view_context.get<sdl_render_context>(window_entity);
+
         auto view = registry.view<opengl_texture>();
 
         for (auto entity : view)
         {
             auto &texture = view.get<opengl_texture>(entity);
-            initialize(texture, context);
+            initialize(texture, sdl_context);
             LOG(INFO) << "Texture initialized.";
         }
 

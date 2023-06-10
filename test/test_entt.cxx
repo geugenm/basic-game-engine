@@ -7,7 +7,7 @@ int main(int argc, char *argv[], char *envp[])
     sdk::game_system system(registry, "My Window", 800, 600);
 
     // run the update method in a loop until the quit event occurs
-    while (system.render_engine.sdl_context.is_initialized())
+    while (system.render_engine.is_initialized(registry))
     {
         system.update(registry);
     }
