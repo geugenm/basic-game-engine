@@ -175,8 +175,6 @@ struct opengl_texture_system
             render(texture);
         }
 
-        auto event_view = registry.view<sdk::keyboard>();
-
         auto view_context = registry.view<sdl_render_context>();
         auto &sdl_context = view_context.get<sdl_render_context>(window_entity);
 
@@ -186,6 +184,8 @@ struct opengl_texture_system
             glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
 
         static texture_params params;
+
+        auto event_view = registry.view<sdk::keyboard>();
 
         for (auto entity : event_view)
         {
@@ -203,6 +203,7 @@ struct opengl_texture_system
                     std::clamp(params.position.y, -1.0f + params.halfHeight,
                                1.0f - params.halfHeight);
             }
+
             if (keyboard == sdk::keyboard::keyboard_S)
             {
                 params.position.x -=
@@ -221,6 +222,7 @@ struct opengl_texture_system
             {
                 params.rotationAngle += params.rotateSpeed;
             }
+
             if (keyboard == sdk::keyboard::keyboard_D)
             {
                 params.rotationAngle -= params.rotateSpeed;
