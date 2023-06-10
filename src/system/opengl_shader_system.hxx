@@ -3,33 +3,10 @@
 #include "entt/entt.hpp"
 #include "opengl_functions.hxx"
 
+#include "texture_type.hxx"
+
 namespace sdk
 {
-
-struct opengl_shader
-{
-    std::filesystem::path _vertex_source_path;
-    std::filesystem::path _fragment_source_path;
-
-    GLuint _program_id{};
-
-    bool _is_initialized = false;
-
-    [[nodiscard]] GLint get_uniform_location(const GLchar *uniform_name) const
-    {
-        const GLint uniform_location =
-            glGetUniformLocation(_program_id, uniform_name);
-
-        if (uniform_location == -1)
-        {
-            throw std::invalid_argument("Given uniform '" +
-                                        std::string(uniform_name) +
-                                        "' is not found.");
-        }
-
-        return uniform_location;
-    }
-};
 
 class opengl_shader_system
 {
@@ -43,6 +20,14 @@ public:
             auto &shader = view.get<opengl_shader>(entity);
             create_shader_program(shader);
         }
+
+        auto sprite_shader_view = registry.view<sprite>();
+
+        for (auto entity : sprite_shader_view)
+        {
+            auto &ent_sprite = sprite_shader_view.get<sprite>(entity);
+            create_shader_program(ent_sprite._shader);
+        }
     }
 
     void update(entt::registry &registry)
@@ -53,6 +38,16 @@ public:
         {
             auto &shader = view.get<opengl_shader>(entity);
             use(shader);
+            glUseProgram(0);
+        }
+
+        auto sprite_shader_view = registry.view<sprite>();
+
+        for (auto entity : sprite_shader_view)
+        {
+            auto &ent_sprite = sprite_shader_view.get<sprite>(entity);
+            use(ent_sprite._shader);
+            glUseProgram(0);
         }
     }
 

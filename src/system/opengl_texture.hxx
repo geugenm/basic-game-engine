@@ -10,49 +10,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "sdl_render_engine.hxx"
+#include "texture_type.hxx"
 
 namespace sdk
 {
-
-struct opengl_texture
-{
-    std::filesystem::path _image_path;
-
-    GLuint _VBO{};
-    GLuint _VAO{};
-    GLuint _EBO{};
-
-    GLuint _texture{};
-
-    unsigned long _width{};
-    unsigned long _height{};
-
-    std::vector<GLfloat> _vertices;
-    std::vector<GLuint> _indices;
-
-    bool _is_initialized = false;
-
-    GLint _number{};
-
-    sdl_render_context _attached_context;
-
-    [[nodiscard]] float image_aspect_ratio() const
-    {
-        return static_cast<float>(_width) / static_cast<float>(_height);
-    }
-};
-
-struct texture_params
-{
-    glm::vec2 position{0.5f, -0.5f};
-    float rotationAngle = 0.0f;
-
-    const float moveSpeed   = 0.05f;
-    const float rotateSpeed = 0.05f;
-
-    float halfWidth  = 0.6f * 0.5f;
-    float halfHeight = 0.6f * 0.5f;
-};
 
 struct opengl_texture_system
 {
@@ -65,21 +26,16 @@ struct opengl_texture_system
         _tank_hull   = registry.create();
         _tank_turret = registry.create();
 
-        opengl_shader shader{
-            ._vertex_source_path   = "../resources/shaders/texture.vert",
-            ._fragment_source_path = "../resources/shaders/texture.frag",
-            ._program_id           = opengl_subsdk::get_new_program(),
-        };
+        sprite tank_hull{
+            ._shader{
+                ._vertex_source_path   = "../resources/shaders/texture.vert",
+                ._fragment_source_path = "../resources/shaders/texture.frag",
+                ._program_id           = opengl_subsdk::get_new_program(),
+            },
 
-        opengl_shader battlefield_shader{
-            ._vertex_source_path   = "../resources/shaders/battlefield.vert",
-            ._fragment_source_path = "../resources/shaders/battlefield.frag",
-            ._program_id           = opengl_subsdk::get_new_program(),
-        };
-
-        opengl_texture hull_texture{
-            ._image_path = "../resources/textures/hull.png",
-            // clang-format off
+            ._texture{
+                ._image_path = "../resources/textures/hull.png",
+                // clang-format off
             ._vertices = {
                 // Positions          // Colors           // Texture Coords
                 0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
@@ -93,13 +49,21 @@ struct opengl_texture_system
                 0, 1, 3, // First Triangle
                 1, 2, 3  // Second Triangle
             },
-            // clang-format on
-            ._number = 0,
+                // clang-format on
+                ._number = 0,
+            },
         };
 
-        opengl_texture turret_texture{
-            ._image_path = "../resources/textures/turret.png",
-            // clang-format off
+        sprite tank_turret{
+            ._shader{
+                ._vertex_source_path   = "../resources/shaders/texture.vert",
+                ._fragment_source_path = "../resources/shaders/texture.frag",
+                ._program_id           = opengl_subsdk::get_new_program(),
+            },
+
+            ._texture{
+                ._image_path = "../resources/textures/turret.png",
+                // clang-format off
             ._vertices = {
                 // Positions          // Colors           // Texture Coords
                 0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
@@ -113,13 +77,21 @@ struct opengl_texture_system
                 0, 1, 3, // First Triangle
                 1, 2, 3  // Second Triangle
             },
-            // clang-format on
-            ._number = 1,
+                // clang-format on
+                ._number = 1,
+            },
         };
 
-        opengl_texture battlefield_texture{
-            ._image_path = "../resources/textures/brick.png",
-            // clang-format off
+        sprite battlefield{
+            ._shader{
+                ._vertex_source_path = "../resources/shaders/battlefield.vert",
+                ._fragment_source_path =
+                    "../resources/shaders/battlefield.frag",
+                ._program_id = opengl_subsdk::get_new_program(),
+            },
+            ._texture{
+                ._image_path = "../resources/textures/brick.png",
+                // clang-format off
             ._vertices = {
                 // Positions          // Colors           // Texture Coords
                 0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
@@ -133,94 +105,84 @@ struct opengl_texture_system
                 0, 1, 3, // First Triangle
                 1, 2, 3  // Second Triangle
             },
-            // clang-format on
-            ._number = 0,
+                // clang-format on
+                ._number = 0,
+            },
         };
 
-        registry.emplace<opengl_shader>(_tank_hull, shader);
-
-        registry.emplace<opengl_texture>(_tank_hull, hull_texture);
-
-        registry.emplace<opengl_texture>(_tank_turret, turret_texture);
-
-        registry.emplace<opengl_shader>(_battlefield, battlefield_shader);
-        registry.emplace<opengl_texture>(_battlefield, battlefield_texture);
+        registry.emplace<sprite>(_tank_turret, tank_turret);
+        registry.emplace<sprite>(_tank_hull, tank_hull);
+        registry.emplace<sprite>(_battlefield, battlefield);
     }
 
     void init_on(entt::registry &registry, entt::entity &window_entity)
     {
         auto view_context = registry.view<sdl_render_context>();
-        auto &sdl_context = view_context.get<sdl_render_context>(window_entity);
+        auto const &sdl_context =
+            view_context.get<sdl_render_context>(window_entity);
 
-        auto view = registry.view<opengl_texture>();
+        auto view = registry.view<sprite>();
 
         for (auto entity : view)
         {
-            auto &texture = view.get<opengl_texture>(entity);
-            initialize(texture, sdl_context);
+            auto &entity_sprite = view.get<sprite>(entity);
+            glUseProgram(entity_sprite._shader._program_id);
+            initialize(entity_sprite._texture, sdl_context);
+            glUseProgram(0);
         }
 
-        auto &shader =
-            registry.view<opengl_shader>().get<opengl_shader>(_tank_hull);
-        glUseProgram(shader._program_id);
+        // TODO: Find blend function
+        //        glEnable(GL_BLEND);
+        //
+        //        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         {
-            const auto &tank_hull_texture =
-                view.get<opengl_texture>(_tank_hull);
+            const auto &tank_hull_sprite = view.get<sprite>(_tank_hull);
+            glUseProgram(tank_hull_sprite._shader._program_id);
 
-            LOG(INFO) << "Tank hull texture number: "
-                      << tank_hull_texture._number;
-
-            glUniform1i(shader.get_uniform_location("ourTexture"),
-                        tank_hull_texture._number);
+            glUniform1i(
+                tank_hull_sprite._shader.get_uniform_location("ourTexture"),
+                tank_hull_sprite._texture._number);
+            glUseProgram(0);
         }
 
         {
-            const auto &tank_turret_texture =
-                view.get<opengl_texture>(_tank_turret);
+            const auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
 
-            LOG(INFO) << "Tank turret texture number: "
-                      << tank_turret_texture._number;
+            glUseProgram(tank_turret_sprite._shader._program_id);
 
-            glUniform1i(shader.get_uniform_location("topTexture"),
-                        tank_turret_texture._number);
+            glUniform1i(
+                tank_turret_sprite._shader.get_uniform_location("topTexture"),
+                tank_turret_sprite._texture._number);
+            glUseProgram(0);
         }
-
-        auto &battlefield_shader =
-            registry.view<opengl_shader>().get<opengl_shader>(_battlefield);
-        glUseProgram(battlefield_shader._program_id);
 
         {
-            const auto &battlefield_texture =
-                view.get<opengl_texture>(_battlefield);
+            const auto &battlefield_sprite = view.get<sprite>(_battlefield);
 
-            LOG(INFO) << "Battlefield texture number: "
-                      << battlefield_texture._number;
+            glUseProgram(battlefield_sprite._shader._program_id);
 
-            glUniform1i(battlefield_shader.get_uniform_location("ourTexture"),
-                        battlefield_texture._number);
+            glUniform1i(
+                battlefield_sprite._shader.get_uniform_location("ourTexture"),
+                battlefield_sprite._texture._number);
+            glUseProgram(0);
         }
-
-        glEnable(GL_BLEND);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     void update(entt::registry &registry, entt::entity &window_entity)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        auto view = registry.view<opengl_texture, opengl_shader>();
+        auto view = registry.view<sprite>();
 
-        for (auto [entity, opengl_tex, opengl_shdr] : view.each())
+        for (auto entity : view)
         {
-            auto &texture = view.get<opengl_texture>(entity);
-            auto &shader  = view.get<opengl_shader>(entity);
-
-            glUseProgram(shader._program_id);
-            GLenum target = GL_TEXTURE0 + texture._texture;
+            auto &entity_sprite = view.get<sprite>(entity);
+            glUseProgram(entity_sprite._shader._program_id);
+            GLenum target = GL_TEXTURE0 + entity_sprite._texture._number;
             glActiveTexture(target);
-            render(texture);
+            render(entity_sprite._texture);
+            glUseProgram(0);
         }
 
         auto view_context = registry.view<sdl_render_context>();
@@ -288,22 +250,31 @@ struct opengl_texture_system
                                     glm::vec3(0.0f, 0.0f, 1.0f));
             transform = transform * aspect_matrix;
 
-            auto &shader =
-                registry.view<opengl_shader>().get<opengl_shader>(_tank_hull);
+            auto &tank_hull_sprite = view.get<sprite>(_tank_hull);
+            glUseProgram(tank_hull_sprite._shader._program_id);
 
-            glUniformMatrix4fv(shader.get_uniform_location("transform"), 1,
-                               GL_FALSE, glm::value_ptr(transform));
+            glUniformMatrix4fv(
+                tank_hull_sprite._shader.get_uniform_location("transform"), 1,
+                GL_FALSE, glm::value_ptr(transform));
+            glUseProgram(0);
+
+            auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
+            glUseProgram(tank_turret_sprite._shader._program_id);
+            glUniformMatrix4fv(
+                tank_turret_sprite._shader.get_uniform_location("transform"), 1,
+                GL_FALSE, glm::value_ptr(transform));
             glUseProgram(0);
         }
         {
             auto transform = glm::mat4(1.0f);
 
-            auto bf_shader_view = registry.view<opengl_shader>();
-            auto &shader = bf_shader_view.get<opengl_shader>(_battlefield);
-            glUseProgram(shader._program_id);
+            auto &battlefield_sprite = view.get<sprite>(_battlefield);
+            glUseProgram(battlefield_sprite._shader._program_id);
 
-            glUniformMatrix4fv(shader.get_uniform_location("transform"), 1,
-                               GL_FALSE, glm::value_ptr(transform));
+            glUniformMatrix4fv(
+                battlefield_sprite._shader.get_uniform_location("transform"), 1,
+                GL_FALSE, glm::value_ptr(transform));
+            glUseProgram(0);
         }
     }
 
