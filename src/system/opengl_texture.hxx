@@ -71,12 +71,42 @@ struct opengl_texture_system
 
         opengl_texture hull_texture{
             ._image_path = "../resources/textures/hull.png",
-            ._number     = 0,
+            // clang-format off
+            ._vertices = {
+                // Positions          // Colors           // Texture Coords
+                0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+                -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
+            },
+
+            ._indices = {
+                // Note that we start from 0!
+                0, 1, 3, // First Triangle
+                1, 2, 3  // Second Triangle
+            },
+            // clang-format on
+            ._number = 0,
         };
 
         opengl_texture turret_texture{
             ._image_path = "../resources/textures/brick.png",
-            ._number     = 1,
+            // clang-format off
+            ._vertices = {
+                // Positions          // Colors           // Texture Coords
+                0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+                -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
+            },
+
+            ._indices = {
+                // Note that we start from 0!
+                0, 1, 3, // First Triangle
+                1, 2, 3  // Second Triangle
+            },
+            // clang-format on
+            ._number = 1,
         };
 
         registry.emplace<opengl_shader>(_tank_hull, shader);
@@ -336,21 +366,19 @@ private:
             scale_y = 1.0f;
         }
 
-        // clang-format off
-        texture._vertices = {
-            // Positions          // Colors           // Texture Coords
-            0.5f * scale_x,  0.5f * scale_y,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-            0.5f * scale_x,  -0.5f * scale_y, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-            -0.5f * scale_x, -0.5f * scale_y, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-            -0.5f * scale_x, 0.5f * scale_y,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-        };
+        // Apply scale to the vertices
+        for (size_t i = 0; i < texture._vertices.size() / 3; ++i)
+        {
+            texture._vertices[i * 3] *= scale_x;
+            texture._vertices[i * 3 + 1] *= scale_y;
+        }
 
-        texture._indices = {
-            // Note that we start from 0!
-            0, 1, 3, // First Triangle
-            1, 2, 3  // Second Triangle
-        };
-        // clang-format on
+        // Apply scale to the texture coordinates
+        for (size_t i = 0; i < texture._vertices.size() / 3; ++i)
+        {
+            texture._vertices[i * 3 + 2] *= scale_x;
+            texture._vertices[i * 3 + 3] *= scale_y;
+        }
 
         glBindVertexArray(texture._VAO);
 
