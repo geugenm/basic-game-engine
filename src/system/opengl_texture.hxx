@@ -190,40 +190,40 @@ struct opengl_texture_system
         for (auto entity : event_view)
         {
             auto &keyboard = event_view.get<sdk::keyboard>(entity);
-            switch (keyboard)
+            if (keyboard == sdk::keyboard::keyboard_W)
             {
-                case sdk::keyboard::keyboard_W:
-                    params.position.x +=
-                        params.moveSpeed * cos(params.rotationAngle);
-                    params.position.y +=
-                        params.moveSpeed * sin(params.rotationAngle);
-                    params.position.x =
-                        std::clamp(params.position.x, -1.0f + params.halfWidth,
-                                   1.0f - params.halfWidth);
-                    params.position.y =
-                        std::clamp(params.position.y, -1.0f + params.halfHeight,
-                                   1.0f - params.halfHeight);
-                    break;
-                case sdk::keyboard::keyboard_S:
-                    params.position.x -=
-                        params.moveSpeed * cos(params.rotationAngle);
-                    params.position.y -=
-                        params.moveSpeed * sin(params.rotationAngle);
-                    params.position.x =
-                        std::clamp(params.position.x, -1.0f + params.halfWidth,
-                                   1.0f - params.halfWidth);
-                    params.position.y =
-                        std::clamp(params.position.y, -1.0f + params.halfHeight,
-                                   1.0f - params.halfHeight);
-                    break;
-                case sdk::keyboard::keyboard_A:
-                    params.rotationAngle += params.rotateSpeed;
-                    break;
-                case sdk::keyboard::keyboard_D:
-                    params.rotationAngle -= params.rotateSpeed;
-                    break;
-                default:
-                    break;
+                params.position.x +=
+                    params.moveSpeed * cos(params.rotationAngle);
+                params.position.y +=
+                    params.moveSpeed * sin(params.rotationAngle);
+                params.position.x =
+                    std::clamp(params.position.x, -1.0f + params.halfWidth,
+                               1.0f - params.halfWidth);
+                params.position.y =
+                    std::clamp(params.position.y, -1.0f + params.halfHeight,
+                               1.0f - params.halfHeight);
+            }
+            if (keyboard == sdk::keyboard::keyboard_S)
+            {
+                params.position.x -=
+                    params.moveSpeed * cos(params.rotationAngle);
+                params.position.y -=
+                    params.moveSpeed * sin(params.rotationAngle);
+                params.position.x =
+                    std::clamp(params.position.x, -1.0f + params.halfWidth,
+                               1.0f - params.halfWidth);
+                params.position.y =
+                    std::clamp(params.position.y, -1.0f + params.halfHeight,
+                               1.0f - params.halfHeight);
+            }
+
+            if (keyboard == sdk::keyboard::keyboard_A)
+            {
+                params.rotationAngle += params.rotateSpeed;
+            }
+            if (keyboard == sdk::keyboard::keyboard_D)
+            {
+                params.rotationAngle -= params.rotateSpeed;
             }
             registry.destroy(entity);
         }
