@@ -36,19 +36,19 @@ struct opengl_texture_system
             ._texture{
                 ._image_path = "../resources/textures/hull.png",
                 // clang-format off
-            ._vertices = {
-                // Positions          // Colors           // Texture Coords
-                0.5f,  0.5f,  0.1f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                0.5f,  -0.5f, 0.1f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                -0.5f, -0.5f, 0.1f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                -0.5f, 0.5f,  0.1f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-            },
+                ._vertices = {
+                    // Positions          // Colors           // Texture Coords
+                    0.5f,  0.5f,  0.1f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                    0.5f,  -0.5f, 0.1f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+                    -0.5f, -0.5f, 0.1f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+                    -0.5f, 0.5f,  0.1f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
+                },
 
-            ._indices = {
-                // Note that we start from 0!
-                0, 1, 3, // First Triangle
-                1, 2, 3  // Second Triangle
-            },
+                ._indices = {
+                    // Note that we start from 0!
+                    0, 1, 3, // First Triangle
+                    1, 2, 3  // Second Triangle
+                },
                 // clang-format on
                 ._number = 0,
             },
@@ -64,19 +64,19 @@ struct opengl_texture_system
             ._texture{
                 ._image_path = "../resources/textures/turret.png",
                 // clang-format off
-            ._vertices = {
-                // Positions          // Colors           // Texture Coords
-                0.5f,  0.5f,  0.2f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                0.5f,  -0.5f, 0.2f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                -0.5f, -0.5f, 0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                -0.5f, 0.5f,  0.2f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-            },
+                ._vertices = {
+                    // Positions          // Colors           // Texture Coords
+                    0.5f,  0.5f,  0.2f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                    0.5f,  -0.5f, 0.2f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+                    -0.5f, -0.5f, 0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+                    -0.5f, 0.5f,  0.2f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
+                },
 
-            ._indices = {
-                // Note that we start from 0!
-                0, 1, 3, // First Triangle
-                1, 2, 3  // Second Triangle
-            },
+                ._indices = {
+                    // Note that we start from 0!
+                    0, 1, 3, // First Triangle
+                    1, 2, 3  // Second Triangle
+                },
                 // clang-format on
                 ._number = 1,
             },
@@ -91,21 +91,22 @@ struct opengl_texture_system
                 ._program_id = opengl_subsdk::get_new_program(),
             },
             ._texture{
-                ._image_path = "../resources/textures/brick.png",
+                ._image_path = "../resources/textures/land.png",
                 // clang-format off
-            ._vertices = {
-                // Positions          // Colors           // Texture Coords
-                0.0f,  1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                0.0f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-            },
+                ._vertices = {
+                        // Positions          // Colors           // Texture Coords
+                        -1.0f,  1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Left
+                        1.0f,  1.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                        1.0f, -1.0f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, // Bottom Right
+                        -1.0f, -1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f  // Bottom Left
+                },
 
-            ._indices = {
-                // Note that we start from 0!
-                0, 1, 3, // First Triangle
-                1, 2, 3  // Second Triangle
-            },
+
+                ._indices = {
+                    // Note that we start from 0!
+                    0, 1, 3, // First Triangle
+                    1, 2, 3  // Second Triangle
+                },
                 // clang-format on
                 ._needs_to_be_cropped = true,
                 ._number              = 0,
@@ -269,6 +270,7 @@ struct opengl_texture_system
         }
         {
             auto transform = glm::mat4(1.0f);
+            transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
             transform      = transform * aspect_matrix;
 
             auto &battlefield_sprite = view.get<sprite>(_battlefield);
@@ -276,7 +278,7 @@ struct opengl_texture_system
 
             glUniformMatrix4fv(
                 battlefield_sprite._shader.get_uniform_location("transform"), 1,
-                GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+                GL_FALSE, glm::value_ptr(transform));
             glUseProgram(0);
         }
     }
