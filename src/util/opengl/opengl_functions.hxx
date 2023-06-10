@@ -60,13 +60,4 @@ void link_shader_program(GLuint program);
 
 void delete_shader(GLuint shader);
 
-void generate_vertex_array(GLsizei generated_names_amount,
-                           GLuint *buffer_array);
-
-void generate_buffer_object_name(GLsizei generated_names_amount,
-                                 GLuint *buffer_array);
-
-
-void unbind_texture(GLenum texture_type);
-
 } // namespace opengl_subsdk

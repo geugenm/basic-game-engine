@@ -13,7 +13,7 @@ if (BUILD_TESTS)
     enable_testing()
 
     add_test_executable(test_sdl_static_compilation test_sdl_general.cxx)
-    target_link_libraries(test_sdl_static_compilation PRIVATE SDL3::SDL3-static)
+    target_link_libraries(test_sdl_static_compilation PRIVATE SDL3::SDL3)
 
     add_test_executable(test_sdl_shared_compilation test_sdl_general.cxx)
     target_link_libraries(test_sdl_shared_compilation PRIVATE SDL3::SDL3-shared)
@@ -29,18 +29,4 @@ if (BUILD_TESTS)
 
     add_test_executable(test_entt test_entt.cxx)
     target_link_libraries(test_entt PRIVATE engine_sdk EnTT::EnTT)
-
-    set(EXCLUDED_EXTENSIONS cpp cxx c hpp hxx h txt)
-
-    file(GLOB_RECURSE ALL_FILES *)
-
-    foreach(FILE ${ALL_FILES})
-        get_filename_component(EXTENSION ${FILE} EXT)
-        list(FIND EXCLUDED_EXTENSIONS ${EXTENSION} IS_EXCLUDED)
-        if(IS_EXCLUDED EQUAL -1)
-            file(RELATIVE_PATH REL_PATH ${CMAKE_SOURCE_DIR} ${FILE})
-            configure_file(${FILE} "${CMAKE_BINARY_DIR}/${REL_PATH}" COPYONLY)
-        endif()
-    endforeach()
-
 endif ()

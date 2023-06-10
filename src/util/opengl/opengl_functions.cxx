@@ -10,7 +10,6 @@
 
 #include "glad/glad.h"
 
-
 bool opengl_subsdk::is_opengl_version_supported()
 {
     int major, minor;
@@ -183,7 +182,8 @@ GLuint opengl_subsdk::get_new_compiled_shader(GLenum shader_type,
     if (!success)
     {
         GLchar info_log[OPENGL_INFO_LOG_SIZE];
-        glGetShaderInfoLog(result_shader, OPENGL_INFO_LOG_SIZE, nullptr, info_log);
+        glGetShaderInfoLog(result_shader, OPENGL_INFO_LOG_SIZE, nullptr,
+                           info_log);
 
         std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n"
                   << info_log << std::endl;
@@ -233,18 +233,6 @@ void opengl_subsdk::delete_shader(GLuint shader)
     glDeleteShader(shader);
 }
 
-void opengl_subsdk::generate_vertex_array(GLsizei generated_names_amount,
-                                          GLuint *buffer_array)
-{
-    glGenVertexArrays(generated_names_amount, buffer_array);
-}
-
-void opengl_subsdk::generate_buffer_object_name(GLsizei generated_names_amount,
-                                                GLuint *buffer_array)
-{
-    glGenBuffers(generated_names_amount, buffer_array);
-}
-
 char *opengl_subsdk::get_file_content(const std::string &file_path)
 {
     std::ifstream input_file(file_path);
@@ -263,7 +251,7 @@ char *opengl_subsdk::get_file_content(const std::string &file_path)
     }
 
     const size_t content_size = content.size();
-    auto *result = new char[content_size + 1];
+    auto *result              = new char[content_size + 1];
     std::copy(content.begin(), content.end(), result);
     result[content_size] = '\0';
 
@@ -273,7 +261,8 @@ char *opengl_subsdk::get_file_content(const std::string &file_path)
 GLuint opengl_subsdk::get_compiled_shader_from_file(GLenum shader_type,
                                                     const char *shader_path)
 {
-    if (shader_path == nullptr) {
+    if (shader_path == nullptr)
+    {
         throw std::invalid_argument("Shader path is null");
     }
 
@@ -283,9 +272,4 @@ GLuint opengl_subsdk::get_compiled_shader_from_file(GLenum shader_type,
         opengl_subsdk::get_new_compiled_shader(shader_type, shader_content);
 
     return result;
-}
-
-void opengl_subsdk::unbind_texture(GLenum texture_type)
-{
-    glBindTexture(texture_type,0);
 }

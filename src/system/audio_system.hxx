@@ -10,11 +10,9 @@ struct audio_system
 {
     sdl_subsdk::audio_mixer sound;
 
-    audio_system(const char * sound_file_path) : sound(sound_file_path) {
-    }
+    audio_system(const char *sound_file_path) : sound(sound_file_path) {}
 
-    void update(entt::registry &registry) {
-    }
+    void update(entt::registry &registry) {}
 };
 
 } // namespace sdk

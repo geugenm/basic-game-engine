@@ -8,7 +8,8 @@
 namespace sdk
 {
 
-struct imgui_window {
+struct imgui_window
+{
     void update();
 };
 
@@ -30,32 +31,40 @@ struct imgui_system
             // Add UI elements
             ImGui::SetNextWindowSize(ImVec2(400, 200));
             ImGui::SetNextWindowPos(ImVec2(0, 0));
-            ImGui::Begin("Game UI", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+            ImGui::Begin("Game UI", NULL,
+                         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                             ImGuiWindowFlags_NoCollapse);
 
             ImGui::ProgressBar(0.7f, ImVec2(-1, 0), "HP");
-            if (ImGui::Button("Pause", ImVec2(80, 40))) {
+            if (ImGui::Button("Pause", ImVec2(80, 40)))
+            {
                 ImGui::OpenPopup("My Popup");
             }
 
-            if (ImGui::BeginPopupModal("Pause", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            if (ImGui::BeginPopupModal("Pause", NULL,
+                                       ImGuiWindowFlags_AlwaysAutoResize))
+            {
                 ImGui::Text("Pause menu");
                 ImGui::Separator();
 
-                if (ImGui::Button("Settings", ImVec2(120, 0))) {
+                if (ImGui::Button("Settings", ImVec2(120, 0)))
+                {
                     // Do something
                 }
 
                 ImGui::Separator();
 
                 // Exit button
-                if (ImGui::Button("Exit", ImVec2(120, 0))) {
+                if (ImGui::Button("Exit", ImVec2(120, 0)))
+                {
                     ImGui::CloseCurrentPopup();
                     // Do something
                 }
 
                 // Resume button
                 ImGui::SameLine();
-                if (ImGui::Button("Resume", ImVec2(120, 0))) {
+                if (ImGui::Button("Resume", ImVec2(120, 0)))
+                {
                     ImGui::CloseCurrentPopup();
                     // Do something
                 }
@@ -67,10 +76,9 @@ struct imgui_system
             ImGui::Text("<WeaponID>");
 
             ImGui::End();
-
         }
 
-        //ImGui::ShowDemoWindow();
+        // ImGui::ShowDemoWindow();
 
         // TODO: implement a normal event system
         //        auto view = registry.view<sdk::event>();

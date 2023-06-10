@@ -10,7 +10,7 @@ file(GLOB_RECURSE IMGUI_BACKEND_SOURCES CONFIGURE_DEPENDS
 add_library(imgui_sdk STATIC)
 
 target_sources(imgui_sdk PRIVATE ${SOURCES} ${IMGUI_BACKEND_SOURCES})
-target_include_directories(imgui_sdk PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(imgui_sdk PUBLIC .)
 
 target_link_libraries(imgui_sdk PRIVATE sdl3_sdk)
 target_link_libraries(imgui_sdk PUBLIC

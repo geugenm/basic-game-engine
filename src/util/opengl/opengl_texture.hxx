@@ -23,6 +23,8 @@ public:
         {
             throw std::invalid_argument("Given image path is empty");
         }
+
+        initialize();
     }
 
     void initialize()

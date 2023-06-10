@@ -2,7 +2,7 @@
   "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 23,
+    "minor": 12,
     "patch": 0
   },
   "configurePresets": [
@@ -15,10 +15,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_STANDARD": "20",
-        "CMAKE_CXX_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function",
-        "CMAKE_C_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function",
-        "CMAKE_CXX_FLAGS_RELEASE": "-fsanitize=address,undefined",
-        "CMAKE_C_FLAGS_RELEASE": "-fsanitize=address,undefined",
+        "CMAKE_CXX_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function, -fsanitize=address,undefined",
+        "CMAKE_C_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function, -fsanitize=address,undefined",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
@@ -48,8 +46,6 @@
         "CMAKE_CXX_FLAGS": "-Ofast -DNDEBUG -march=native -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function",
         "CMAKE_C_FLAGS": "-Ofast -DNDEBUG -march=native -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_CXX_FLAGS_RELEASE": "-fsanitize=address,undefined",
-        "CMAKE_C_FLAGS_RELEASE": "-fsanitize=address,undefined",
         "BUILD_TESTS": "ON"
       }
     },

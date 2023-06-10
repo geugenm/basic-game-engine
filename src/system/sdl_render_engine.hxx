@@ -17,6 +17,18 @@ struct sdl_render_context
     {
         return _window != nullptr && _context != nullptr;
     }
+
+    [[nodiscard]] int get_width() const {
+        int width;
+        SDL_GetWindowSize(_window, &width, nullptr);
+        return width;
+    }
+
+    [[nodiscard]] int get_height() const {
+        int height;
+        SDL_GetWindowSize(_window, nullptr, &height);
+        return height;
+    }
 };
 
 struct sdl_gl_engine
@@ -49,6 +61,15 @@ struct sdl_gl_engine
 
     void update(entt::registry &registry)
     {
+        static bool is_first_update = true;
+
+        if (is_first_update)
+        {
+            is_first_update   = false;
+            const auto entity = registry.create();
+            registry.emplace<sdl_render_context>(entity, sdl_context);
+        }
+
         if (!sdl_context.is_initialized())
         {
             throw sdk::engine_error("SDL engine is not initialized");

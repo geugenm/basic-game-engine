@@ -12,6 +12,6 @@ target_link_libraries(sdk_systems PUBLIC
         opengl_sdk
         imgui_sdk
         sdl3_sdk
-        SDL3::SDL3-static
+        SDL3::SDL3
         EasyLogging::EasyLogging
         )

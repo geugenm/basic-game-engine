@@ -5,5 +5,5 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx" "*.hxx" "*.hpp
 add_library(opengl_sdk STATIC)
 
 target_sources(opengl_sdk PUBLIC ${SOURCES})
-target_include_directories(opengl_sdk PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(opengl_sdk PUBLIC .)
 target_link_libraries(opengl_sdk PRIVATE engine_includes)
