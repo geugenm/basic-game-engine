@@ -25,7 +25,7 @@ struct imgui_system
         // Add UI elements
         ImGui::SetNextWindowSize(ImVec2(400, 200));
         ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::Begin("Game UI", NULL,
+        ImGui::Begin("Game UI", nullptr,
                      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                          ImGuiWindowFlags_NoCollapse);
 
@@ -36,7 +36,7 @@ struct imgui_system
             ImGui::OpenPopup("Pause");
         }
 
-        if (ImGui::BeginPopupModal("Pause", NULL,
+        if (ImGui::BeginPopupModal("Pause", nullptr,
                                    ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("Pause menu");
