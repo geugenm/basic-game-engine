@@ -47,7 +47,7 @@ private:
     [[nodiscard]] SDL_FunctionPointer
     get_sdl_function_pointer(const std::string_view &method_name)
     {
-        void *game_handle = SDL_LoadObject(new_library_path_.c_str());
+        void *game_handle = SDL_LoadObject(new_library_path_.string().c_str());
 
         if (game_handle == nullptr)
         {

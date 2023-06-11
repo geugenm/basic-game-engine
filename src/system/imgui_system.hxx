@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imgui_wrapper.hxx"
+#include "imgui/imgui_wrapper.hxx"
 #include "sdl_render_engine.hxx"
 
 #include <entt/entt.hpp>

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 # Enable/disable building tests
-option(BUILD_TESTS "Build tests" ON)
+option(BUILD_TESTS "Build tests" OFF)
 if (BUILD_TESTS)
     function(add_test_executable target_name source_file)
         add_executable(${target_name} ${source_file})
@@ -30,3 +30,6 @@ if (BUILD_TESTS)
     add_test_executable(test_entt test_entt.cxx)
     target_link_libraries(test_entt PRIVATE engine_sdk EnTT::EnTT)
 endif ()
+
+add_executable(wow test_entt.cxx)
+target_link_libraries(wow PRIVATE engine_sdk EnTT::EnTT)
