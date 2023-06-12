@@ -4,7 +4,7 @@ add_subdirectory(opengl)
 add_subdirectory(sdl)
 add_subdirectory(imgui)
 
-add_library(sdk_util STATIC)
+add_library(sdk_util SHARED)
 
 target_include_directories(sdk_util PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

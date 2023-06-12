@@ -9,7 +9,7 @@ CPMAddPackage(
 
 
 if (imgui_ADDED)
-    add_library(imgui STATIC)
+    add_library(imgui SHARED)
     target_sources(imgui PRIVATE
             "${imgui_SOURCE_DIR}/imgui.cpp"
             "${imgui_SOURCE_DIR}/imgui_demo.cpp"

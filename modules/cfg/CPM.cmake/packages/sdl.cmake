@@ -5,9 +5,7 @@ CPMAddPackage(
         GITHUB_REPOSITORY libsdl-org/SDL
         GIT_TAG d032492aaba19c108dfd5e52866573bd02bf6148
         OPTIONS
-        "SDL_ATOMIC OFF"
-
-        "SDL_STATIC ON"
+        
         "SDL_SHARED ON"
 
         "SDL_VIRTUAL_JOYSTICK OFF"

@@ -15,8 +15,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_STANDARD": "20",
-        "CMAKE_CXX_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function, -fsanitize=address,undefined",
-        "CMAKE_C_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function, -fsanitize=address,undefined",
+        "CMAKE_CXX_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function",
+        "CMAKE_C_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },

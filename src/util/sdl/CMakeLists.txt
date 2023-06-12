@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx" "*.hxx" "*.hpp" "*.h")
 
-add_library(sdl3_sdk STATIC)
+add_library(sdl3_sdk SHARED)
 
 target_sources(sdl3_sdk PUBLIC ${SOURCES})
 target_include_directories(sdl3_sdk PUBLIC ${CMAKE_CURRENT_LIST_DIR})

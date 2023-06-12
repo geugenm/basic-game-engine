@@ -18,21 +18,21 @@ endif ()
 
 # Include necessary CMake modules and scripts
 message(STATUS "Including necessary CMake modules...")
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/verify_cpp_support.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/git_update_submodules.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/packages.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/copy_resources.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/verify_cpp_support.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/git_update_submodules.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/packages.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/copy_resources.cmake)
 
 option(ENABLE_CODE_QUALITY_TARGETS "Enable code quality tools" OFF)
 if (ENABLE_CODE_QUALITY_TARGETS)
     message(STATUS "Adding code quality tools targets...")
-    include(${CMAKE_CURRENT_LIST_DIR}/cmake/code_quality.cmake)
+    include(${CMAKE_SOURCE_DIR}/cmake/code_quality.cmake)
 endif ()
 
 option(BUILD_DOCS_TARGET "Build documentation" OFF)
 if (BUILD_DOCS_TARGET)
     message(STATUS "Adding build documentation targets...")
-    include(${CMAKE_CURRENT_LIST_DIR}/cmake/build_docs.cmake)
+    include(${CMAKE_SOURCE_DIR}/cmake/build_docs.cmake)
 endif ()
 
 

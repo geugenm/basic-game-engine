@@ -1,4 +1,4 @@
-include(${CMAKE_CURRENT_LIST_DIR}/../modules/cfg/CPM.cmake/CPM.cmake.cmake)
+include(${CMAKE_SOURCE_DIR}/modules/cfg/CPM.cmake/CPM.cmake.cmake)
 
 file(GLOB CPM_PACKAGE_FILES "${CPM_PACKAGES_DIR}/*.cmake")
 

@@ -1,5 +1,5 @@
 function(update_submodules)
-    set(GIT_REPO_PATH "${CMAKE_CURRENT_LIST_DIR}/../")
+    set(GIT_REPO_PATH "${CMAKE_SOURCE_DIR}")
 
     # Check if Git is installed
     find_package(Git REQUIRED)
