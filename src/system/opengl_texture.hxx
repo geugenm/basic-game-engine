@@ -95,10 +95,10 @@ struct opengl_texture_system
                 // clang-format off
                 ._vertices = {
                     // Positions          // Colors           // Texture Coords
-                    -1.0f,  1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Left
-                    1.0f,  1.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                    1.0f, -1.0f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, // Bottom Right
-                    -1.0f, -1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f  // Bottom Left
+                    1.0f,  1.0f,  0.01f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                    1.0f,  -1.0f, 0.01f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
+                    -1.0f, -1.0f, 0.01f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+                    -1.0f, 1.0f,  0.01f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
                 },
 
 
