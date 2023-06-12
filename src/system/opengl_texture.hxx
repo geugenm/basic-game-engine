@@ -11,10 +11,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <format>
 #include <nlohmann/json.hpp>
 
 namespace sdk
 {
+
+template <typename... Args> std::string concatenate_strings(Args &&...args)
+{
+    std::string result;
+    (result.append(args), ...);
+    return result;
+}
 
 struct opengl_texture_system final
 {
@@ -27,24 +35,31 @@ struct opengl_texture_system final
         _tank_hull   = registry.create();
         _tank_turret = registry.create();
 
-        std::ifstream inputFile("../resources/textures/turret.json");
+        const std::string_view resource_path = "../resources/";
+
+        std::ifstream inputFile(
+            concatenate_strings(resource_path, "/sprites/turret.json"));
         if (!inputFile.is_open())
         {
             throw std::invalid_argument("Could not open file");
         }
         nlohmann::json json;
         inputFile >> json;
+        const char *wow = "wow";
         LOG(INFO) << json["shader"]["vertex_source_path"];
 
         sprite tank_hull{
             ._shader{
-                ._vertex_source_path   = "../resources/shaders/texture.vert",
-                ._fragment_source_path = "../resources/shaders/texture.frag",
-                ._program_id           = opengl_subsdk::get_new_program(),
+                ._vertex_source_path = concatenate_strings(
+                    resource_path, "sprites/shaders/texture.vert"),
+                ._fragment_source_path = concatenate_strings(
+                    resource_path, "sprites/shaders/texture.frag"),
+                ._program_id = opengl_subsdk::get_new_program(),
             },
 
             ._texture{
-                ._image_path = "../resources/textures/hull.png",
+                ._image_path = concatenate_strings(resource_path,
+                                                   "sprites/textures/hull.png"),
                 // clang-format off
                 ._vertices = {
                     // Positions          // Colors           // Texture Coords
@@ -84,13 +99,15 @@ struct opengl_texture_system final
         };
         sprite battlefield{
             ._shader{
-                ._vertex_source_path = "../resources/shaders/battlefield.vert",
-                ._fragment_source_path =
-                    "../resources/shaders/battlefield.frag",
+                ._vertex_source_path = concatenate_strings(
+                    resource_path, "sprites/shaders/battlefield.vert"),
+                ._fragment_source_path = concatenate_strings(
+                    resource_path, "sprites/shaders/battlefield.frag"),
                 ._program_id = opengl_subsdk::get_new_program(),
             },
             ._texture{
-                ._image_path = "../resources/textures/land.png",
+                ._image_path = concatenate_strings(resource_path,
+                                                   "sprites/textures/land.png"),
                 // clang-format off
                 ._vertices = {
                     // Positions          // Colors           // Texture Coords

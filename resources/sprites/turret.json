@@ -1,10 +1,10 @@
 {
   "shader": {
-    "vertex_source_path": "../resources/shaders/texture.vert",
-    "fragment_source_path": "../resources/shaders/texture.frag"
+    "vertex_source_path": "../resources/sprites/shaders/texture.vert",
+    "fragment_source_path": "../resources/sprites/shaders/texture.frag"
   },
   "texture": {
-    "image_path": "../resources/textures/turret.png",
+    "image_path": "../resources/sprites/textures/turret.png",
     "vertices": [
       0.5, 0.5, 0.2, 0.0, 0.0, 0.0, 1.0, 1.0,
       0.5, -0.5, 0.2, 0.0, 1.0, 0.0, 1.0, 0.0,
