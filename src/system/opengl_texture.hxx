@@ -175,7 +175,8 @@ struct opengl_texture_system
         }
     }
 
-    void update(entt::registry &registry, entt::entity &window_entity)
+    void update(entt::registry &registry,
+                entt::entity const &window_entity) const
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -183,7 +184,7 @@ struct opengl_texture_system
 
         for (auto entity : view)
         {
-            auto &entity_sprite = view.get<sprite>(entity);
+            auto const &entity_sprite = view.get<sprite>(entity);
             glUseProgram(entity_sprite._shader._program_id);
             auto target = static_cast<GLenum>(GL_TEXTURE0 +
                                               entity_sprite._texture._number);
