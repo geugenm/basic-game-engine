@@ -91,7 +91,7 @@ struct sdl_gl_engine
             {
                 destroy(registry);
             }
-            
+
             imgui_subsdk::process_event(event);
 
             if (event.type == SDL_EVENT_KEY_DOWN)
@@ -106,7 +106,7 @@ struct sdl_gl_engine
         SDL_GL_SwapWindow(sdl_context._window);
     }
 
-    void destroy(entt::registry &registry)
+    void destroy(entt::registry &registry) const
     {
         auto view         = registry.view<sdl_render_context>();
         auto &sdl_context = view.get<sdl_render_context>(_window_entity);

@@ -9,7 +9,7 @@ namespace Engine
 class SDLDLLReloader : public IDLLReloader
 {
 public:
-    SDLDLLReloader() {}
+    SDLDLLReloader() = default;
 
     ~SDLDLLReloader() override = default;
 
@@ -51,9 +51,9 @@ private:
 
         if (game_handle == nullptr)
         {
-            throw std::runtime_error("Error: failed to load dynamic library: " +
-                                     new_library_path_.string() + ", " +
-                                     SDL_GetError());
+            throw std::invalid_argument(
+                "Error: failed to load dynamic library: " +
+                new_library_path_.string() + ", " + SDL_GetError());
         }
 
         SDL_FunctionPointer create_game_func_ptr =
@@ -61,7 +61,7 @@ private:
 
         if (create_game_func_ptr == nullptr)
         {
-            throw std::runtime_error(
+            throw std::invalid_argument(
                 "Error: failed to load function 'create_application' from "
                 "dynamic library: " +
                 new_library_path_.string() + ", " + SDL_GetError());

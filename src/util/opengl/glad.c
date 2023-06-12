@@ -1243,8 +1243,8 @@ void APIENTRY glad_debug_impl_glDrawElementsInstancedBaseVertex(
                            arg1, arg2, arg3, arg4, arg5);
 }
 PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC
-    glad_debug_glDrawElementsInstancedBaseVertex =
-        glad_debug_impl_glDrawElementsInstancedBaseVertex;
+glad_debug_glDrawElementsInstancedBaseVertex =
+    glad_debug_impl_glDrawElementsInstancedBaseVertex;
 PFNGLDRAWRANGEELEMENTSPROC glad_glDrawRangeElements;
 void APIENTRY glad_debug_impl_glDrawRangeElements(GLenum arg0, GLuint arg1,
                                                   GLuint arg2, GLsizei arg3,
@@ -1754,7 +1754,7 @@ GLint APIENTRY glad_debug_impl_glGetFragDataLocation(GLuint arg0,
 PFNGLGETFRAGDATALOCATIONPROC glad_debug_glGetFragDataLocation =
     glad_debug_impl_glGetFragDataLocation;
 PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC
-    glad_glGetFramebufferAttachmentParameteriv;
+glad_glGetFramebufferAttachmentParameteriv;
 void APIENTRY glad_debug_impl_glGetFramebufferAttachmentParameteriv(GLenum arg0,
                                                                     GLenum arg1,
                                                                     GLenum arg2,
@@ -1769,8 +1769,8 @@ void APIENTRY glad_debug_impl_glGetFramebufferAttachmentParameteriv(GLenum arg0,
                            arg0, arg1, arg2, arg3);
 }
 PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC
-    glad_debug_glGetFramebufferAttachmentParameteriv =
-        glad_debug_impl_glGetFramebufferAttachmentParameteriv;
+glad_debug_glGetFramebufferAttachmentParameteriv =
+    glad_debug_impl_glGetFramebufferAttachmentParameteriv;
 PFNGLGETFRAMEBUFFERPARAMETERIVPROC glad_glGetFramebufferParameteriv;
 void APIENTRY glad_debug_impl_glGetFramebufferParameteriv(GLenum arg0,
                                                           GLenum arg1,
@@ -3384,8 +3384,8 @@ void APIENTRY glad_debug_impl_glRenderbufferStorageMultisample(
                            arg1, arg2, arg3, arg4);
 }
 PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC
-    glad_debug_glRenderbufferStorageMultisample =
-        glad_debug_impl_glRenderbufferStorageMultisample;
+glad_debug_glRenderbufferStorageMultisample =
+    glad_debug_impl_glRenderbufferStorageMultisample;
 PFNGLRESUMETRANSFORMFEEDBACKPROC glad_glResumeTransformFeedback;
 void APIENTRY glad_debug_impl_glResumeTransformFeedback(void)
 {

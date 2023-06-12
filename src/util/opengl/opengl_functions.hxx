@@ -27,11 +27,10 @@ bool is_opengl_version_supported();
 
 std::string glenum_to_string(GLenum value);
 
-static void GLAPIENTRY opengl_debug_callback(GLenum source, GLenum type,
-                                             GLuint id, GLenum severity,
-                                             GLsizei length,
-                                             const GLchar *message,
-                                             const void *userParam);
+static void GLAPIENTRY
+opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
+                      [[maybe_unused]] GLsizei length, const GLchar *message,
+                      [[maybe_unused]] const void *userParam);
 
 void enable_debug_mode();
 

@@ -11,7 +11,7 @@ namespace sdk
 class opengl_shader_system
 {
 public:
-    void init(entt::registry &registry)
+    void init(entt::registry &registry) const
     {
         auto view = registry.view<opengl_shader>();
 
@@ -30,7 +30,7 @@ public:
         }
     }
 
-    void update(entt::registry &registry)
+    void update(entt::registry &registry) const
     {
         auto view = registry.view<opengl_shader>();
 
@@ -90,7 +90,7 @@ private:
         shader._is_initialized = true;
     }
 
-    static void use(opengl_shader &shader)
+    static void use(opengl_shader const &shader)
     {
         if (shader._is_initialized == false)
         {

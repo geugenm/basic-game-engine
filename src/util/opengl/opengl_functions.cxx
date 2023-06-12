@@ -12,7 +12,8 @@
 
 bool opengl_subsdk::is_opengl_version_supported()
 {
-    int major, minor;
+    int major;
+    int minor;
     glGetIntegerv(GL_MAJOR_VERSION, &major);
 
     glGetIntegerv(GL_MINOR_VERSION, &minor);
@@ -73,10 +74,10 @@ std::string opengl_subsdk::glenum_to_string(GLenum value)
     }
 }
 
-void opengl_subsdk::opengl_debug_callback(GLenum source, GLenum type, GLuint id,
-                                          GLenum severity, GLsizei length,
-                                          const GLchar *message,
-                                          const void *userParam)
+void opengl_subsdk::opengl_debug_callback(
+    GLenum source, GLenum type, GLuint id, GLenum severity,
+    [[maybe_unused]] GLsizei length, const GLchar *message,
+    [[maybe_unused]] const void *userParam)
 {
     std::ostringstream msg;
     msg << "OpenGL Error:" << std::endl;
@@ -186,13 +187,12 @@ GLuint opengl_subsdk::get_new_compiled_shader(GLenum shader_type,
 
     if (!success)
     {
-        GLchar info_log[OPENGL_INFO_LOG_SIZE];
+        std::string log;
         glGetShaderInfoLog(result_shader, OPENGL_INFO_LOG_SIZE, nullptr,
-                           info_log);
+                           log.data());
 
-        std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n"
-                  << info_log << std::endl;
-        throw std::runtime_error("Failed to compile shader");
+        std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n" << log << std::endl;
+        throw std::domain_error("Failed to compile shader");
     }
 
     return result_shader;
@@ -207,12 +207,12 @@ void opengl_subsdk::link_shader_program(GLuint program)
 
     if (!success)
     {
-        GLchar info_log[OPENGL_INFO_LOG_SIZE];
-        glGetProgramInfoLog(program, OPENGL_INFO_LOG_SIZE, nullptr, info_log);
+        std::string log;
+        glGetProgramInfoLog(program, OPENGL_INFO_LOG_SIZE, nullptr, log.data());
 
         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                  << info_log << std::endl;
-        throw std::runtime_error("Failed to link shader");
+                  << log << std::endl;
+        throw std::domain_error("Failed to link shader");
     }
 }
 
@@ -222,7 +222,7 @@ GLuint opengl_subsdk::get_new_program()
 
     if (program == 0)
     {
-        throw std::runtime_error("Failed to create OpenGL program");
+        throw std::domain_error("Failed to create OpenGL program");
     }
 
     return program;

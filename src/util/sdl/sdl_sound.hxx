@@ -33,12 +33,13 @@ enum class stereo_audio_channel
 
 static void audio_callback(void *userdata, uint8_t *stream, int len)
 {
+    static bool first_time = true;
+
     static auto start             = std::chrono::high_resolution_clock::now();
     static auto finish            = start;
     static uint32_t default_delay = 0;
     static stereo_audio_channel channels{stereo_audio_channel::left_and_right};
 
-    static bool first_time = true;
     if (first_time)
     {
         LOG(INFO) << "start audio_callback." << std::endl;
@@ -261,7 +262,7 @@ public:
         LOG(INFO) << "Audio device started";
     }
 
-    void destroy()
+    void destroy() const
     {
         LOG(INFO) << "Pause audio device (stop audio thread)";
 

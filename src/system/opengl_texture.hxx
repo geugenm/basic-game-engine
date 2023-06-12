@@ -122,7 +122,7 @@ struct opengl_texture_system
         registry.emplace<sprite>(_battlefield, battlefield);
     }
 
-    void init_on(entt::registry &registry, entt::entity &window_entity)
+    void init_on(entt::registry &registry, entt::entity &window_entity) const
     {
         auto view_context = registry.view<sdl_render_context>();
         auto const &sdl_context =
@@ -185,14 +185,16 @@ struct opengl_texture_system
         {
             auto &entity_sprite = view.get<sprite>(entity);
             glUseProgram(entity_sprite._shader._program_id);
-            GLenum target = GL_TEXTURE0 + entity_sprite._texture._number;
+            auto target = static_cast<GLenum>(GL_TEXTURE0 +
+                                              entity_sprite._texture._number);
             glActiveTexture(target);
             render(entity_sprite._texture);
             glUseProgram(0);
         }
 
         auto view_context = registry.view<sdl_render_context>();
-        auto &sdl_context = view_context.get<sdl_render_context>(window_entity);
+        auto const &sdl_context =
+            view_context.get<sdl_render_context>(window_entity);
 
         const float aspect_ratio = static_cast<float>(sdl_context.get_width()) /
                                    static_cast<float>(sdl_context.get_height());
@@ -205,7 +207,7 @@ struct opengl_texture_system
 
         for (auto entity : event_view)
         {
-            auto &keyboard = event_view.get<sdk::keyboard>(entity);
+            auto const &keyboard = event_view.get<sdk::keyboard>(entity);
             if (keyboard == sdk::keyboard::keyboard_W)
             {
                 params.position.x +=
@@ -256,7 +258,7 @@ struct opengl_texture_system
                                     glm::vec3(0.0f, 0.0f, 1.0f));
             transform = transform * aspect_matrix;
 
-            auto &tank_hull_sprite = view.get<sprite>(_tank_hull);
+            auto const &tank_hull_sprite = view.get<sprite>(_tank_hull);
             glUseProgram(tank_hull_sprite._shader._program_id);
 
             glUniformMatrix4fv(
@@ -264,7 +266,7 @@ struct opengl_texture_system
                 GL_FALSE, glm::value_ptr(transform));
             glUseProgram(0);
 
-            auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
+            auto const &tank_turret_sprite = view.get<sprite>(_tank_turret);
             glUseProgram(tank_turret_sprite._shader._program_id);
             glUniformMatrix4fv(
                 tank_turret_sprite._shader.get_uniform_location("transform"), 1,
@@ -276,7 +278,7 @@ struct opengl_texture_system
             transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
             transform      = transform * aspect_matrix;
 
-            auto &battlefield_sprite = view.get<sprite>(_battlefield);
+            auto const &battlefield_sprite = view.get<sprite>(_battlefield);
             glUseProgram(battlefield_sprite._shader._program_id);
 
             glUniformMatrix4fv(
@@ -287,7 +289,7 @@ struct opengl_texture_system
     }
 
 private:
-    void render(opengl_texture &texture)
+    static void render(opengl_texture const &texture)
     {
         glBindTexture(GL_TEXTURE_2D, texture._texture);
 
@@ -298,7 +300,7 @@ private:
         glBindVertexArray(0);
     }
 
-    void destroy(opengl_texture &texture)
+    static void destroy(opengl_texture const &texture)
     {
         glDeleteVertexArrays(1, &texture._VAO);
 
@@ -307,7 +309,8 @@ private:
         glDeleteBuffers(1, &texture._EBO);
     }
 
-    void initialize(opengl_texture &texture, const sdl_render_context &context)
+    static void initialize(opengl_texture &texture,
+                           const sdl_render_context &context)
     {
         // Load image, create texture and generate mipmaps
         const auto png_data = get_png_data(texture);
@@ -390,7 +393,7 @@ private:
         return png_data;
     }
 
-    void generate_buffers(opengl_texture &texture)
+    static void generate_buffers(opengl_texture &texture)
     {
         glGenVertexArrays(1, &texture._VAO);
 
@@ -399,8 +402,8 @@ private:
         glGenBuffers(1, &texture._EBO);
     }
 
-    void bind_buffers(opengl_texture &texture,
-                      const sdl_render_context &sdl_context)
+    static void bind_buffers(opengl_texture &texture,
+                             const sdl_render_context &sdl_context)
     {
         if (texture._needs_to_be_cropped)
         {
@@ -442,18 +445,20 @@ private:
 
         glBindBuffer(GL_ARRAY_BUFFER, texture._VBO);
 
-        glBufferData(GL_ARRAY_BUFFER,
-                     texture._vertices.size() * sizeof(GLfloat),
-                     texture._vertices.data(), GL_DYNAMIC_DRAW);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            static_cast<GLsizeiptr>(texture._vertices.size() * sizeof(GLfloat)),
+            texture._vertices.data(), GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texture._EBO);
 
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     texture._indices.size() * sizeof(GLuint),
-                     texture._indices.data(), GL_DYNAMIC_DRAW);
+        glBufferData(
+            GL_ELEMENT_ARRAY_BUFFER,
+            static_cast<GLsizeiptr>(texture._indices.size() * sizeof(GLuint)),
+            texture._indices.data(), GL_DYNAMIC_DRAW);
     }
 
-    void enable_attributes()
+    static void enable_attributes()
     {
         // Position attribute
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
@@ -474,7 +479,7 @@ private:
         glEnableVertexAttribArray(2);
     }
 
-    static void set_texture_parameters(opengl_texture &texture)
+    static void set_texture_parameters(opengl_texture const &texture)
     {
         // Set the texture wrapping parameters
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
