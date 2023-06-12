@@ -130,8 +130,6 @@ struct opengl_texture_system final
             },
         };
 
-        // TODO: fix the deformation
-
         // ! The order plays the role
         registry.emplace<sprite>(_tank_turret, tank_turret);
         registry.emplace<sprite>(_tank_hull, tank_hull);
@@ -213,9 +211,10 @@ struct opengl_texture_system final
         auto const &sdl_context =
             view_context.get<sdl_render_context>(window_entity);
 
-        const float aspect_ratio = static_cast<float>(sdl_context.get_width()) /
-                                   static_cast<float>(sdl_context.get_height());
-        glm::mat4 aspect_matrix =
+        static const float aspect_ratio =
+            static_cast<float>(sdl_context.get_width()) /
+            static_cast<float>(sdl_context.get_height());
+        const glm::mat4 aspect_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
 
         static texture_params params;
@@ -278,20 +277,25 @@ struct opengl_texture_system final
                                     glm::vec3(0.0f, 0.0f, 1.0f));
             transform = transform * aspect_matrix;
 
-            auto const &tank_hull_sprite = view.get<sprite>(_tank_hull);
-            glUseProgram(tank_hull_sprite._shader._program_id);
+            {
+                auto const &tank_hull_sprite = view.get<sprite>(_tank_hull);
+                glUseProgram(tank_hull_sprite._shader._program_id);
 
-            glUniformMatrix4fv(
-                tank_hull_sprite._shader.get_uniform_location("transform"), 1,
-                GL_FALSE, glm::value_ptr(transform));
-            glUseProgram(0);
+                glUniformMatrix4fv(
+                    tank_hull_sprite._shader.get_uniform_location("transform"),
+                    1, GL_FALSE, glm::value_ptr(transform));
+                glUseProgram(0);
+            }
 
-            auto const &tank_turret_sprite = view.get<sprite>(_tank_turret);
-            glUseProgram(tank_turret_sprite._shader._program_id);
-            glUniformMatrix4fv(
-                tank_turret_sprite._shader.get_uniform_location("transform"), 1,
-                GL_FALSE, glm::value_ptr(transform));
-            glUseProgram(0);
+            {
+                auto const &tank_turret_sprite = view.get<sprite>(_tank_turret);
+                glUseProgram(tank_turret_sprite._shader._program_id);
+                glUniformMatrix4fv(
+                    tank_turret_sprite._shader.get_uniform_location(
+                        "transform"),
+                    1, GL_FALSE, glm::value_ptr(transform));
+                glUseProgram(0);
+            }
         }
         {
             auto transform = glm::mat4(1.0f);
