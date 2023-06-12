@@ -238,7 +238,8 @@ void opengl_subsdk::delete_shader(GLuint shader)
     glDeleteShader(shader);
 }
 
-char *opengl_subsdk::get_file_content(const std::filesystem::path &file_path)
+std::string
+opengl_subsdk::get_file_content(const std::filesystem::path &file_path)
 {
     if (!exists(file_path))
     {
@@ -247,7 +248,6 @@ char *opengl_subsdk::get_file_content(const std::filesystem::path &file_path)
     }
 
     std::ifstream input_file(file_path);
-
     if (!input_file.is_open())
     {
         throw std::invalid_argument("Unable to open file: " +
@@ -262,12 +262,7 @@ char *opengl_subsdk::get_file_content(const std::filesystem::path &file_path)
         throw std::invalid_argument("File is empty");
     }
 
-    const size_t content_size = content.size();
-    auto *result              = new char[content_size + 1];
-    std::copy(content.begin(), content.end(), result);
-    result[content_size] = '\0';
-
-    return result;
+    return content;
 }
 
 GLuint opengl_subsdk::get_compiled_shader_from_file(
@@ -279,10 +274,10 @@ GLuint opengl_subsdk::get_compiled_shader_from_file(
                                     "' does not exist");
     }
 
-    GLchar const *shader_content = opengl_subsdk::get_file_content(shader_path);
+    std::string shader_content = opengl_subsdk::get_file_content(shader_path);
 
-    GLuint result =
-        opengl_subsdk::get_new_compiled_shader(shader_type, shader_content);
+    GLuint result = opengl_subsdk::get_new_compiled_shader(
+        shader_type, shader_content.data());
 
     return result;
 }
