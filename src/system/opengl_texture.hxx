@@ -1,6 +1,8 @@
 #pragma once
 
 #include "render/picopng.hxx"
+#include "sdl_render_engine.hxx"
+#include "texture_type.hxx"
 
 #include <entt/entt.hpp>
 #include <opengl_functions.hxx>
@@ -9,13 +11,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "sdl_render_engine.hxx"
-#include "texture_type.hxx"
+#include <nlohmann/json.hpp>
 
 namespace sdk
 {
 
-struct opengl_texture_system
+struct opengl_texture_system final
 {
     entt::entity _tank_hull;
     entt::entity _tank_turret;
@@ -25,6 +26,15 @@ struct opengl_texture_system
     {
         _tank_hull   = registry.create();
         _tank_turret = registry.create();
+
+        std::ifstream inputFile("../resources/textures/turret.json");
+        if (!inputFile.is_open())
+        {
+            throw std::invalid_argument("Could not open file");
+        }
+        nlohmann::json json;
+        inputFile >> json;
+        LOG(INFO) << json["shader"]["vertex_source_path"];
 
         sprite tank_hull{
             ._shader{
@@ -57,30 +67,19 @@ struct opengl_texture_system
 
         sprite tank_turret{
             ._shader{
-                ._vertex_source_path   = "../resources/shaders/texture.vert",
-                ._fragment_source_path = "../resources/shaders/texture.frag",
+                ._vertex_source_path   = json["shader"]["vertex_source_path"],
+                ._fragment_source_path = json["shader"]["fragment_source_path"],
                 ._program_id           = opengl_subsdk::get_new_program(),
             },
 
             ._texture{
-                ._image_path = "../resources/textures/turret.png",
-                // clang-format off
-                ._vertices = {
-                    // Positions          // Colors           // Texture Coords
-                    0.5f,  0.5f,  0.2f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                    0.5f,  -0.5f, 0.2f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                    -0.5f, -0.5f, 0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                    -0.5f, 0.5f,  0.2f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-                },
+                ._image_path = json["texture"]["image_path"],
+                ._vertices   = json["texture"]["vertices"],
 
-                ._indices = {
-                    // Note that we start from 0!
-                    0, 1, 3, // First Triangle
-                    1, 2, 3  // Second Triangle
-                },
-                // clang-format on
-                ._need_generate_mipmaps = false,
-                ._number                = 1,
+                ._indices = json["texture"]["indices"],
+                ._need_generate_mipmaps =
+                    json["texture"]["need_generate_mipmaps"],
+                ._number = json["texture"]["number"],
             },
         };
         sprite battlefield{
@@ -250,6 +249,9 @@ struct opengl_texture_system
         }
 
         {
+            // TODO:
+            //  fix AABB deformation
+            //  (transform matrix scale defines the collidable borders)
             auto transform = glm::mat4(1.0f);
             transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
             transform =
@@ -276,7 +278,6 @@ struct opengl_texture_system
         }
         {
             auto transform = glm::mat4(1.0f);
-            transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
             transform      = transform * aspect_matrix;
 
             auto const &battlefield_sprite = view.get<sprite>(_battlefield);

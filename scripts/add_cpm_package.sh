@@ -40,4 +40,5 @@ CPMAddPackage(
 )
 EOF
 
-echo "CMake file created successfully at ${target_dir}/CPM_${name}.cmake"
+echo "CMake file created successfully at '${target_dir}/CPM_${name}.cmake'.
+Now reload cmake to download and setup the library."

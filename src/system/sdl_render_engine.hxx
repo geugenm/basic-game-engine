@@ -74,7 +74,7 @@ struct sdl_gl_engine
         return view.get<sdl_render_context>(_window_entity).is_initialized();
     }
 
-    void update(entt::registry &registry)
+    void update(entt::registry &registry) const
     {
         auto view         = registry.view<sdl_render_context>();
         auto &sdl_context = view.get<sdl_render_context>(_window_entity);

@@ -12,8 +12,8 @@ endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Setting default build type to Debug. Enabling sanitizer...")
-    add_compile_options(-fsanitize=address)
-    add_link_options(-fsanitize=address)
+    #    add_compile_options(-fsanitize=address)
+    #    add_link_options(-fsanitize=address)
 endif ()
 
 # Include necessary CMake modules and scripts
@@ -58,7 +58,7 @@ include(CMakePrintHelpers)
 cmake_print_variables(CMAKE_CXX_FLAGS CMAKE_EXE_LINKER_FLAGS CMAKE_BINARY_DIR)
 
 cmake_print_properties(TARGETS MY_LIBRARIES_NAMES
-        PROPERTIES POSITION_INDEPENDENT_CODE)
+                       PROPERTIES POSITION_INDEPENDENT_CODE)
 
 if (NOT DEFINED MY_LIBRARIES_NAMES)
     message(FATAL_ERROR "MY_LIBRARIES_NAMES not defined")
