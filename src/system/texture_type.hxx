@@ -66,11 +66,13 @@ struct texture_params
     glm::vec2 position{0.5f, -0.5f};
     float rotationAngle = 0.0f;
 
-    const float moveSpeed   = 0.05f;
-    const float rotateSpeed = 0.05f;
+    const float moveSpeed   = 0.03f;
+    const float rotateSpeed = 0.02f;
 
     float halfWidth  = 0.6f * 0.5f;
     float halfHeight = 0.6f * 0.5f;
+
+    float rotation_angle = 0.0f;
 };
 
 struct sprite

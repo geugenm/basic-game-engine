@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL3/SDL.h>
+
 #include "render/picopng.hxx"
 #include "sdl_render_engine.hxx"
 #include "texture_type.hxx"
@@ -12,6 +14,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <format>
+#include <glm/gtx/vector_angle.hpp>
 #include <nlohmann/json.hpp>
 
 namespace sdk
@@ -22,6 +25,40 @@ template <typename... Args> std::string concatenate_strings(Args &&...args)
     std::string result;
     (result.append(args), ...);
     return result;
+}
+
+glm::mat4 tankTurretRotation(int windowWidth, int windowHeight,
+                             float rotationSpeed, float &fixed_angle)
+{
+    // Get mouse state
+    float mouseX;
+    float mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
+
+    // Convert mouse position to normalized screen-space direction
+    float normalizedX =
+        (2.0f * mouseX) / static_cast<float>(windowWidth) - 1.0f;
+    float normalizedY =
+        1.0f - (2.0f * mouseY) / static_cast<float>(windowHeight);
+
+    // Calculate target rotation angle
+    float angle =
+        fixed_angle + glm::angle(glm::vec3(normalizedX, normalizedY, 0.0f),
+                                 glm::vec3(0.0f, 0.0f, 1.0f)) *
+                          rotationSpeed;
+    fixed_angle = angle;
+
+    // Create rotation matrix
+    glm::mat4 rotationMatrix =
+        glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // Combine current transformation matrix with rotation matrix
+    glm::mat4 currentTransform = glm::translate(
+        glm::mat4(1.0f),
+        glm::vec3(0.0f, 0.0f, -glm::length(glm::vec3(0.0f, 0.0f, 1.0f))));
+    glm::mat4 finalTransform = rotationMatrix * currentTransform;
+
+    return finalTransform;
 }
 
 struct opengl_texture_system final
@@ -264,10 +301,10 @@ struct opengl_texture_system final
             registry.destroy(entity);
         }
 
-        {
-            // TODO:
+        { // TODO:
             //  fix AABB deformation
             //  (transform matrix scale defines the collidable borders)
+
             auto transform = glm::mat4(1.0f);
             transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
             transform =
@@ -288,12 +325,20 @@ struct opengl_texture_system final
             }
 
             {
+                auto transform1 = glm::mat4(1.0f);
+                transform1 =
+                    glm::scale(transform1, glm::vec3(0.6f, 0.6f, 0.6f));
+                auto g_thanks = tankTurretRotation(sdl_context.get_width(),
+                                                   sdl_context.get_height(),
+                                                   0.5f, params.rotation_angle);
+                transform1    = transform1 * g_thanks;
+                transform1    = transform1 * aspect_matrix;
                 auto const &tank_turret_sprite = view.get<sprite>(_tank_turret);
                 glUseProgram(tank_turret_sprite._shader._program_id);
                 glUniformMatrix4fv(
                     tank_turret_sprite._shader.get_uniform_location(
                         "transform"),
-                    1, GL_FALSE, glm::value_ptr(transform));
+                    1, GL_FALSE, glm::value_ptr(transform1));
                 glUseProgram(0);
             }
         }
@@ -309,7 +354,7 @@ struct opengl_texture_system final
                 GL_FALSE, glm::value_ptr(transform));
             glUseProgram(0);
         }
-    }
+    } // namespace sdk
 
 private:
     static void render(opengl_texture const &texture)
