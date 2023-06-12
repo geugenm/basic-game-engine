@@ -50,7 +50,8 @@ struct opengl_texture_system
                     1, 2, 3  // Second Triangle
                 },
                 // clang-format on
-                ._number = 0,
+                ._need_generate_mipmaps = false,
+                ._number                = 0,
             },
         };
 
@@ -78,11 +79,10 @@ struct opengl_texture_system
                     1, 2, 3  // Second Triangle
                 },
                 // clang-format on
-                ._number = 1,
+                ._need_generate_mipmaps = false,
+                ._number                = 1,
             },
         };
-
-        // TODO: fix the deformation
         sprite battlefield{
             ._shader{
                 ._vertex_source_path = "../resources/shaders/battlefield.vert",
@@ -94,11 +94,11 @@ struct opengl_texture_system
                 ._image_path = "../resources/textures/land.png",
                 // clang-format off
                 ._vertices = {
-                        // Positions          // Colors           // Texture Coords
-                        -1.0f,  1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Left
-                        1.0f,  1.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                        1.0f, -1.0f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, // Bottom Right
-                        -1.0f, -1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f  // Bottom Left
+                    // Positions          // Colors           // Texture Coords
+                    -1.0f,  1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Left
+                    1.0f,  1.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top Right
+                    1.0f, -1.0f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, // Bottom Right
+                    -1.0f, -1.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f  // Bottom Left
                 },
 
 
@@ -108,10 +108,13 @@ struct opengl_texture_system
                     1, 2, 3  // Second Triangle
                 },
                 // clang-format on
-                ._needs_to_be_cropped = true,
-                ._number              = 0,
+                ._need_generate_mipmaps = false,
+                ._needs_to_be_cropped   = true,
+                ._number                = 0,
             },
         };
+
+        // TODO: fix the deformation
 
         // ! The order plays the role
         registry.emplace<sprite>(_tank_turret, tank_turret);
@@ -329,7 +332,7 @@ private:
         // texture object
         glBindTexture(GL_TEXTURE_2D, texture._texture);
 
-        set_texture_parameters();
+        set_texture_parameters(texture);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture._width, texture._height,
                      0, GL_RGBA, GL_UNSIGNED_BYTE, png_data.data());
@@ -471,15 +474,22 @@ private:
         glEnableVertexAttribArray(2);
     }
 
-    static void set_texture_parameters()
+    static void set_texture_parameters(opengl_texture &texture)
     {
         // Set the texture wrapping parameters
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
         // Set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                        GL_LINEAR_MIPMAP_LINEAR);
+        if (texture._need_generate_mipmaps)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            GL_LINEAR_MIPMAP_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 };
