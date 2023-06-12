@@ -71,8 +71,6 @@ struct texture_params
 
     float halfWidth  = 0.6f * 0.5f;
     float halfHeight = 0.6f * 0.5f;
-
-    float rotation_angle = 0.0f;
 };
 
 struct sprite
