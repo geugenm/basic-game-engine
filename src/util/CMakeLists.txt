@@ -6,11 +6,11 @@ add_subdirectory(imgui)
 
 add_library(sdk_util SHARED)
 
-target_include_directories(sdk_util PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(sdk_util PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(sdk_util PUBLIC
-        sdl3_sdk
-        opengl_sdk
-        imgui_sdk
-        engine_includes
-        )
+                      sdl3_utils
+                      opengl_utils
+                      imgui_utils
+                      engine_includes
+                      )
