@@ -4,10 +4,7 @@ in vec2 TexCoord;
 
 out vec4 color;
 
-uniform sampler2D ourTexture;
-uniform sampler2D topTexture;
-
-uniform sampler2D background_texture;
+uniform sampler2D texture;
 
 bool near_line(vec2 point, vec2 a, vec2 b, float thickness) {
     vec2 ab = b - a;
@@ -17,7 +14,6 @@ bool near_line(vec2 point, vec2 a, vec2 b, float thickness) {
     float distance = length(point - projection);
     return distance < thickness;
 }
-
 
 void main()
 {
@@ -33,17 +29,12 @@ void main()
 
     bool near_diagonal = near_line(TexCoord, diagonal_start, diagonal_end, diagonal_thickness);
 
-    vec4 bottomColor = texture2D(ourTexture, TexCoord);
-    vec4 topColor = texture2D(topTexture, TexCoord);
-    vec4 background_color = texture2D(background_texture, TexCoord);
-
-    vec4 finalColor = mix(background_color, bottomColor, 0.1);
-    vec4 final_color = mix(finalColor, topColor, topColor.a);
+    vec4 bottomColor = texture2D(texture, TexCoord);
 
     if (near_border || near_diagonal) {
         color = light_purple;
     } else {
-        color = final_color;
+        color = bottomColor;
     }
 }
 

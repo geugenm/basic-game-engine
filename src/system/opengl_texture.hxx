@@ -18,19 +18,8 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <nlohmann/json.hpp>
 
-// My idea about tank race,
-// my idea about rotating tank (continuation of my initial project)
-
 namespace sdk
 {
-
-template <typename... Args> std::string concatenate_strings(Args &&...args)
-{
-    std::string result;
-    (result.append(args), ...);
-    return result;
-}
-
 struct opengl_texture_system final
 {
     entt::entity _tank_hull;
@@ -42,100 +31,9 @@ struct opengl_texture_system final
         _tank_hull   = registry.create();
         _tank_turret = registry.create();
 
-        const std::string_view resource_path = "../resources/";
-
-        std::ifstream inputFile(
-            concatenate_strings(resource_path, "/sprites/turret.json"));
-        if (!inputFile.is_open())
-        {
-            throw std::invalid_argument("Could not open file");
-        }
-        nlohmann::json json;
-        inputFile >> json;
-        const char *wow = "wow";
-        LOG(INFO) << json["shader"]["vertex_source_path"];
-
-        sprite tank_hull{
-            ._shader{
-                ._vertex_source_path = concatenate_strings(
-                    resource_path, "sprites/shaders/texture.vert"),
-                ._fragment_source_path = concatenate_strings(
-                    resource_path, "sprites/shaders/texture.frag"),
-                ._program_id = opengl_subsdk::get_new_program(),
-            },
-
-            ._texture{
-                ._image_path = concatenate_strings(resource_path,
-                                                   "sprites/textures/hull.png"),
-                // clang-format off
-                ._vertices = {
-                    // Positions          // Colors           // Texture Coords
-                    0.5f,  0.5f,  0.1f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                    0.5f,  -0.5f, 0.1f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                    -0.5f, -0.5f, 0.1f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                    -0.5f, 0.5f,  0.1f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-                },
-
-                ._indices = {
-                    // Note that we start from 0!
-                    0, 1, 3, // First Triangle
-                    1, 2, 3  // Second Triangle
-                },
-                // clang-format on
-                ._need_generate_mipmaps = false,
-                ._number                = 0,
-            },
-        };
-
-        sprite tank_turret{
-            ._shader{
-                ._vertex_source_path   = json["shader"]["vertex_source_path"],
-                ._fragment_source_path = json["shader"]["fragment_source_path"],
-                ._program_id           = opengl_subsdk::get_new_program(),
-            },
-
-            ._texture{
-                ._image_path = json["texture"]["image_path"],
-                ._vertices   = json["texture"]["vertices"],
-
-                ._indices = json["texture"]["indices"],
-                ._need_generate_mipmaps =
-                    json["texture"]["need_generate_mipmaps"],
-                ._number = json["texture"]["number"],
-            },
-        };
-        sprite battlefield{
-            ._shader{
-                ._vertex_source_path = concatenate_strings(
-                    resource_path, "sprites/shaders/battlefield.vert"),
-                ._fragment_source_path = concatenate_strings(
-                    resource_path, "sprites/shaders/battlefield.frag"),
-                ._program_id = opengl_subsdk::get_new_program(),
-            },
-            ._texture{
-                ._image_path = concatenate_strings(resource_path,
-                                                   "sprites/textures/land.png"),
-                // clang-format off
-                ._vertices = {
-                    // Positions          // Colors           // Texture Coords
-                    1.0f,  1.0f,  0.01f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top Right
-                    1.0f,  -1.0f, 0.01f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom Right
-                    -1.0f, -1.0f, 0.01f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
-                    -1.0f, 1.0f,  0.01f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // Top Left
-                },
-
-
-                ._indices = {
-                    // Note that we start from 0!
-                    0, 1, 3, // First Triangle
-                    1, 2, 3  // Second Triangle
-                },
-                // clang-format on
-                ._need_generate_mipmaps = false,
-                ._needs_to_be_cropped   = true,
-                ._number                = 0,
-            },
-        };
+        sprite tank_hull   = load_sprite_by_file_name("hull");
+        sprite tank_turret = load_sprite_by_file_name("turret");
+        sprite battlefield = load_sprite_by_file_name("battlefield");
 
         // ! The order plays the role
         registry.emplace<sprite>(_tank_turret, tank_turret);
@@ -168,7 +66,7 @@ struct opengl_texture_system final
             glUseProgram(tank_hull_sprite._shader._program_id);
 
             glUniform1i(
-                tank_hull_sprite._shader.get_uniform_location("ourTexture"),
+                tank_hull_sprite._shader.get_uniform_location("texture"),
                 tank_hull_sprite._texture._number);
             glUseProgram(0);
         }
@@ -179,7 +77,7 @@ struct opengl_texture_system final
             glUseProgram(tank_turret_sprite._shader._program_id);
 
             glUniform1i(
-                tank_turret_sprite._shader.get_uniform_location("topTexture"),
+                tank_turret_sprite._shader.get_uniform_location("texture"),
                 tank_turret_sprite._texture._number);
             glUseProgram(0);
         }
@@ -190,7 +88,7 @@ struct opengl_texture_system final
             glUseProgram(battlefield_sprite._shader._program_id);
 
             glUniform1i(
-                battlefield_sprite._shader.get_uniform_location("ourTexture"),
+                battlefield_sprite._shader.get_uniform_location("texture"),
                 battlefield_sprite._texture._number);
             glUseProgram(0);
         }
@@ -269,13 +167,11 @@ struct opengl_texture_system final
             {
                 params.rotationAngle -= params.rotateSpeed;
             }
+
             registry.destroy(entity);
         }
 
-        { // TODO:
-            //  fix AABB deformation
-            //  (transform matrix scale defines the collidable borders)
-
+        {
             auto transform = glm::mat4(1.0f);
             transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
             transform =
@@ -337,6 +233,66 @@ struct opengl_texture_system final
     } // namespace sdk
 
 private:
+    [[nodiscard]] static sprite load_sprite_by_file_name(
+        const std::string_view &texture_name,
+        const std::filesystem::path &resources_path = "../resources/sprites")
+    {
+        static constexpr std::string_view properties_extension = ".json";
+
+        std::filesystem::path texture_path = resources_path / texture_name;
+        texture_path.replace_extension(properties_extension);
+
+        if (!std::filesystem::exists(texture_path))
+        {
+            throw std::invalid_argument("Texture '" + texture_path.string() +
+                                        "' not found");
+        }
+
+        std::ifstream input_file(texture_path);
+        if (!input_file.is_open())
+        {
+            throw std::invalid_argument("Could not open file: " +
+                                        texture_path.string());
+        }
+
+        nlohmann::json json_texture_properties;
+
+        input_file >> json_texture_properties;
+
+        input_file.close();
+
+        if (json_texture_properties.empty())
+        {
+            throw std::invalid_argument("Empty texture properties file: " +
+                                        texture_path.string());
+        }
+
+        sprite result{
+            ._shader{
+                ._vertex_source_path =
+                    resources_path /
+                    json_texture_properties["shader"]["vertex_source_path"],
+                ._fragment_source_path =
+                    resources_path /
+                    json_texture_properties["shader"]["fragment_source_path"],
+                ._program_id = opengl_subsdk::get_new_program(),
+            },
+
+            ._texture{
+                ._image_path = resources_path /
+                               json_texture_properties["texture"]["image_path"],
+                ._vertices = json_texture_properties["texture"]["vertices"],
+
+                ._indices = json_texture_properties["texture"]["indices"],
+                ._need_generate_mipmaps =
+                    json_texture_properties["texture"]["need_generate_mipmaps"],
+                ._number = json_texture_properties["texture"]["number"],
+            },
+        };
+
+        return result;
+    }
+
     static void render(opengl_texture const &texture)
     {
         glBindTexture(GL_TEXTURE_2D, texture._texture);
@@ -453,7 +409,7 @@ private:
     static void bind_buffers(opengl_texture &texture,
                              const sdl_render_context &sdl_context)
     {
-        if (texture._needs_to_be_cropped)
+        if (texture._needs_to_be_scaled)
         {
             float image_aspect_ratio = texture.image_aspect_ratio();
             float window_aspect_ratio =

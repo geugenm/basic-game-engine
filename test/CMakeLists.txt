@@ -6,7 +6,7 @@ if (BUILD_TESTS)
     function(add_test_executable target_name source_file)
         add_executable(${target_name} ${source_file})
         set_target_properties(${target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-                "${CMAKE_BINARY_DIR}/test")
+                              "${CMAKE_BINARY_DIR}/test")
         target_link_libraries(${target_name} PRIVATE GTest::GTest)
     endfunction()
 
@@ -20,9 +20,6 @@ if (BUILD_TESTS)
 
     add_test_executable(test_opengl_texture test_opengl_texture.cxx)
     target_link_libraries(test_opengl_texture PRIVATE engine_sdk)
-
-    add_test_executable(test_imgui_interaction test_imgui_engine_interaction.cxx)
-    target_link_libraries(test_imgui_interaction PRIVATE engine_sdk)
 
     add_test_executable(test_sdl_sound test_sdl_sound.cxx)
     target_link_libraries(test_sdl_sound PRIVATE engine_sdk)

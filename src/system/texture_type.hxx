@@ -51,7 +51,7 @@ struct opengl_texture
 
     bool _is_initialized        = false;
     bool _need_generate_mipmaps = true;
-    bool _needs_to_be_cropped   = true;
+    bool _needs_to_be_scaled    = true;
 
     GLint _number{};
 
