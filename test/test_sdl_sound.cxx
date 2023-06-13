@@ -1,5 +1,5 @@
-#include "sdl_sound.hxx"
 #include "opengl_functions.hxx"
+#include "sdl_sound.hxx"
 
 #include <SDL3/SDL.h>
 #include <cmath>

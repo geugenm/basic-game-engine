@@ -3,7 +3,8 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace sdk {
+namespace sdk
+{
 class engine_error final : public std::runtime_error
 {
 public:
@@ -47,4 +48,4 @@ private:
 
     mutable std::string info_;
 };
-}
+} // namespace sdk

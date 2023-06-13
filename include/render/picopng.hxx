@@ -103,8 +103,8 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
             int makeFromLengths(const std::vector<unsigned long> &bitlen,
                                 unsigned long maxbitlen)
             { // make tree given the lengths
-                unsigned long numcodes = bitlen.size();
-                unsigned long treepos = 0;
+                unsigned long numcodes   = bitlen.size();
+                unsigned long treepos    = 0;
                 unsigned long nodefilled = 0;
                 std::vector<unsigned long> tree1d(numcodes);
                 std::vector<unsigned long> blcount(maxbitlen + 1, 0);
@@ -175,8 +175,8 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
             void inflate(std::vector<unsigned char> &out,
                          const std::vector<unsigned char> &in, size_t inpos = 0)
             {
-                size_t bp = 0;
-                size_t pos = 0; // bit pointer and byte pointer
+                size_t bp            = 0;
+                size_t pos           = 0; // bit pointer and byte pointer
                 error                = 0;
                 unsigned long BFINAL = 0;
                 while (!BFINAL && !error)
@@ -205,10 +205,8 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
                     out.resize(pos); // Only now we know the true size of out,
                                      // resize it to that
             }
-            void generateFixedTrees(
-                HuffmanTree &tree,
-                HuffmanTree
-                    &treeD)
+            void generateFixedTrees(HuffmanTree &tree,
+                                    HuffmanTree &treeD)
                 const // get the tree of a deflated block with fixed tree
             {
                 std::vector<unsigned long> bitlen(288, 8);
@@ -223,8 +221,8 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
             }
             HuffmanTree codetree;
             HuffmanTree codetreeD;
-            HuffmanTree codelengthcodetree; // the code tree for Huffman codes, dist
-                                    // codes, and code length codes
+            HuffmanTree codelengthcodetree; // the code tree for Huffman codes,
+                                            // dist codes, and code length codes
             unsigned long huffmanDecodeSymbol(const unsigned char *in,
                                               size_t &bp,
                                               const HuffmanTree &codetree,
@@ -482,9 +480,9 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
                 bp = p * 8;
             }
         };
-        int
-        decompress(std::vector<unsigned char> &out,
-                   const std::vector<unsigned char> &in) const // returns error value
+        int decompress(
+            std::vector<unsigned char> &out,
+            const std::vector<unsigned char> &in) const // returns error value
         {
             Inflator inflator;
             if (in.size() < 2)
@@ -496,7 +494,7 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
                 return 24;
             } // error: 256 * in[0] + in[1] must be a multiple of 31, the FCHECK
               // value is supposed to be made that way
-            unsigned long CM = in[0] & 15;
+            unsigned long CM    = in[0] & 15;
             unsigned long CINFO = (in[0] >> 4) & 15;
             unsigned long FDICT = (in[1] >> 5) & 1;
             if (CM != 8 || CINFO > 7)
@@ -751,8 +749,8 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
                                                    (passw[i] * bpp + 7) / 8);
                 std::vector<unsigned char> scanlineo((info.width * bpp + 7) /
                                                      8);
-                std::vector<unsigned char> scanlinen((info.width * bpp + 7) /
-                              8); //"old" and "new" scanline
+                std::vector<unsigned char> scanlinen(
+                    (info.width * bpp + 7) / 8); //"old" and "new" scanline
                 for (int i = 0; i < 7; i++)
                     adam7Pass(&out_[0], &scanlinen[0], &scanlineo[0],
                               &scanlines[passstart[i]], info.width, pattern[i],
@@ -1115,13 +1113,13 @@ static inline int decodePNG(std::vector<unsigned char> &out_image,
         paethPredictor(short a, short b,
                        short c) // Paeth predicter, used by PNG filter type 4
         {
-            short p = a + b - c;
+            short p  = a + b - c;
             short pa = p > a ? (p - a) : (a - p);
             short pb = p > b ? (p - b) : (b - p);
             short pc = p > c ? (p - c) : (c - p);
             return static_cast<unsigned char>((pa <= pb && pa <= pc) ? a
-                                   : pb <= pc             ? b
-                                                          : c);
+                                              : pb <= pc             ? b
+                                                                     : c);
         }
     };
     PNG decoder;
