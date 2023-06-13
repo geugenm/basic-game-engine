@@ -15,8 +15,6 @@ struct opengl_shader
 
     GLuint _program_id{};
 
-    bool _is_initialized = false;
-
     [[nodiscard]] GLint get_uniform_location(const GLchar *uniform_name) const
     {
         const GLint uniform_location =
@@ -49,7 +47,6 @@ struct opengl_texture
     std::vector<GLfloat> _vertices;
     std::vector<GLuint> _indices;
 
-    bool _is_initialized        = false;
     bool _need_generate_mipmaps = true;
     bool _needs_to_be_scaled    = true;
 

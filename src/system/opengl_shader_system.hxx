@@ -11,7 +11,7 @@ namespace sdk
 class opengl_shader_system
 {
 public:
-    void init(entt::registry &registry) const
+    static void init(entt::registry &registry)
     {
         auto view = registry.view<opengl_shader>();
 
@@ -27,27 +27,6 @@ public:
         {
             auto &ent_sprite = sprite_shader_view.get<sprite>(entity);
             create_shader_program(ent_sprite._shader);
-        }
-    }
-
-    void update(entt::registry &registry) const
-    {
-        auto view = registry.view<opengl_shader>();
-
-        for (auto entity : view)
-        {
-            auto &shader = view.get<opengl_shader>(entity);
-            use(shader);
-            glUseProgram(0);
-        }
-
-        auto sprite_shader_view = registry.view<sprite>();
-
-        for (auto entity : sprite_shader_view)
-        {
-            auto &ent_sprite = sprite_shader_view.get<sprite>(entity);
-            use(ent_sprite._shader);
-            glUseProgram(0);
         }
     }
 
@@ -86,17 +65,6 @@ private:
 
         opengl_subsdk::delete_shader(vertex);
         opengl_subsdk::delete_shader(fragment);
-
-        shader._is_initialized = true;
-    }
-
-    static void use(opengl_shader const &shader)
-    {
-        if (shader._is_initialized == false)
-        {
-            throw std::invalid_argument("Shader is not initialized.");
-        }
-        glUseProgram(shader._program_id);
     }
 };
 

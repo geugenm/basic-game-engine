@@ -35,7 +35,7 @@ struct opengl_texture_system final
         sprite tank_turret = load_sprite_by_file_name("turret");
         sprite battlefield = load_sprite_by_file_name("battlefield");
 
-        // ! The order plays the role
+        // ! The order is important
         registry.emplace<sprite>(_tank_turret, tank_turret);
         registry.emplace<sprite>(_tank_hull, tank_hull);
         registry.emplace<sprite>(_battlefield, battlefield);
@@ -350,8 +350,6 @@ private:
         }
 
         LOG(INFO) << "Texture loaded: " << texture._image_path.string();
-
-        texture._is_initialized = true;
     }
 
     [[nodiscard]] static std::vector<unsigned char>
