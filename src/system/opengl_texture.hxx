@@ -18,6 +18,9 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <nlohmann/json.hpp>
 
+// My idea about tank race,
+// my idea about rotating tank (continuation of my initial project)
+
 namespace sdk
 {
 
