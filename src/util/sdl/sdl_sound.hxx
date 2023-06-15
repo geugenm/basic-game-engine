@@ -79,7 +79,7 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
                 audio_buff_data->note.time * 2.0 * 3.1415926 *
                 static_cast<double>(audio_buff_data->note.frequency);
             double curr_sample =
-                std::numeric_limits<int16_t>::max() * sin(omega_t);
+                65535 * sin(omega_t);
             auto curr_val = static_cast<int16_t>(curr_sample);
 
             switch (channels)

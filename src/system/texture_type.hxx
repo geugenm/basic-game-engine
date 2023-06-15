@@ -3,7 +3,7 @@
 #include "glad/glad.h"
 
 #include <filesystem>
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 #include <vector>
 
 namespace sdk
