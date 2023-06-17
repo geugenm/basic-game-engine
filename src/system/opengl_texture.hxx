@@ -95,8 +95,63 @@ struct opengl_texture_system final
         }
     }
 
-    void update(entt::registry &registry,
-                entt::entity const &window_entity) const
+    void handle_events(const SDL_Event &event)
+    {
+        if (event.type != SDL_EVENT_KEY_DOWN)
+        {
+            return;
+        }
+
+        const Uint8 *keys = SDL_GetKeyboardState(NULL);
+
+        if (keys[SDL_SCANCODE_W])
+        {
+            m_hull_parameters.position.x +=
+                m_hull_parameters.moveSpeed *
+                cos(m_hull_parameters.rotationAngle);
+            m_hull_parameters.position.y +=
+                m_hull_parameters.moveSpeed *
+                sin(m_hull_parameters.rotationAngle);
+            m_hull_parameters.position.x =
+                std::clamp(m_hull_parameters.position.x,
+                           -1.0f + m_hull_parameters.halfWidth,
+                           1.0f - m_hull_parameters.halfWidth);
+            m_hull_parameters.position.y =
+                std::clamp(m_hull_parameters.position.y,
+                           -1.0f + m_hull_parameters.halfHeight,
+                           1.0f - m_hull_parameters.halfHeight);
+        }
+
+        if (keys[SDL_SCANCODE_S])
+        {
+            m_hull_parameters.position.x -=
+                m_hull_parameters.moveSpeed *
+                cos(m_hull_parameters.rotationAngle);
+            m_hull_parameters.position.y -=
+                m_hull_parameters.moveSpeed *
+                sin(m_hull_parameters.rotationAngle);
+            m_hull_parameters.position.x =
+                std::clamp(m_hull_parameters.position.x,
+                           -1.0f + m_hull_parameters.halfWidth,
+                           1.0f - m_hull_parameters.halfWidth);
+            m_hull_parameters.position.y =
+                std::clamp(m_hull_parameters.position.y,
+                           -1.0f + m_hull_parameters.halfHeight,
+                           1.0f - m_hull_parameters.halfHeight);
+        }
+
+        if (keys[SDL_SCANCODE_A])
+        {
+            m_hull_parameters.rotationAngle += m_hull_parameters.rotateSpeed;
+        }
+
+        if (keys[SDL_SCANCODE_D])
+        {
+            m_hull_parameters.rotationAngle -= m_hull_parameters.rotateSpeed;
+        }
+    }
+
+    void update(entt::registry &registry, entt::entity const &window_entity)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -123,62 +178,13 @@ struct opengl_texture_system final
         const glm::mat4 aspect_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
 
-        static texture_params params;
-        static texture_params params_turret;
-
-        auto event_view = registry.view<sdk::keyboard>();
-
-        for (auto entity : event_view)
-        {
-            auto const &keyboard = event_view.get<sdk::keyboard>(entity);
-            if (keyboard == sdk::keyboard::keyboard_W)
-            {
-                params.position.x +=
-                    params.moveSpeed * cos(params.rotationAngle);
-                params.position.y +=
-                    params.moveSpeed * sin(params.rotationAngle);
-                params.position.x =
-                    std::clamp(params.position.x, -1.0f + params.halfWidth,
-                               1.0f - params.halfWidth);
-                params.position.y =
-                    std::clamp(params.position.y, -1.0f + params.halfHeight,
-                               1.0f - params.halfHeight);
-            }
-
-            if (keyboard == sdk::keyboard::keyboard_S)
-            {
-                params.position.x -=
-                    params.moveSpeed * cos(params.rotationAngle);
-                params.position.y -=
-                    params.moveSpeed * sin(params.rotationAngle);
-                params.position.x =
-                    std::clamp(params.position.x, -1.0f + params.halfWidth,
-                               1.0f - params.halfWidth);
-                params.position.y =
-                    std::clamp(params.position.y, -1.0f + params.halfHeight,
-                               1.0f - params.halfHeight);
-            }
-
-            if (keyboard == sdk::keyboard::keyboard_A)
-            {
-                params.rotationAngle += params.rotateSpeed;
-            }
-
-            if (keyboard == sdk::keyboard::keyboard_D)
-            {
-                params.rotationAngle -= params.rotateSpeed;
-            }
-
-            registry.destroy(entity);
-        }
-
         {
             auto transform = glm::mat4(1.0f);
             transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
-            transform =
-                glm::translate(transform, glm::vec3(params.position.x,
-                                                    params.position.y, 0.0f));
-            transform = glm::rotate(transform, params.rotationAngle,
+            transform      = glm::translate(
+                transform, glm::vec3(m_hull_parameters.position.x,
+                                          m_hull_parameters.position.y, 0.0f));
+            transform = glm::rotate(transform, m_hull_parameters.rotationAngle,
                                     glm::vec3(0.0f, 0.0f, 1.0f));
             transform = transform * aspect_matrix;
 
@@ -197,17 +203,18 @@ struct opengl_texture_system final
                 static float mouse_y;
                 SDL_GetMouseState(&mouse_x, &mouse_y);
 
-                params_turret.position.x = params.position.x;
-                params_turret.position.y = params.position.y;
+                m_turret_parameters.position.x = m_hull_parameters.position.x;
+                m_turret_parameters.position.y = m_hull_parameters.position.y;
 
                 auto transform1 = glm::mat4(1.0f);
                 transform1 =
                     glm::scale(transform1, glm::vec3(0.6f, 0.6f, 0.6f));
                 transform1 = glm::translate(
-                    transform1, glm::vec3(params_turret.position.x,
-                                          params_turret.position.y, 0.0f));
+                    transform1,
+                    glm::vec3(m_turret_parameters.position.x,
+                              m_turret_parameters.position.y, 0.0f));
                 transform1 =
-                    glm::rotate(transform1, params_turret.rotationAngle,
+                    glm::rotate(transform1, m_turret_parameters.rotationAngle,
                                 glm::vec3(0.0f, 0.0f, 1.0f));
                 transform1                     = transform1 * aspect_matrix;
                 auto const &tank_turret_sprite = view.get<sprite>(_tank_turret);
@@ -231,7 +238,7 @@ struct opengl_texture_system final
                 GL_FALSE, glm::value_ptr(transform));
             glUseProgram(0);
         }
-    } // namespace sdk
+    }
 
 private:
     static void render(opengl_texture const &texture)
@@ -440,6 +447,9 @@ private:
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
+
+    texture_params m_hull_parameters;
+    texture_params m_turret_parameters;
 };
 
 } // namespace sdk

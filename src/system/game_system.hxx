@@ -33,9 +33,22 @@ struct game_system
 
     void update(entt::registry &registry)
     {
-        render_engine.update(registry);
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_EVENT_QUIT)
+            {
+                render_engine.destroy(registry);
+            }
+
+            imgui_subsdk::process_event(event);
+
+            texture_system.handle_events(event);
+        }
+
         texture_system.update(registry, render_engine._window_entity);
         imgui.update(registry);
+        render_engine.update(registry);
     }
 };
 
