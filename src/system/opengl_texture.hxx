@@ -3,9 +3,10 @@
 #include <SDL3/SDL.h>
 
 #include "SDL_mouse.h"
+#include "components/general_components.hxx"
+#include "nlohmann/json_fwd.hpp"
 #include "render/picopng.hxx"
 #include "sdl_render_engine.hxx"
-#include "texture_type.hxx"
 
 #include <entt/entt.hpp>
 #include <opengl_functions.hxx>
@@ -233,33 +234,45 @@ struct opengl_texture_system final
     } // namespace sdk
 
 private:
+    [[nodiscard]] static nlohmann::json
+    get_file_json_content(std::filesystem::path file_path)
+    {
+        static constexpr std::string_view properties_extension = ".json";
+
+        file_path.replace_extension(properties_extension);
+
+        if (!std::filesystem::exists(file_path))
+        {
+            throw std::invalid_argument("Json file '" + file_path.string() +
+                                        "' was not found");
+        }
+
+        std::ifstream input_file(file_path);
+        if (!input_file.is_open())
+        {
+            throw std::invalid_argument("Could not open file: " +
+                                        file_path.string());
+        }
+
+        nlohmann::json json_content;
+
+        input_file >> json_content;
+
+        input_file.close();
+
+        return json_content;
+    }
+
     [[nodiscard]] static sprite load_sprite_by_file_name(
         const std::string_view &texture_name,
         const std::filesystem::path &resources_path = "../resources/sprites")
     {
-        static constexpr std::string_view properties_extension = ".json";
 
-        std::filesystem::path texture_path = resources_path / texture_name;
-        texture_path.replace_extension(properties_extension);
+        const std::filesystem::path texture_path =
+            resources_path / texture_name;
 
-        if (!std::filesystem::exists(texture_path))
-        {
-            throw std::invalid_argument("Texture '" + texture_path.string() +
-                                        "' not found");
-        }
-
-        std::ifstream input_file(texture_path);
-        if (!input_file.is_open())
-        {
-            throw std::invalid_argument("Could not open file: " +
-                                        texture_path.string());
-        }
-
-        nlohmann::json json_texture_properties;
-
-        input_file >> json_texture_properties;
-
-        input_file.close();
+        const nlohmann::json json_texture_properties =
+            get_file_json_content(texture_path);
 
         if (json_texture_properties.empty())
         {
@@ -409,7 +422,7 @@ private:
     {
         if (texture._needs_to_be_scaled)
         {
-            float image_aspect_ratio = texture.image_aspect_ratio();
+            float image_aspect_ratio = texture.get_image_aspect_ratio();
             float window_aspect_ratio =
                 static_cast<float>(sdl_context.get_width()) /
                 static_cast<float>(sdl_context.get_height());

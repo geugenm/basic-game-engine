@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glad/glad.h"
+#include "../util/opengl/glad/glad.h"
 
 #include <filesystem>
 #include <glm/glm.hpp>
@@ -52,7 +52,7 @@ struct opengl_texture
 
     GLint _number{};
 
-    [[nodiscard]] float image_aspect_ratio() const
+    [[nodiscard]] float get_image_aspect_ratio() const
     {
         return static_cast<float>(_width) / static_cast<float>(_height);
     }
@@ -70,9 +70,26 @@ struct texture_params
     float halfHeight = 0.6f * 0.5f;
 };
 
+struct transform
+{
+    glm::vec2 _position{0.5f, -0.5f};
+    float _rotation_angle = 0.0f;
+
+    const float _move_speed;
+    const float _rotate_speed;
+};
+
 struct sprite
 {
     opengl_shader _shader;
     opengl_texture _texture;
+
+    transform _transform;
+};
+
+struct player_tank
+{
+    sprite _hull_sprite;
+    sprite _turret_sprite;
 };
 } // namespace sdk

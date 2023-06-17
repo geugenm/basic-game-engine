@@ -3,7 +3,7 @@
 #include "entt/entt.hpp"
 #include "opengl_functions.hxx"
 
-#include "texture_type.hxx"
+#include "components/general_components.hxx"
 
 namespace sdk
 {
