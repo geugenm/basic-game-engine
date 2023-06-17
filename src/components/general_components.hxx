@@ -93,7 +93,7 @@ struct opengl_texture
 
 struct transform
 {
-    glm::vec2 _position{0.5f, -0.5f};
+    glm::vec2 _position{0.0f, -0.0f};
     float _current_rotation_angle = 0.0f;
 
     float _movement_speed = 0.0f;

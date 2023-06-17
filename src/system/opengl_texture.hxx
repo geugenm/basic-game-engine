@@ -10,6 +10,7 @@
 
 #include <entt/entity/entity.hpp>
 #include <entt/entt.hpp>
+#include <glm/ext/quaternion_transform.hpp>
 #include <glm/fwd.hpp>
 #include <opengl_functions.hxx>
 
@@ -180,6 +181,16 @@ struct opengl_texture_system final
         }
     }
 
+    float rotateTowards(float current_angle, float target_angle,
+                        float max_rotation_speed)
+    {
+        float angle_difference =
+            fmod(target_angle - current_angle + 540.0f, 360.0f) - 180.0f;
+        float rotation_speed = glm::clamp(angle_difference, -max_rotation_speed,
+                                          max_rotation_speed);
+        return current_angle + rotation_speed;
+    }
+
     void update(entt::registry &registry, entt::entity const &window_entity)
     {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -233,6 +244,36 @@ struct opengl_texture_system final
             // TODO: transformation for turret for the mouse,
             //  using SDL_GetMouseState()
             auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
+
+            glm::vec2 mouse;
+            // Get window size
+            // Normalize mouse coordinates and convert to world coordinates
+            SDL_GetMouseState(&mouse.x, &mouse.y);
+            mouse = glm::vec2(
+                2.0f * (mouse.x / static_cast<float>(sdl_context.get_width()) -
+                        0.5f),
+                -2.0f *
+                    (mouse.y / static_cast<float>(sdl_context.get_height()) -
+                     0.5f));
+
+            // Calculate the angle between the turret and the mouse position
+            glm::vec2 turretPosition =
+                glm::vec2(tank_turret_sprite._transform._position.x,
+                          tank_turret_sprite._transform._position.y);
+            glm::vec2 direction = glm::normalize(mouse - turretPosition);
+            float target_angle =
+                glm::degrees(glm::atan(direction.y, direction.x));
+
+            // Adjust the angle based on the orientation of the turret texture
+            float texture_rotation_offset =
+                90.0f; // Change this value according to your turret texture
+                       // orientation
+            target_angle -= texture_rotation_offset;
+
+            // Update the turret's rotation angle to match the target angle
+            tank_turret_sprite._transform._current_rotation_angle =
+                glm::mix(tank_turret_sprite._transform._current_rotation_angle,
+                         target_angle, 0.02f);
 
             auto transform1 =
                 offset_matrix4 *
