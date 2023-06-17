@@ -91,25 +91,13 @@ struct opengl_texture
     }
 };
 
-struct texture_params
-{
-    glm::vec2 position{0.5f, -0.5f};
-    float rotationAngle = 0.0f;
-
-    const float moveSpeed   = 0.03f;
-    const float rotateSpeed = 0.02f;
-
-    float halfWidth  = 0.6f * 0.5f;
-    float halfHeight = 0.6f * 0.5f;
-};
-
 struct transform
 {
     glm::vec2 _position{0.5f, -0.5f};
-    float _rotation_angle = 0.0f;
+    float _current_rotation_angle = 0.0f;
 
-    const float _movement_speed;
-    const float _rotation_speed;
+    float _movement_speed = 0.0f;
+    float _rotation_speed = 0.0f;
 };
 
 struct sprite

@@ -8,7 +8,9 @@
 #include "render/picopng.hxx"
 #include "sdl_render_engine.hxx"
 
+#include <entt/entity/entity.hpp>
 #include <entt/entt.hpp>
+#include <glm/fwd.hpp>
 #include <opengl_functions.hxx>
 
 #include <glm/glm.hpp>
@@ -102,52 +104,54 @@ struct opengl_texture_system final
             return;
         }
 
-        const Uint8 *keys = SDL_GetKeyboardState(NULL);
+        const Uint8 *keys = SDL_GetKeyboardState(nullptr);
+
+        static constexpr float scale_half       = 0.6f * 0.5f;
+        m_player_tank_transform._rotation_speed = 0.02f;
+        m_player_tank_transform._movement_speed = 0.03f;
 
         if (keys[SDL_SCANCODE_W])
         {
-            m_hull_parameters.position.x +=
-                m_hull_parameters.moveSpeed *
-                cos(m_hull_parameters.rotationAngle);
-            m_hull_parameters.position.y +=
-                m_hull_parameters.moveSpeed *
-                sin(m_hull_parameters.rotationAngle);
-            m_hull_parameters.position.x =
-                std::clamp(m_hull_parameters.position.x,
-                           -1.0f + m_hull_parameters.halfWidth,
-                           1.0f - m_hull_parameters.halfWidth);
-            m_hull_parameters.position.y =
-                std::clamp(m_hull_parameters.position.y,
-                           -1.0f + m_hull_parameters.halfHeight,
-                           1.0f - m_hull_parameters.halfHeight);
+            m_player_tank_transform._position.x +=
+                m_player_tank_transform._movement_speed *
+                cos(m_player_tank_transform._current_rotation_angle);
+            m_player_tank_transform._position.y +=
+                m_player_tank_transform._movement_speed *
+                sin(m_player_tank_transform._current_rotation_angle);
+            m_player_tank_transform._position.x =
+                std::clamp(m_player_tank_transform._position.x,
+                           -1.0f + scale_half, 1.0f - scale_half);
+            m_player_tank_transform._position.y =
+                std::clamp(m_player_tank_transform._position.y,
+                           -1.0f + scale_half, 1.0f - scale_half);
         }
 
         if (keys[SDL_SCANCODE_S])
         {
-            m_hull_parameters.position.x -=
-                m_hull_parameters.moveSpeed *
-                cos(m_hull_parameters.rotationAngle);
-            m_hull_parameters.position.y -=
-                m_hull_parameters.moveSpeed *
-                sin(m_hull_parameters.rotationAngle);
-            m_hull_parameters.position.x =
-                std::clamp(m_hull_parameters.position.x,
-                           -1.0f + m_hull_parameters.halfWidth,
-                           1.0f - m_hull_parameters.halfWidth);
-            m_hull_parameters.position.y =
-                std::clamp(m_hull_parameters.position.y,
-                           -1.0f + m_hull_parameters.halfHeight,
-                           1.0f - m_hull_parameters.halfHeight);
+            m_player_tank_transform._position.x -=
+                m_player_tank_transform._movement_speed *
+                cos(m_player_tank_transform._current_rotation_angle);
+            m_player_tank_transform._position.y -=
+                m_player_tank_transform._movement_speed *
+                sin(m_player_tank_transform._current_rotation_angle);
+            m_player_tank_transform._position.x =
+                std::clamp(m_player_tank_transform._position.x,
+                           -1.0f + scale_half, 1.0f - scale_half);
+            m_player_tank_transform._position.y =
+                std::clamp(m_player_tank_transform._position.y,
+                           -1.0f + scale_half, 1.0f - scale_half);
         }
 
         if (keys[SDL_SCANCODE_A])
         {
-            m_hull_parameters.rotationAngle += m_hull_parameters.rotateSpeed;
+            m_player_tank_transform._current_rotation_angle +=
+                m_player_tank_transform._rotation_speed;
         }
 
         if (keys[SDL_SCANCODE_D])
         {
-            m_hull_parameters.rotationAngle -= m_hull_parameters.rotateSpeed;
+            m_player_tank_transform._current_rotation_angle -=
+                m_player_tank_transform._rotation_speed;
         }
     }
 
@@ -168,7 +172,7 @@ struct opengl_texture_system final
             glUseProgram(0);
         }
 
-        auto view_context = registry.view<sdl_render_context>();
+        const auto view_context = registry.view<sdl_render_context>();
         auto const &sdl_context =
             view_context.get<sdl_render_context>(window_entity);
 
@@ -178,54 +182,42 @@ struct opengl_texture_system final
         const glm::mat4 aspect_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
 
+        const auto singular_matrix4 = glm::mat4(1.0f);
+        const auto scale_matrix4 =
+            glm::scale(singular_matrix4, glm::vec3(0.6f, 0.6f, 0.6f));
+        const auto offset_matrix4 = glm::translate(
+            scale_matrix4,
+            glm::vec3(m_player_tank_transform._position.x,
+                      m_player_tank_transform._position.y, 0.0f));
+
         {
-            auto transform = glm::mat4(1.0f);
-            transform      = glm::scale(transform, glm::vec3(0.6f, 0.6f, 0.6f));
-            transform      = glm::translate(
-                transform, glm::vec3(m_hull_parameters.position.x,
-                                          m_hull_parameters.position.y, 0.0f));
-            transform = glm::rotate(transform, m_hull_parameters.rotationAngle,
-                                    glm::vec3(0.0f, 0.0f, 1.0f));
-            transform = transform * aspect_matrix;
+            auto transform = glm::rotate(
+                offset_matrix4, m_player_tank_transform._current_rotation_angle,
+                glm::vec3(0.0f, 0.0f, 1.0f));
+            transform                    = transform * aspect_matrix;
+            auto const &tank_hull_sprite = view.get<sprite>(_tank_hull);
+            glUseProgram(tank_hull_sprite._shader._program_id);
 
-            {
-                auto const &tank_hull_sprite = view.get<sprite>(_tank_hull);
-                glUseProgram(tank_hull_sprite._shader._program_id);
-
-                glUniformMatrix4fv(
-                    tank_hull_sprite._shader.get_uniform_location("transform"),
-                    1, GL_FALSE, glm::value_ptr(transform));
-                glUseProgram(0);
-            }
-
-            {
-                static float mouse_x;
-                static float mouse_y;
-                SDL_GetMouseState(&mouse_x, &mouse_y);
-
-                m_turret_parameters.position.x = m_hull_parameters.position.x;
-                m_turret_parameters.position.y = m_hull_parameters.position.y;
-
-                auto transform1 = glm::mat4(1.0f);
-                transform1 =
-                    glm::scale(transform1, glm::vec3(0.6f, 0.6f, 0.6f));
-                transform1 = glm::translate(
-                    transform1,
-                    glm::vec3(m_turret_parameters.position.x,
-                              m_turret_parameters.position.y, 0.0f));
-                transform1 =
-                    glm::rotate(transform1, m_turret_parameters.rotationAngle,
-                                glm::vec3(0.0f, 0.0f, 1.0f));
-                transform1                     = transform1 * aspect_matrix;
-                auto const &tank_turret_sprite = view.get<sprite>(_tank_turret);
-                glUseProgram(tank_turret_sprite._shader._program_id);
-                glUniformMatrix4fv(
-                    tank_turret_sprite._shader.get_uniform_location(
-                        "transform"),
-                    1, GL_FALSE, glm::value_ptr(transform1));
-                glUseProgram(0);
-            }
+            glUniformMatrix4fv(
+                tank_hull_sprite._shader.get_uniform_location("transform"), 1,
+                GL_FALSE, glm::value_ptr(transform));
+            glUseProgram(0);
         }
+
+        {
+            // TODO: transformation for turret for the mouse,
+            //  using SDL_GetMouseState()
+            auto transform1 =
+                glm::rotate(offset_matrix4, 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+            transform1                     = transform1 * aspect_matrix;
+            auto const &tank_turret_sprite = view.get<sprite>(_tank_turret);
+            glUseProgram(tank_turret_sprite._shader._program_id);
+            glUniformMatrix4fv(
+                tank_turret_sprite._shader.get_uniform_location("transform"), 1,
+                GL_FALSE, glm::value_ptr(transform1));
+            glUseProgram(0);
+        }
+
         {
             auto transform = glm::mat4(1.0f);
             transform      = transform * aspect_matrix;
@@ -238,7 +230,7 @@ struct opengl_texture_system final
                 GL_FALSE, glm::value_ptr(transform));
             glUseProgram(0);
         }
-    }
+    } // namespace sdk
 
 private:
     static void render(opengl_texture const &texture)
@@ -448,8 +440,7 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
-    texture_params m_hull_parameters;
-    texture_params m_turret_parameters;
+    transform m_player_tank_transform;
 };
 
 } // namespace sdk

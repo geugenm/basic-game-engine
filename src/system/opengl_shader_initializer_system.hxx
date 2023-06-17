@@ -8,7 +8,7 @@
 namespace sdk
 {
 
-class opengl_shader_system
+class opengl_shader_initializer_system
 {
 public:
     static void init(entt::registry &registry)

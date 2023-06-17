@@ -2,7 +2,7 @@
 
 #include "audio_system.hxx"
 #include "imgui_system.hxx"
-#include "opengl_shader_system.hxx"
+#include "opengl_shader_initializer_system.hxx"
 #include "opengl_texture.hxx"
 #include "sdl_render_engine.hxx"
 
@@ -14,7 +14,7 @@ namespace sdk
 struct game_system
 {
     [[no_unique_address]] opengl_texture_system texture_system{};
-    [[no_unique_address]] opengl_shader_system shader_system;
+    [[no_unique_address]] opengl_shader_initializer_system shader_system;
 
     sdl_gl_engine render_engine;
 
@@ -27,12 +27,16 @@ struct game_system
     {
         imgui.init(registry, render_engine._window_entity);
         texture_system.test(registry);
-        sdk::opengl_shader_system::init(registry);
+        sdk::opengl_shader_initializer_system::init(registry);
         texture_system.init_on(registry, render_engine._window_entity);
     }
 
     void update(entt::registry &registry)
     {
+        texture_system.update(registry, render_engine._window_entity);
+        imgui.update(registry);
+        render_engine.update(registry);
+
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -45,10 +49,6 @@ struct game_system
 
             texture_system.handle_events(event);
         }
-
-        texture_system.update(registry, render_engine._window_entity);
-        imgui.update(registry);
-        render_engine.update(registry);
     }
 };
 
