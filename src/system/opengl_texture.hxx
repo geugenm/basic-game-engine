@@ -29,6 +29,31 @@ struct opengl_texture_system final
     entt::entity _tank_turret;
     entt::entity _battlefield;
 
+    glm::mat4 heli_propeller_rotation(const int &window_width,
+                                      const int &window_height,
+                                      const float &rotation_speed,
+                                      float &fixed_angle)
+    {
+        // Calculate target rotation angle
+        float angle = fixed_angle +
+                      glm::angle(glm::vec3(window_width, window_height, 0.0f),
+                                 glm::vec3(0.0f, 0.0f, 1.0f)) *
+                          rotation_speed;
+        fixed_angle = angle;
+
+        // Create rotation matrix
+        glm::mat4 rotationMatrix =
+            glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        // Combine current transformation matrix with rotation matrix
+        glm::mat4 currentTransform = glm::translate(
+            glm::mat4(1.0f),
+            glm::vec3(0.0f, 0.0f, -glm::length(glm::vec3(0.0f, 0.0f, 1.0f))));
+        glm::mat4 finalTransform = rotationMatrix * currentTransform;
+
+        return finalTransform;
+    }
+
     void test(entt::registry &registry)
     {
         _tank_hull   = registry.create();
@@ -207,10 +232,15 @@ struct opengl_texture_system final
         {
             // TODO: transformation for turret for the mouse,
             //  using SDL_GetMouseState()
+            auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
+
             auto transform1 =
-                glm::rotate(offset_matrix4, 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-            transform1                     = transform1 * aspect_matrix;
-            auto const &tank_turret_sprite = view.get<sprite>(_tank_turret);
+                offset_matrix4 *
+                heli_propeller_rotation(
+                    sdl_context.get_width(), sdl_context.get_height(), 0.2f,
+                    tank_turret_sprite._transform._current_rotation_angle);
+            transform1 = transform1 * aspect_matrix;
+
             glUseProgram(tank_turret_sprite._shader._program_id);
             glUniformMatrix4fv(
                 tank_turret_sprite._shader.get_uniform_location("transform"), 1,
