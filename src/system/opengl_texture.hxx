@@ -32,9 +32,9 @@ struct opengl_texture_system final
         _tank_hull   = registry.create();
         _tank_turret = registry.create();
 
-        sprite tank_hull   = load_sprite_by_file_name("hull");
-        sprite tank_turret = load_sprite_by_file_name("turret");
-        sprite battlefield = load_sprite_by_file_name("battlefield");
+        sprite tank_hull   = sprite::get_sprite_from_file("hull");
+        sprite tank_turret = sprite::get_sprite_from_file("turret");
+        sprite battlefield = sprite::get_sprite_from_file("battlefield");
 
         // ! The order is important
         registry.emplace<sprite>(_tank_turret, tank_turret);
@@ -234,78 +234,6 @@ struct opengl_texture_system final
     } // namespace sdk
 
 private:
-    [[nodiscard]] static nlohmann::json
-    get_file_json_content(std::filesystem::path file_path)
-    {
-        static constexpr std::string_view properties_extension = ".json";
-
-        file_path.replace_extension(properties_extension);
-
-        if (!std::filesystem::exists(file_path))
-        {
-            throw std::invalid_argument("Json file '" + file_path.string() +
-                                        "' was not found");
-        }
-
-        std::ifstream input_file(file_path);
-        if (!input_file.is_open())
-        {
-            throw std::invalid_argument("Could not open file: " +
-                                        file_path.string());
-        }
-
-        nlohmann::json json_content;
-
-        input_file >> json_content;
-
-        input_file.close();
-
-        return json_content;
-    }
-
-    [[nodiscard]] static sprite load_sprite_by_file_name(
-        const std::string_view &texture_name,
-        const std::filesystem::path &resources_path = "../resources/sprites")
-    {
-
-        const std::filesystem::path texture_path =
-            resources_path / texture_name;
-
-        const nlohmann::json json_texture_properties =
-            get_file_json_content(texture_path);
-
-        if (json_texture_properties.empty())
-        {
-            throw std::invalid_argument("Empty texture properties file: " +
-                                        texture_path.string());
-        }
-
-        sprite result{
-            ._shader{
-                ._vertex_source_path =
-                    resources_path /
-                    json_texture_properties["shader"]["vertex_source_path"],
-                ._fragment_source_path =
-                    resources_path /
-                    json_texture_properties["shader"]["fragment_source_path"],
-                ._program_id = opengl_subsdk::get_new_program(),
-            },
-
-            ._texture{
-                ._image_path = resources_path /
-                               json_texture_properties["texture"]["image_path"],
-                ._vertices = json_texture_properties["texture"]["vertices"],
-
-                ._indices = json_texture_properties["texture"]["indices"],
-                ._need_generate_mipmaps =
-                    json_texture_properties["texture"]["need_generate_mipmaps"],
-                ._number = json_texture_properties["texture"]["number"],
-            },
-        };
-
-        return result;
-    }
-
     static void render(opengl_texture const &texture)
     {
         glBindTexture(GL_TEXTURE_2D, texture._texture);
