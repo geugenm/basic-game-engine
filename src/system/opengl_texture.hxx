@@ -125,47 +125,24 @@ struct opengl_texture_system final
 
     void handle_events(const SDL_Event &event)
     {
-        if (event.type != SDL_EVENT_KEY_DOWN)
-        {
-            return;
-        }
-
         const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
-        static constexpr float scale_half       = 0.6f * 0.5f;
         m_player_tank_transform._rotation_speed = 0.02f;
-        m_player_tank_transform._movement_speed = 0.03f;
+        m_player_tank_transform._movement_speed = 0.01f;
+
+        glm::vec2 m_velocity(
+            glm::cos(m_player_tank_transform._current_rotation_angle),
+            glm::sin(m_player_tank_transform._current_rotation_angle));
+        m_velocity *= m_player_tank_transform._movement_speed;
 
         if (keys[SDL_SCANCODE_W])
         {
-            m_player_tank_transform._position.x +=
-                m_player_tank_transform._movement_speed *
-                cos(m_player_tank_transform._current_rotation_angle);
-            m_player_tank_transform._position.y +=
-                m_player_tank_transform._movement_speed *
-                sin(m_player_tank_transform._current_rotation_angle);
-            m_player_tank_transform._position.x =
-                std::clamp(m_player_tank_transform._position.x,
-                           -1.0f + scale_half, 1.0f - scale_half);
-            m_player_tank_transform._position.y =
-                std::clamp(m_player_tank_transform._position.y,
-                           -1.0f + scale_half, 1.0f - scale_half);
+            m_player_tank_transform._position += m_velocity;
         }
 
         if (keys[SDL_SCANCODE_S])
         {
-            m_player_tank_transform._position.x -=
-                m_player_tank_transform._movement_speed *
-                cos(m_player_tank_transform._current_rotation_angle);
-            m_player_tank_transform._position.y -=
-                m_player_tank_transform._movement_speed *
-                sin(m_player_tank_transform._current_rotation_angle);
-            m_player_tank_transform._position.x =
-                std::clamp(m_player_tank_transform._position.x,
-                           -1.0f + scale_half, 1.0f - scale_half);
-            m_player_tank_transform._position.y =
-                std::clamp(m_player_tank_transform._position.y,
-                           -1.0f + scale_half, 1.0f - scale_half);
+            m_player_tank_transform._position -= m_velocity;
         }
 
         if (keys[SDL_SCANCODE_A])
@@ -235,37 +212,6 @@ struct opengl_texture_system final
             //  using SDL_GetMouseState()
             // Use mix for interpolation with coef ~0.01f
             auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
-
-            glm::vec2 mouse;
-            // Get window size
-            // Normalize mouse coordinates and convert to world coordinates
-            SDL_GetMouseState(&mouse.x, &mouse.y);
-            mouse = glm::vec2(
-                2.0f * (mouse.x / static_cast<float>(sdl_context.get_width()) -
-                        0.5f),
-                -2.0f *
-                    (mouse.y / static_cast<float>(sdl_context.get_height()) -
-                     0.5f));
-
-            // Calculate the angle between the turret and the mouse position
-            auto turretPosition =
-                glm::vec2(tank_turret_sprite._transform._position.x,
-                          tank_turret_sprite._transform._position.y);
-            glm::vec2 direction = glm::normalize(mouse - turretPosition);
-            float target_angle =
-                glm::degrees(glm::atan(direction.y, direction.x));
-
-            // Adjust the angle based on the orientation of the turret texture
-            float texture_rotation_offset =
-                0.0f; // Change this value according to your turret texture
-                      // orientation
-            target_angle -= texture_rotation_offset;
-
-            // Update the turret's rotation angle to match the target angle
-            tank_turret_sprite._transform._current_rotation_angle =
-                glm::mix(tank_turret_sprite._transform._current_rotation_angle,
-                         target_angle, 0.04f) /
-                (std::numbers::pi_v<float>);
 
             auto transform1 = glm::rotate(
                 offset_matrix4,
