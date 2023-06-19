@@ -61,6 +61,12 @@ struct game_system
                 texture_system.handle_events(event);
             }
 
+            if (registry.view<game_states>().get<game_states>(
+                    game_state_entity) == game_states::exited)
+            {
+                render_engine.destroy(registry);
+            }
+
             imgui_subsdk::process_event(event);
         }
     }

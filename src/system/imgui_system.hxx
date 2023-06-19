@@ -39,7 +39,6 @@ struct imgui_system
                 auto &state =
                     registry.view<game_states>().get<game_states>(entity);
                 state = game_states::paused;
-                LOG(INFO) << "Game paused";
             }
             ImGui::OpenPopup("Pause");
         }
@@ -59,6 +58,12 @@ struct imgui_system
             // Exit button
             if (ImGui::Button("Exit", ImVec2(120, 0)))
             {
+                for (auto entity : registry.view<game_states>())
+                {
+                    auto &state =
+                        registry.view<game_states>().get<game_states>(entity);
+                    state = game_states::exited;
+                }
                 ImGui::CloseCurrentPopup();
                 // Do something
             }
@@ -67,6 +72,12 @@ struct imgui_system
             ImGui::SameLine();
             if (ImGui::Button("Resume", ImVec2(120, 0)))
             {
+                for (auto entity : registry.view<game_states>())
+                {
+                    auto &state =
+                        registry.view<game_states>().get<game_states>(entity);
+                    state = game_states::played;
+                }
                 ImGui::CloseCurrentPopup();
                 // Do something
             }

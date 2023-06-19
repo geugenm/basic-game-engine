@@ -152,6 +152,7 @@ enum class game_states
 {
     paused,
     played,
-    in_menu
+    in_menu,
+    exited
 };
 } // namespace sdk
