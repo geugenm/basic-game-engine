@@ -20,22 +20,36 @@
 namespace sdk
 {
 
+struct player
+{
+    entt::entity m_turret;
+    entt::entity m_hull;
+
+    entt::entity m_bullet_sample;
+    std::list<entt::entity> m_bullets;
+
+    static constexpr float k_hull_rotation_speed = 0.02f;
+    static constexpr float k_hull_movement_speed = 0.01f;
+
+    static constexpr float k_turret_rotation_speed = 0.008f;
+};
+
 class player_system
 {
 public:
     void init(entt::registry &registry)
     {
-        m_turret = registry.create();
-        m_hull   = registry.create();
+        m_player.m_turret = registry.create();
+        m_player.m_hull   = registry.create();
 
         sprite tank_hull   = sprite::get_sprite_from_file("hull");
         sprite tank_turret = sprite::get_sprite_from_file("turret");
 
         sprite bullet = sprite::get_sprite_from_file("shell");
 
-        registry.emplace<sprite>(m_turret, tank_turret);
-        registry.emplace<sprite>(m_hull, tank_hull);
-        registry.emplace<sprite>(m_bullet_sample, bullet);
+        registry.emplace<sprite>(m_player.m_turret, tank_turret);
+        registry.emplace<sprite>(m_player.m_hull, tank_hull);
+        registry.emplace<sprite>(m_player.m_bullet_sample, bullet);
 
         auto sprite_shader_view = registry.view<sprite>();
 
@@ -62,12 +76,13 @@ public:
     {
         const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
-        auto &hull_transform   = registry.get<sprite>(m_hull)._transform;
-        auto &turret_transform = registry.get<sprite>(m_turret)._transform;
+        auto &hull_transform = registry.get<sprite>(m_player.m_hull)._transform;
+        auto &turret_transform =
+            registry.get<sprite>(m_player.m_turret)._transform;
 
         glm::vec2 m_velocity(glm::cos(hull_transform._current_rotation_angle),
                              glm::sin(hull_transform._current_rotation_angle));
-        m_velocity *= k_hull_movement_speed;
+        m_velocity *= player::k_hull_movement_speed;
 
         if (keys[SDL_SCANCODE_W])
         {
@@ -81,12 +96,14 @@ public:
 
         if (keys[SDL_SCANCODE_A])
         {
-            hull_transform._current_rotation_angle += k_hull_rotation_speed;
+            hull_transform._current_rotation_angle +=
+                player::k_hull_rotation_speed;
         }
 
         if (keys[SDL_SCANCODE_D])
         {
-            hull_transform._current_rotation_angle -= k_hull_rotation_speed;
+            hull_transform._current_rotation_angle -=
+                player::k_hull_rotation_speed;
         }
 
         turret_transform._position = hull_transform._position;
@@ -95,7 +112,8 @@ public:
         {
             entt::entity bullet = registry.create();
 
-            sprite bullet_sprite = registry.get<sprite>(m_bullet_sample);
+            sprite bullet_sprite =
+                registry.get<sprite>(m_player.m_bullet_sample);
             bullet_sprite._shader =
                 bullet_sprite._shader.get_initialized_shader();
 
@@ -107,26 +125,48 @@ public:
 
             bullet_sprite._transform = turret_transform;
 
-            m_bullets.push_back(bullet);
+            m_player.m_bullets.push_back(bullet);
 
             registry.emplace<sprite>(bullet, bullet_sprite);
         }
+
+        auto &turret_sprite = registry.get<sprite>(m_player.m_turret);
+
+        // Transforming SDL mouse coordinates to opengl texture coordinates
+        glm::vec2 mouse_position;
+        SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
+
+        // Moving to the center of the window
+        mouse_position = mouse_position - m_window_size / 2.0f;
+
+        // Y-axis inversion (SDL coordinates)
+        mouse_position.y *= -1.0f;
+        mouse_position = glm::normalize(mouse_position);
+
+        // Normalized X-axis vector for relative angle calculation
+        auto axes_x_direction = glm::vec2(1.0f, 0.0f);
+
+        m_turret_target_rotation_angle =
+            glm::orientedAngle(axes_x_direction, mouse_position);
     }
 
     void update(entt::registry &registry,
                 const sdl_render_context &render_window)
     {
-        auto &hull_sprite = registry.get<sprite>(m_hull);
+        auto const &hull_sprite = registry.get<sprite>(m_player.m_hull);
         hull_sprite.render();
 
-        auto &turret_sprite = registry.get<sprite>(m_turret);
+        auto const &turret_sprite = registry.get<sprite>(m_player.m_turret);
         turret_sprite.render();
 
-        for (auto const &ent_bullet : m_bullets)
+        for (auto const &ent_bullet : m_player.m_bullets)
         {
             auto const &entity_sprite = registry.get<sprite>(ent_bullet);
             entity_sprite.render();
         }
+
+        m_window_size =
+            glm::vec2(render_window.get_width(), render_window.get_height());
 
         const float window_aspect_ratio =
             static_cast<float>(render_window.get_width()) /
@@ -137,9 +177,12 @@ public:
 
         handle_bullets(registry, aspect_matrix);
         handle_hull(registry, aspect_matrix);
-        handle_turret(
-            registry, aspect_matrix,
-            glm::vec2(render_window.get_width(), render_window.get_height()));
+        handle_turret(registry, aspect_matrix);
+    }
+
+    [[nodiscard]] player get_player() const
+    {
+        return m_player;
     }
 
 private:
@@ -151,7 +194,7 @@ private:
         static const auto scale_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(0.6f, 0.6f, 1.0f));
 
-        for (auto const &bullet : m_bullets)
+        for (auto const &bullet : m_player.m_bullets)
         {
             auto &bullet_sprite = registry.get<sprite>(bullet);
 
@@ -192,14 +235,14 @@ private:
 
         for (const auto &entity : entities_to_remove)
         {
-            m_bullets.remove(entity);
+            m_player.m_bullets.remove(entity);
             registry.destroy(entity);
         }
     }
 
     void handle_hull(entt::registry &registry, const glm::mat4 &aspect_matrix)
     {
-        auto const &hull_sprite = registry.get<sprite>(m_hull);
+        auto const &hull_sprite = registry.get<sprite>(m_player.m_hull);
 
         static const auto scale_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(0.6f, 0.6f, 1.0f));
@@ -212,7 +255,7 @@ private:
             glm::vec3(0.0f, 0.0f, 1.0f));
         const auto transform = rotation * aspect_matrix;
 
-        auto const &tank_hull_sprite = registry.get<sprite>(m_hull);
+        auto const &tank_hull_sprite = registry.get<sprite>(m_player.m_hull);
         glUseProgram(tank_hull_sprite._shader._program_id);
 
         glUniformMatrix4fv(
@@ -221,13 +264,12 @@ private:
         glUseProgram(0);
     }
 
-    void handle_turret(entt::registry &registry, const glm::mat4 &aspect_matrix,
-                       const glm::vec2 &window_size)
+    void handle_turret(entt::registry &registry, const glm::mat4 &aspect_matrix)
     {
         // TODO: fix the pi angle uneeded rotation for the whole 2pi (edge
         // case)
         // TODO: fix window proprotions position calculation bug
-        auto &turret_sprite = registry.get<sprite>(m_turret);
+        auto &turret_sprite = registry.get<sprite>(m_player.m_turret);
 
         static const auto scale_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(0.6f, 0.6f, 1.0f));
@@ -236,27 +278,11 @@ private:
             glm::vec3(turret_sprite._transform._position.x,
                       turret_sprite._transform._position.y, 0.0f));
 
-        // Transforming SDL mouse coordinates to opengl texture coordinates
-        glm::vec2 mouse_position;
-        SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
-
-        // Moving to the center of the window
-        mouse_position = mouse_position - window_size / 2.0f;
-
-        // Y-axis inversion (SDL coordinates)
-        mouse_position.y *= -1.0f;
-        mouse_position = glm::normalize(mouse_position);
-
-        // Normalized X-axis vector for relative angle calculation
-        auto axes_x_direction = glm::vec2(1.0f, 0.0f);
-
-        float angle = glm::orientedAngle(axes_x_direction, mouse_position);
-
         // Linear interpolation for the angle in order to get smooth
         // rotation
-        turret_sprite._transform._current_rotation_angle =
-            glm::mix(turret_sprite._transform._current_rotation_angle, angle,
-                     k_turret_rotation_speed);
+        turret_sprite._transform._current_rotation_angle = glm::mix(
+            turret_sprite._transform._current_rotation_angle,
+            m_turret_target_rotation_angle, player::k_turret_rotation_speed);
 
         const auto rotation = glm::rotate(
             offset_matrix, turret_sprite._transform._current_rotation_angle,
@@ -270,16 +296,13 @@ private:
         glUseProgram(0);
     }
 
-    entt::entity m_turret;
-    entt::entity m_hull;
+    player m_player;
 
-    entt::entity m_bullet_sample;
-    std::list<entt::entity> m_bullets;
+    glm::vec2 m_window_size;
 
-    static constexpr float k_hull_rotation_speed = 0.02f;
-    static constexpr float k_hull_movement_speed = 0.01f;
+    float m_turret_target_rotation_angle = 0.0f;
 
-    static constexpr float k_turret_rotation_speed = 0.008f;
+    friend class enemy_system;
 };
 
 } // namespace sdk
