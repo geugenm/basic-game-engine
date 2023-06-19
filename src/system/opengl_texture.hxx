@@ -141,6 +141,10 @@ struct opengl_texture_system final
 
             auto bullet_sprite       = view.get<sprite>(_bullet);
             bullet_sprite._transform = m_turret_transform;
+            LOG(INFO) << "Rotation bullet: "
+                      << bullet_sprite._transform._current_rotation_angle
+                      << " vs turret: "
+                      << m_turret_transform._current_rotation_angle;
 
             _bullets.push_back(bullet);
 
@@ -275,6 +279,7 @@ struct opengl_texture_system final
             tank_turret_sprite._transform._current_rotation_angle =
                 glm::mix(tank_turret_sprite._transform._current_rotation_angle,
                          angle, 0.007f);
+            m_turret_transform = tank_turret_sprite._transform;
 
             auto transform1 = glm::rotate(
                 offset_matrix4,
