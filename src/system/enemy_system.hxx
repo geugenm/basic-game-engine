@@ -27,18 +27,30 @@ public:
         auto &enemy_transform_turret =
             registry.get<sprite>(m_control_system.m_player.m_turret)._transform;
 
-        m_control_system.update(registry, render_window);
-
         const auto direction = player_transform._position;
-        
-        m_control_system.m_turret_target_rotation_angle = glm::orientedAngle(
-            glm::vec2(1.0f, 0.0f), player_transform._position);
+
+        const float angle_to_player =
+            glm::orientedAngle(glm::vec2(1.0f, 0.0f), direction);
+
+        enemy_transform._current_rotation_angle =
+            glm::mix(enemy_transform._current_rotation_angle, angle_to_player,
+                     player::k_hull_rotation_speed);
+
+        const glm::vec2 velocity(
+            glm::cos(enemy_transform._current_rotation_angle),
+            glm::sin(enemy_transform._current_rotation_angle));
+
+        enemy_transform._position +=
+            velocity * 0.0f * player::k_hull_rotation_speed / 5.0f;
+
+        m_control_system.m_turret_target_rotation_angle = angle_to_player;
+        enemy_transform_turret._position = enemy_transform._position;
+
+        m_control_system.update(registry, render_window);
     }
 
 private:
     player_system m_control_system;
-
-    static constexpr float k_detection_range = 10.0f;
 };
 
 } // namespace sdk
