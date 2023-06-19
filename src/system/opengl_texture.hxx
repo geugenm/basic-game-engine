@@ -139,9 +139,6 @@ struct opengl_texture_system final
             auto view           = registry.view<sprite>();
             entt::entity bullet = registry.create();
 
-            auto &bullet_go      = view.get<sprite>(_bullet);
-            bullet_go._transform = m_turret_transform;
-
             sprite bullet_sprite  = view.get<sprite>(_bullet);
             bullet_sprite._shader = opengl_shader::get_new_shader(
                 bullet_sprite._shader._vertex_source_path,
@@ -189,15 +186,47 @@ struct opengl_texture_system final
 
         auto view = registry.view<sprite>();
 
-        for (auto entity : view)
         {
-            auto const &entity_sprite = view.get<sprite>(entity);
+            auto const &entity_sprite = view.get<sprite>(_battlefield);
             glUseProgram(entity_sprite._shader._program_id);
             auto target = static_cast<GLenum>(GL_TEXTURE0 +
                                               entity_sprite._texture._number);
             glActiveTexture(target);
             render(entity_sprite._texture);
             glUseProgram(0);
+        }
+
+        {
+            auto const &entity_sprite = view.get<sprite>(_tank_hull);
+            glUseProgram(entity_sprite._shader._program_id);
+            auto target = static_cast<GLenum>(GL_TEXTURE0 +
+                                              entity_sprite._texture._number);
+            glActiveTexture(target);
+            render(entity_sprite._texture);
+            glUseProgram(0);
+        }
+        
+        {
+            auto const &entity_sprite = view.get<sprite>(_tank_turret);
+            glUseProgram(entity_sprite._shader._program_id);
+            auto target = static_cast<GLenum>(GL_TEXTURE0 +
+                                              entity_sprite._texture._number);
+            glActiveTexture(target);
+            render(entity_sprite._texture);
+            glUseProgram(0);
+        }
+
+        {
+            for (auto const &bullet : _bullets)
+            {
+                auto const &entity_sprite = view.get<sprite>(bullet);
+                glUseProgram(entity_sprite._shader._program_id);
+                auto target = static_cast<GLenum>(
+                    GL_TEXTURE0 + entity_sprite._texture._number);
+                glActiveTexture(target);
+                render(entity_sprite._texture);
+                glUseProgram(0);
+            }
         }
 
         const auto view_context = registry.view<sdl_render_context>();
@@ -310,17 +339,16 @@ struct opengl_texture_system final
         }
 
         {
-            //            auto transform = glm::mat4(1.0f);
-            //            transform      = transform * aspect_matrix;
-            //
-            //            auto const &battlefield_sprite =
-            //            view.get<sprite>(_battlefield);
-            //            glUseProgram(battlefield_sprite._shader._program_id);
-            //
-            //            glUniformMatrix4fv(
-            //                battlefield_sprite._shader.get_uniform_location("transform"),
-            //                1, GL_FALSE, glm::value_ptr(transform));
-            //            glUseProgram(0);
+            auto transform = glm::mat4(1.0f);
+            transform      = transform * aspect_matrix;
+
+            auto const &battlefield_sprite = view.get<sprite>(_battlefield);
+            glUseProgram(battlefield_sprite._shader._program_id);
+
+            glUniformMatrix4fv(
+                battlefield_sprite._shader.get_uniform_location("transform"), 1,
+                GL_FALSE, glm::value_ptr(transform));
+            glUseProgram(0);
         }
     } // namespace sdk
 
