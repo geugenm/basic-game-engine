@@ -136,12 +136,22 @@ struct opengl_texture_system final
 
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
         {
-            // TODO: make new bullet texture
-
             auto view           = registry.view<sprite>();
             entt::entity bullet = registry.create();
 
-            sprite bullet_sprite = view.get<sprite>(_bullet);
+            auto &bullet_go      = view.get<sprite>(_bullet);
+            bullet_go._transform = m_turret_transform;
+
+            sprite bullet_sprite  = view.get<sprite>(_bullet);
+            bullet_sprite._shader = opengl_shader::get_new_shader(
+                bullet_sprite._shader._vertex_source_path,
+                bullet_sprite._shader._fragment_source_path);
+
+            glUseProgram(bullet_sprite._shader._program_id);
+
+            glUniform1i(bullet_sprite._shader.get_uniform_location("texture"),
+                        bullet_sprite._texture._number);
+            glUseProgram(0);
 
             bullet_sprite._transform = m_turret_transform;
 
@@ -202,7 +212,7 @@ struct opengl_texture_system final
 
         const auto singular_matrix4 = glm::mat4(1.0f);
         const auto scale_matrix4 =
-            glm::scale(singular_matrix4, glm::vec3(0.6f, 0.6f, 0.6f));
+            glm::scale(singular_matrix4, glm::vec3(0.6f, 0.6f, 1.0f));
         const auto offset_matrix4 = glm::translate(
             scale_matrix4, glm::vec3(m_hull_transform._position.x,
                                      m_hull_transform._position.y, 0.0f));
@@ -216,11 +226,11 @@ struct opengl_texture_system final
                     glm::cos(bullet_sprite._transform._current_rotation_angle),
                     glm::sin(bullet_sprite._transform._current_rotation_angle));
 
-                static constexpr float velocity = 0.2f;
+                static constexpr float velocity = 0.1f;
                 bullet_sprite._transform._position += rotor * velocity;
 
                 const auto scale_matrix =
-                    glm::scale(singular_matrix4, glm::vec3(0.2f, 0.2f, 0.9f));
+                    glm::scale(singular_matrix4, glm::vec3(0.6f, 0.6f, 1.0f));
                 const auto offset_matrix = glm::translate(
                     scale_matrix,
                     glm::vec3(bullet_sprite._transform._position.x,
@@ -300,16 +310,17 @@ struct opengl_texture_system final
         }
 
         {
-            auto transform = glm::mat4(1.0f);
-            transform      = transform * aspect_matrix;
-
-            auto const &battlefield_sprite = view.get<sprite>(_battlefield);
-            glUseProgram(battlefield_sprite._shader._program_id);
-
-            glUniformMatrix4fv(
-                battlefield_sprite._shader.get_uniform_location("transform"), 1,
-                GL_FALSE, glm::value_ptr(transform));
-            glUseProgram(0);
+            //            auto transform = glm::mat4(1.0f);
+            //            transform      = transform * aspect_matrix;
+            //
+            //            auto const &battlefield_sprite =
+            //            view.get<sprite>(_battlefield);
+            //            glUseProgram(battlefield_sprite._shader._program_id);
+            //
+            //            glUniformMatrix4fv(
+            //                battlefield_sprite._shader.get_uniform_location("transform"),
+            //                1, GL_FALSE, glm::value_ptr(transform));
+            //            glUseProgram(0);
         }
     } // namespace sdk
 
