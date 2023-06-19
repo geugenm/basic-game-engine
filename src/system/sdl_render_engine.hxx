@@ -8,31 +8,6 @@
 namespace sdk
 {
 
-struct sdl_render_context
-{
-    SDL_Window *_window    = nullptr;
-    SDL_GLContext _context = nullptr;
-
-    [[nodiscard]] bool is_initialized() const
-    {
-        return _window != nullptr && _context != nullptr;
-    }
-
-    [[nodiscard]] int get_width() const
-    {
-        int width;
-        SDL_GetWindowSize(_window, &width, nullptr);
-        return width;
-    }
-
-    [[nodiscard]] int get_height() const
-    {
-        int height;
-        SDL_GetWindowSize(_window, nullptr, &height);
-        return height;
-    }
-};
-
 struct sdl_gl_engine
 {
     entt::entity _window_entity;

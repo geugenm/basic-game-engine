@@ -9,6 +9,31 @@
 
 namespace sdk
 {
+struct sdl_render_context
+{
+    SDL_Window *_window    = nullptr;
+    SDL_GLContext _context = nullptr;
+
+    [[nodiscard]] bool is_initialized() const
+    {
+        return _window != nullptr && _context != nullptr;
+    }
+
+    [[nodiscard]] int get_width() const
+    {
+        int width;
+        SDL_GetWindowSize(_window, &width, nullptr);
+        return width;
+    }
+
+    [[nodiscard]] int get_height() const
+    {
+        int height;
+        SDL_GetWindowSize(_window, nullptr, &height);
+        return height;
+    }
+};
+
 namespace util
 {
 [[nodiscard]] static nlohmann::json
@@ -61,6 +86,11 @@ struct opengl_shader
         }
 
         return uniform_location;
+    }
+
+    [[nodiscard]] opengl_shader get_initialized_shader() const
+    {
+        return get_new_shader(_vertex_source_path, _fragment_source_path);
     }
 
     [[nodiscard]] static opengl_shader
@@ -132,6 +162,17 @@ struct opengl_texture
     {
         return static_cast<float>(_width) / static_cast<float>(_height);
     }
+
+    void render() const
+    {
+        glBindTexture(GL_TEXTURE_2D, _texture);
+
+        glBindVertexArray(_VAO);
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        glBindVertexArray(0);
+    }
 };
 
 struct transform
@@ -146,6 +187,15 @@ struct sprite
     opengl_texture _texture;
 
     transform _transform;
+
+    void render() const
+    {
+        glUseProgram(_shader._program_id);
+        auto target = static_cast<GLenum>(GL_TEXTURE0 + _texture._number);
+        glActiveTexture(target);
+        _texture.render();
+        glUseProgram(0);
+    }
 
     [[nodiscard]] static sprite get_sprite_from_file(
         const std::string_view &json_parameters_file_name,
