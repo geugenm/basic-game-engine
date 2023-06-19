@@ -17,7 +17,8 @@
         "CMAKE_CXX_STANDARD": "20",
         "CMAKE_CXX_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function",
         "CMAKE_C_FLAGS": "-Og -g -Wall -Wextra -Wpedantic -Wconversion -Wno-unused-function",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_BUILD_PARALLEL_LEVEL": "6"
       }
     },
     {

@@ -27,34 +27,9 @@ namespace sdk
 {
 struct opengl_texture_system final
 {
-    entt::entity _tank_hull;
-    entt::entity _tank_turret;
-    entt::entity _battlefield;
-
-    glm::mat4 heli_propeller_rotation(const int &window_width,
-                                      const int &window_height,
-                                      const float &rotation_speed,
-                                      float &fixed_angle)
-    {
-        // Calculate target rotation angle
-        float angle = fixed_angle +
-                      glm::angle(glm::vec3(window_width, window_height, 0.0f),
-                                 glm::vec3(0.0f, 0.0f, 1.0f)) *
-                          rotation_speed;
-        fixed_angle = angle;
-
-        // Create rotation matrix
-        glm::mat4 rotationMatrix =
-            glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
-
-        // Combine current transformation matrix with rotation matrix
-        glm::mat4 currentTransform = glm::translate(
-            glm::mat4(1.0f),
-            glm::vec3(0.0f, 0.0f, -glm::length(glm::vec3(0.0f, 0.0f, 1.0f))));
-        glm::mat4 finalTransform = rotationMatrix * currentTransform;
-
-        return finalTransform;
-    }
+    entt::entity _tank_hull{};
+    entt::entity _tank_turret{};
+    entt::entity _battlefield{};
 
     void test(entt::registry &registry)
     {
@@ -131,8 +106,6 @@ struct opengl_texture_system final
 
         static constexpr float hull_rotation_speed = 0.02f;
         static constexpr float hull_movement_speed = 0.01f;
-
-        static constexpr float turret_rotation_speed = 0.03f;
 
         glm::vec2 m_velocity(
             glm::cos(m_hull_transform._current_rotation_angle),
@@ -211,31 +184,38 @@ struct opengl_texture_system final
         }
 
         {
-            // TODO: transformation for turret for the mouse,
-            //  using SDL_GetMouseState()
-            // Use mix for interpolation with coef ~0.01f
+            // TODO: fix the pi angle uneeded rotation for the whole 2pi (edge
+            // case)
             auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
 
+            // Transforming SDL mouse coordinates to opengl texture coordinates
             glm::vec2 mouse_position;
             SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
 
             const glm::vec2 window_size(sdl_context.get_width(),
                                         sdl_context.get_height());
+            // Moving to the center of the window
             mouse_position = mouse_position - window_size / 2.0f;
+
+            // Y-axis inversion (SDL coordinates)
             mouse_position.y *= -1.0f;
             mouse_position = glm::normalize(mouse_position);
 
-            glm::vec2 axes_x_direction = glm::vec2(1.0f, 0.0f);
+            // Normalized X-axis vector for relative angle calculation
+            auto axes_x_direction = glm::vec2(1.0f, 0.0f);
 
             float angle = glm::orientedAngle(axes_x_direction, mouse_position);
-            LOG(INFO) << "Mouse rel pos norm: " << mouse_position.x << " "
-                      << mouse_position.y << " angle: " << angle;
-            float mixed_angle =
+
+            // Linear interpolation for the angle in order to get smooth
+            // rotation
+            tank_turret_sprite._transform._current_rotation_angle =
                 glm::mix(tank_turret_sprite._transform._current_rotation_angle,
                          angle, 0.1f);
 
-            auto transform1 =
-                glm::rotate(offset_matrix4, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+            auto transform1 = glm::rotate(
+                offset_matrix4,
+                tank_turret_sprite._transform._current_rotation_angle,
+                glm::vec3(0.0f, 0.0f, 1.0f));
             transform1 = transform1 * aspect_matrix;
 
             glUseProgram(tank_turret_sprite._shader._program_id);
