@@ -10,6 +10,7 @@
 
 #include <entt/entity/entity.hpp>
 #include <entt/entt.hpp>
+#include <glm/ext/quaternion_geometric.hpp>
 #include <glm/ext/quaternion_transform.hpp>
 #include <glm/fwd.hpp>
 #include <opengl_functions.hxx>
@@ -125,37 +126,40 @@ struct opengl_texture_system final
 
     void handle_events(const SDL_Event &event)
     {
+        // TODO: implement frame time in order to fix blazing speed ups
         const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
-        m_player_tank_transform._rotation_speed = 0.02f;
-        m_player_tank_transform._movement_speed = 0.01f;
+        static constexpr float hull_rotation_speed = 0.02f;
+        static constexpr float hull_movement_speed = 0.01f;
+
+        static constexpr float turret_rotation_speed = 0.03f;
 
         glm::vec2 m_velocity(
-            glm::cos(m_player_tank_transform._current_rotation_angle),
-            glm::sin(m_player_tank_transform._current_rotation_angle));
-        m_velocity *= m_player_tank_transform._movement_speed;
+            glm::cos(m_hull_transform._current_rotation_angle),
+            glm::sin(m_hull_transform._current_rotation_angle));
+        m_velocity *= hull_movement_speed;
 
         if (keys[SDL_SCANCODE_W])
         {
-            m_player_tank_transform._position += m_velocity;
+            m_hull_transform._position += m_velocity;
         }
 
         if (keys[SDL_SCANCODE_S])
         {
-            m_player_tank_transform._position -= m_velocity;
+            m_hull_transform._position -= m_velocity;
         }
 
         if (keys[SDL_SCANCODE_A])
         {
-            m_player_tank_transform._current_rotation_angle +=
-                m_player_tank_transform._rotation_speed;
+            m_hull_transform._current_rotation_angle += hull_rotation_speed;
         }
 
         if (keys[SDL_SCANCODE_D])
         {
-            m_player_tank_transform._current_rotation_angle -=
-                m_player_tank_transform._rotation_speed;
+            m_hull_transform._current_rotation_angle -= hull_rotation_speed;
         }
+
+        m_turret_transform._position = m_hull_transform._position;
     }
 
     void update(entt::registry &registry, entt::entity const &window_entity)
@@ -189,13 +193,12 @@ struct opengl_texture_system final
         const auto scale_matrix4 =
             glm::scale(singular_matrix4, glm::vec3(0.6f, 0.6f, 0.6f));
         const auto offset_matrix4 = glm::translate(
-            scale_matrix4,
-            glm::vec3(m_player_tank_transform._position.x,
-                      m_player_tank_transform._position.y, 0.0f));
+            scale_matrix4, glm::vec3(m_hull_transform._position.x,
+                                     m_hull_transform._position.y, 0.0f));
 
         {
             auto transform = glm::rotate(
-                offset_matrix4, m_player_tank_transform._current_rotation_angle,
+                offset_matrix4, m_hull_transform._current_rotation_angle,
                 glm::vec3(0.0f, 0.0f, 1.0f));
             transform                    = transform * aspect_matrix;
             auto const &tank_hull_sprite = view.get<sprite>(_tank_hull);
@@ -213,10 +216,26 @@ struct opengl_texture_system final
             // Use mix for interpolation with coef ~0.01f
             auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
 
-            auto transform1 = glm::rotate(
-                offset_matrix4,
-                tank_turret_sprite._transform._current_rotation_angle,
-                glm::vec3(0.0f, 0.0f, 1.0f));
+            glm::vec2 mouse_position;
+            SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
+
+            const glm::vec2 window_size(sdl_context.get_width(),
+                                        sdl_context.get_height());
+            mouse_position = mouse_position - window_size / 2.0f;
+            mouse_position.y *= -1.0f;
+            mouse_position = glm::normalize(mouse_position);
+
+            glm::vec2 axes_x_direction = glm::vec2(1.0f, 0.0f);
+
+            float angle = glm::orientedAngle(axes_x_direction, mouse_position);
+            LOG(INFO) << "Mouse rel pos norm: " << mouse_position.x << " "
+                      << mouse_position.y << " angle: " << angle;
+            float mixed_angle =
+                glm::mix(tank_turret_sprite._transform._current_rotation_angle,
+                         angle, 0.1f);
+
+            auto transform1 =
+                glm::rotate(offset_matrix4, angle, glm::vec3(0.0f, 0.0f, 1.0f));
             transform1 = transform1 * aspect_matrix;
 
             glUseProgram(tank_turret_sprite._shader._program_id);
@@ -448,7 +467,9 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
-    transform m_player_tank_transform;
+    transform m_hull_transform;
+
+    transform m_turret_transform;
 };
 
 } // namespace sdk
