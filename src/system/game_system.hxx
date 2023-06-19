@@ -58,7 +58,7 @@ struct game_system
             if (registry.view<game_states>().get<game_states>(
                     game_state_entity) == game_states::played)
             {
-                texture_system.handle_events(event);
+                texture_system.handle_events(registry, event);
             }
 
             if (registry.view<game_states>().get<game_states>(

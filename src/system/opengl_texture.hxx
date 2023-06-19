@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "SDL_events.h"
 #include "SDL_mouse.h"
 #include "components/general_components.hxx"
 #include "nlohmann/json_fwd.hpp"
@@ -9,6 +10,7 @@
 #include "sdl_render_engine.hxx"
 
 #include <entt/entity/entity.hpp>
+#include <entt/entity/fwd.hpp>
 #include <entt/entt.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/ext/quaternion_transform.hpp>
@@ -22,6 +24,7 @@
 #include <format>
 #include <glm/gtx/vector_angle.hpp>
 #include <nlohmann/json.hpp>
+#include <stack>
 
 namespace sdk
 {
@@ -31,16 +34,25 @@ struct opengl_texture_system final
     entt::entity _tank_turret{};
     entt::entity _battlefield{};
 
+    std::list<entt::entity> _bullets;
+    entt::entity _bullet;
+
     void test(entt::registry &registry)
     {
         _tank_hull   = registry.create();
         _tank_turret = registry.create();
+        _bullet      = registry.create();
+        _battlefield = registry.create();
 
         sprite tank_hull   = sprite::get_sprite_from_file("hull");
         sprite tank_turret = sprite::get_sprite_from_file("turret");
         sprite battlefield = sprite::get_sprite_from_file("battlefield");
 
+        sprite bullet = sprite::get_sprite_from_file("turret");
+
         // ! The order is important
+        registry.emplace<sprite>(_bullet, bullet);
+
         registry.emplace<sprite>(_tank_turret, tank_turret);
         registry.emplace<sprite>(_tank_hull, tank_hull);
         registry.emplace<sprite>(_battlefield, battlefield);
@@ -65,6 +77,16 @@ struct opengl_texture_system final
         glEnable(GL_BLEND);
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        {
+            const auto &bullet_sprite = view.get<sprite>(_bullet);
+
+            glUseProgram(bullet_sprite._shader._program_id);
+
+            glUniform1i(bullet_sprite._shader.get_uniform_location("texture"),
+                        bullet_sprite._texture._number);
+            glUseProgram(0);
+        }
 
         {
             const auto &tank_hull_sprite = view.get<sprite>(_tank_hull);
@@ -99,7 +121,7 @@ struct opengl_texture_system final
         }
     }
 
-    void handle_events(const SDL_Event &event)
+    void handle_events(entt::registry &registry, const SDL_Event &event)
     {
         // TODO: implement frame time in order to fix blazing speed ups
         const Uint8 *keys = SDL_GetKeyboardState(nullptr);
@@ -111,6 +133,19 @@ struct opengl_texture_system final
             glm::cos(m_hull_transform._current_rotation_angle),
             glm::sin(m_hull_transform._current_rotation_angle));
         m_velocity *= hull_movement_speed;
+
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+        {
+            auto view           = registry.view<sprite>();
+            entt::entity bullet = registry.create();
+
+            auto bullet_sprite       = view.get<sprite>(_bullet);
+            bullet_sprite._transform = m_turret_transform;
+
+            _bullets.push_back(bullet);
+
+            registry.emplace<sprite>(bullet, bullet_sprite);
+        }
 
         if (keys[SDL_SCANCODE_W])
         {
@@ -168,6 +203,34 @@ struct opengl_texture_system final
         const auto offset_matrix4 = glm::translate(
             scale_matrix4, glm::vec3(m_hull_transform._position.x,
                                      m_hull_transform._position.y, 0.0f));
+
+        {
+            for (auto const &bullet : _bullets)
+            {
+                auto &bullet_sprite = view.get<sprite>(bullet);
+
+                const auto rotor = glm::vec2(
+                    glm::cos(bullet_sprite._transform._current_rotation_angle),
+                    glm::sin(bullet_sprite._transform._current_rotation_angle));
+
+                static constexpr float velocity = 0.2f;
+                bullet_sprite._transform._position += rotor * velocity;
+
+                const auto scale_matrix = glm::translate(
+                    scale_matrix4,
+                    glm::vec3(bullet_sprite._transform._position.x,
+                              bullet_sprite._transform._position.y, 0.0f));
+
+                const auto transform = scale_matrix * aspect_matrix;
+
+                glUseProgram(bullet_sprite._shader._program_id);
+
+                glUniformMatrix4fv(
+                    bullet_sprite._shader.get_uniform_location("transform"), 1,
+                    GL_FALSE, glm::value_ptr(transform));
+                glUseProgram(0);
+            }
+        }
 
         {
             auto transform = glm::rotate(
