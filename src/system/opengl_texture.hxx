@@ -134,29 +134,6 @@ struct opengl_texture_system final
             glm::sin(m_hull_transform._current_rotation_angle));
         m_velocity *= hull_movement_speed;
 
-        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
-        {
-            auto view           = registry.view<sprite>();
-            entt::entity bullet = registry.create();
-
-            sprite bullet_sprite  = view.get<sprite>(_bullet);
-            bullet_sprite._shader = opengl_shader::get_new_shader(
-                bullet_sprite._shader._vertex_source_path,
-                bullet_sprite._shader._fragment_source_path);
-
-            glUseProgram(bullet_sprite._shader._program_id);
-
-            glUniform1i(bullet_sprite._shader.get_uniform_location("texture"),
-                        bullet_sprite._texture._number);
-            glUseProgram(0);
-
-            bullet_sprite._transform = m_turret_transform;
-
-            _bullets.push_back(bullet);
-
-            registry.emplace<sprite>(bullet, bullet_sprite);
-        }
-
         if (keys[SDL_SCANCODE_W])
         {
             m_hull_transform._position += m_velocity;
@@ -178,6 +155,30 @@ struct opengl_texture_system final
         }
 
         m_turret_transform._position = m_hull_transform._position;
+
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+        {
+            // TODO: Fix start position when turret moved shot
+            auto view           = registry.view<sprite>();
+            entt::entity bullet = registry.create();
+
+            sprite bullet_sprite  = view.get<sprite>(_bullet);
+            bullet_sprite._shader = opengl_shader::get_new_shader(
+                bullet_sprite._shader._vertex_source_path,
+                bullet_sprite._shader._fragment_source_path);
+
+            glUseProgram(bullet_sprite._shader._program_id);
+
+            glUniform1i(bullet_sprite._shader.get_uniform_location("texture"),
+                        bullet_sprite._texture._number);
+            glUseProgram(0);
+
+            bullet_sprite._transform = m_turret_transform;
+
+            _bullets.push_back(bullet);
+
+            registry.emplace<sprite>(bullet, bullet_sprite);
+        }
     }
 
     void update(entt::registry &registry, entt::entity const &window_entity)
@@ -205,7 +206,7 @@ struct opengl_texture_system final
             render(entity_sprite._texture);
             glUseProgram(0);
         }
-        
+
         {
             auto const &entity_sprite = view.get<sprite>(_tank_turret);
             glUseProgram(entity_sprite._shader._program_id);
@@ -247,9 +248,21 @@ struct opengl_texture_system final
                                      m_hull_transform._position.y, 0.0f));
 
         {
-            for (auto const &bullet : _bullets)
+            std::list<entt::entity> entities_to_remove;
+            for (auto &bullet : _bullets)
             {
                 auto &bullet_sprite = view.get<sprite>(bullet);
+
+                // Check if the bullet is inside the battlefield
+                if (bullet_sprite._transform._position.x < -2.0f ||
+                    bullet_sprite._transform._position.x > 2.0f ||
+                    bullet_sprite._transform._position.y < -2.0f ||
+                    bullet_sprite._transform._position.y > 2.0f)
+                {
+                    // remove current entity from _bullets list
+                    entities_to_remove.push_back(bullet);
+                    continue;
+                }
 
                 const auto rotor = glm::vec2(
                     glm::cos(bullet_sprite._transform._current_rotation_angle),
@@ -277,6 +290,12 @@ struct opengl_texture_system final
                     bullet_sprite._shader.get_uniform_location("transform"), 1,
                     GL_FALSE, glm::value_ptr(transform));
                 glUseProgram(0);
+            }
+
+            for (const auto &entity : entities_to_remove)
+            {
+                _bullets.remove(entity);
+                registry.destroy(entity);
             }
         }
 
