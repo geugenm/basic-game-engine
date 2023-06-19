@@ -186,6 +186,7 @@ struct opengl_texture_system final
         {
             // TODO: fix the pi angle uneeded rotation for the whole 2pi (edge
             // case)
+            // TODO: fix window proprotions position calculation bug
             auto &tank_turret_sprite = view.get<sprite>(_tank_turret);
 
             // Transforming SDL mouse coordinates to opengl texture coordinates
@@ -210,7 +211,7 @@ struct opengl_texture_system final
             // rotation
             tank_turret_sprite._transform._current_rotation_angle =
                 glm::mix(tank_turret_sprite._transform._current_rotation_angle,
-                         angle, 0.1f);
+                         angle, 0.007f);
 
             auto transform1 = glm::rotate(
                 offset_matrix4,

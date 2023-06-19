@@ -147,4 +147,11 @@ struct sprite
         return result;
     }
 };
+
+enum class game_states
+{
+    paused,
+    played,
+    in_menu
+};
 } // namespace sdk

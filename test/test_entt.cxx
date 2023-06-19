@@ -10,6 +10,7 @@ int main(int argc, char *argv[], char *envp[])
     while (system.render_engine.is_initialized(registry))
     {
         system.update(registry);
+        system.handle_events(registry);
     }
 
     return EXIT_SUCCESS;

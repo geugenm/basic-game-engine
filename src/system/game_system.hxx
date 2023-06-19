@@ -1,6 +1,7 @@
 #pragma once
 
 #include "audio_system.hxx"
+#include "components/general_components.hxx"
 #include "imgui_system.hxx"
 #include "opengl_shader_initializer_system.hxx"
 #include "opengl_texture.hxx"
@@ -17,6 +18,7 @@ struct game_system
     [[no_unique_address]] opengl_shader_initializer_system shader_system;
 
     sdl_gl_engine render_engine;
+    entt::entity game_state_entity;
 
     [[no_unique_address]] imgui_system imgui;
     // audio_system audio{"../resources/wav/car_on.WAV"};
@@ -29,14 +31,22 @@ struct game_system
         texture_system.test(registry);
         sdk::opengl_shader_initializer_system::init(registry);
         texture_system.init_on(registry, render_engine._window_entity);
+
+        game_states state = game_states::played;
+        game_state_entity = registry.create();
+        registry.emplace<game_states>(game_state_entity, state);
     }
 
     void update(entt::registry &registry)
     {
         texture_system.update(registry, render_engine._window_entity);
+
         imgui.update(registry);
         render_engine.update(registry);
+    }
 
+    void handle_events(entt::registry &registry)
+    {
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -45,9 +55,13 @@ struct game_system
                 render_engine.destroy(registry);
             }
 
-            imgui_subsdk::process_event(event);
+            if (registry.view<game_states>().get<game_states>(
+                    game_state_entity) == game_states::played)
+            {
+                texture_system.handle_events(event);
+            }
 
-            texture_system.handle_events(event);
+            imgui_subsdk::process_event(event);
         }
     }
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "components/general_components.hxx"
 #include "imgui_wrapper.hxx"
 #include "sdl_render_engine.hxx"
 
@@ -33,6 +34,13 @@ struct imgui_system
 
         if (ImGui::Button("Pause", ImVec2(80, 40)))
         {
+            for (auto entity : registry.view<game_states>())
+            {
+                auto &state =
+                    registry.view<game_states>().get<game_states>(entity);
+                state = game_states::paused;
+                LOG(INFO) << "Game paused";
+            }
             ImGui::OpenPopup("Pause");
         }
 
