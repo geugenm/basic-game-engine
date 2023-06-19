@@ -141,10 +141,6 @@ struct opengl_texture_system final
 
             auto bullet_sprite       = view.get<sprite>(_bullet);
             bullet_sprite._transform = m_turret_transform;
-            LOG(INFO) << "Rotation bullet: "
-                      << bullet_sprite._transform._current_rotation_angle
-                      << " vs turret: "
-                      << m_turret_transform._current_rotation_angle;
 
             _bullets.push_back(bullet);
 
@@ -220,12 +216,16 @@ struct opengl_texture_system final
                 static constexpr float velocity = 0.2f;
                 bullet_sprite._transform._position += rotor * velocity;
 
-                const auto scale_matrix = glm::translate(
+                const auto offset_matrix = glm::translate(
                     scale_matrix4,
                     glm::vec3(bullet_sprite._transform._position.x,
                               bullet_sprite._transform._position.y, 0.0f));
 
-                const auto transform = scale_matrix * aspect_matrix;
+                auto transform = glm::rotate(
+                    offset_matrix,
+                    bullet_sprite._transform._current_rotation_angle,
+                    glm::vec3(0.0f, 0.0f, 1.0f));
+                transform = transform * aspect_matrix;
 
                 glUseProgram(bullet_sprite._shader._program_id);
 
