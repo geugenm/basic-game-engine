@@ -48,7 +48,7 @@ struct opengl_texture_system final
         sprite tank_turret = sprite::get_sprite_from_file("turret");
         sprite battlefield = sprite::get_sprite_from_file("battlefield");
 
-        sprite bullet = sprite::get_sprite_from_file("turret");
+        sprite bullet = sprite::get_sprite_from_file("shell");
 
         // ! The order is important
         registry.emplace<sprite>(_bullet, bullet);
@@ -136,10 +136,13 @@ struct opengl_texture_system final
 
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
         {
+            // TODO: make new bullet texture
+
             auto view           = registry.view<sprite>();
             entt::entity bullet = registry.create();
 
-            auto bullet_sprite       = view.get<sprite>(_bullet);
+            sprite bullet_sprite = view.get<sprite>(_bullet);
+
             bullet_sprite._transform = m_turret_transform;
 
             _bullets.push_back(bullet);
@@ -216,8 +219,10 @@ struct opengl_texture_system final
                 static constexpr float velocity = 0.2f;
                 bullet_sprite._transform._position += rotor * velocity;
 
+                const auto scale_matrix =
+                    glm::scale(singular_matrix4, glm::vec3(0.2f, 0.2f, 0.9f));
                 const auto offset_matrix = glm::translate(
-                    scale_matrix4,
+                    scale_matrix,
                     glm::vec3(bullet_sprite._transform._position.x,
                               bullet_sprite._transform._position.y, 0.0f));
 
