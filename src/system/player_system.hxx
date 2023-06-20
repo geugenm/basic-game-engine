@@ -49,6 +49,8 @@ public:
 
         registry.emplace<sprite>(m_player.m_turret, tank_turret);
         registry.emplace<sprite>(m_player.m_hull, tank_hull);
+
+        m_player.m_bullet_sample = registry.create();
         registry.emplace<sprite>(m_player.m_bullet_sample, bullet);
 
         auto sprite_shader_view = registry.view<sprite>();
@@ -130,7 +132,7 @@ public:
             registry.emplace<sprite>(bullet, bullet_sprite);
         }
 
-        auto &turret_sprite = registry.get<sprite>(m_player.m_turret);
+        auto const &turret_sprite = registry.get<sprite>(m_player.m_turret);
 
         // Transforming SDL mouse coordinates to opengl texture coordinates
         glm::vec2 mouse_position;
