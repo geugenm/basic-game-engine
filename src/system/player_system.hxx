@@ -32,8 +32,6 @@ struct player
 
     static constexpr float k_hull_rotation_speed = 0.02f;
     static constexpr float k_hull_movement_speed = 0.01f;
-
-    static constexpr float k_turret_rotation_speed = 0.008f;
 };
 
 std::stringstream get_vector2_info(const glm::vec2 &vector)
@@ -158,17 +156,10 @@ public:
 
         mouse_position = glm::normalize(mouse_position);
 
-        LOG(INFO) << get_vector2_info(mouse_position).str();
-        LOG(INFO) << get_vector2_info(turret_sprite._transform._position).str();
-        LOG(INFO) << get_vector2_info(mouse_position -
-                                      turret_sprite._transform._position)
-                         .str();
-
-        // Normalized X-axis vector for relative angle calculation
-        auto axes_x_direction = glm::vec2(1.0f, 0.0f);
-
-        m_turret_target_rotation_angle = glm::orientedAngle(
-            glm::normalize(axes_x_direction), glm::normalize(mouse_position));
+        LOG(INFO) << "Mouse position: "
+                  << get_vector2_info(mouse_position).str();
+        LOG(INFO) << "Turret position: "
+                  << get_vector2_info(turret_sprite._transform._position).str();
     }
 
     void update(entt::registry &registry,
@@ -290,7 +281,7 @@ private:
         // TODO: fix the pi angle uneeded rotation for the whole 2pi (edge
         // case)
         // TODO: fix window proprotions position calculation bug
-        auto &turret_sprite = registry.get<sprite>(m_player.m_turret);
+        auto const &turret_sprite = registry.get<sprite>(m_player.m_turret);
 
         static const auto scale_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(0.6f, 0.6f, 1.0f));
@@ -299,19 +290,7 @@ private:
             glm::vec3(turret_sprite._transform._position.x,
                       turret_sprite._transform._position.y, 0.0f));
 
-        // Linear interpolation for the angle in order to get smooth
-        // rotation
-        turret_sprite._transform._current_rotation_angle =
-            m_turret_target_rotation_angle;
-
-        const auto rotor = glm::vec2(
-            glm::cos(turret_sprite._transform._current_rotation_angle),
-            glm::sin(turret_sprite._transform._current_rotation_angle));
-
-        const auto rotation =
-            glm::rotate(offset_matrix, m_turret_target_rotation_angle,
-                        glm::vec3(0.0f, 0.0f, 1.0f));
-        const auto transform = rotation * aspect_matrix;
+        const auto transform = offset_matrix * aspect_matrix;
 
         glUseProgram(turret_sprite._shader._program_id);
         glUniformMatrix4fv(
@@ -323,10 +302,6 @@ private:
     player m_player;
 
     glm::vec2 m_window_size;
-
-    float m_turret_target_rotation_angle = 0.0f;
-
-    friend class enemy_system;
 };
 
 } // namespace sdk

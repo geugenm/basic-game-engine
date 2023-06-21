@@ -6,7 +6,6 @@
 #include "SDL_mouse.h"
 
 #include "components/general_components.hxx"
-#include "enemy_system.hxx"
 #include "nlohmann/json_fwd.hpp"
 #include "player_system.hxx"
 #include "render/picopng.hxx"
@@ -46,7 +45,6 @@ struct opengl_texture_system final
     void init_on(entt::registry &registry, entt::entity &window_entity)
     {
         m_player_system.init(registry);
-        m_enemy_system.init(registry);
         auto sdl_context = registry.get<sdl_render_context>(window_entity);
 
         auto view = registry.view<sprite>();
@@ -91,8 +89,6 @@ struct opengl_texture_system final
             registry.get<sdl_render_context>(window_entity);
 
         m_player_system.update(registry, sdl_context);
-        m_enemy_system.update(registry, sdl_context,
-                              m_player_system.get_player());
 
         const float aspect_ratio = static_cast<float>(sdl_context.get_width()) /
                                    static_cast<float>(sdl_context.get_height());
@@ -317,12 +313,7 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
-    transform m_hull_transform;
-
-    transform m_turret_transform;
-
     player_system m_player_system;
-    enemy_system m_enemy_system;
 };
 
 } // namespace sdk
