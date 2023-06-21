@@ -46,7 +46,8 @@ get_file_json_content(std::filesystem::path file_path)
     if (!std::filesystem::exists(file_path))
     {
         throw std::invalid_argument("Json file '" + file_path.string() +
-                                    "' was not found");
+                                    "' was not found, looking for it in: " +
+                                    std::filesystem::current_path().string());
     }
 
     std::ifstream input_file(file_path);
@@ -199,7 +200,7 @@ struct sprite
 
     [[nodiscard]] static sprite get_sprite_from_file(
         const std::string_view &json_parameters_file_name,
-        const std::filesystem::path &resources_path = "../resources/sprites")
+        const std::filesystem::path &resources_path = "../assets/sprites")
     {
 
         const std::filesystem::path texture_path =

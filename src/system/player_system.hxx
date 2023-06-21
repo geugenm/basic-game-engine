@@ -3,9 +3,11 @@
 #include <entt/entity/fwd.hpp>
 #include <entt/entt.hpp>
 
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/ext/quaternion_transform.hpp>
 #include <glm/fwd.hpp>
+#include <glm/geometric.hpp>
 #include <glm/glm.hpp>
 
 #include <glm/glm.hpp>
@@ -33,6 +35,16 @@ struct player
 
     static constexpr float k_turret_rotation_speed = 0.008f;
 };
+
+std::stringstream get_vector2_info(const glm::vec2 &vector)
+{
+    std::stringstream ss;
+    ss << "Vector position: [" << vector.x << "] [" << vector.y
+       << "], Angle oriented(-pi to pi): "
+       << glm::orientedAngle(glm::vec2(1.0f, 0.0f), glm::normalize(vector))
+       << std::endl;
+    return ss;
+}
 
 class player_system
 {
@@ -143,13 +155,20 @@ public:
 
         // Y-axis inversion (SDL coordinates)
         mouse_position.y *= -1.0f;
+
         mouse_position = glm::normalize(mouse_position);
+
+        LOG(INFO) << get_vector2_info(mouse_position).str();
+        LOG(INFO) << get_vector2_info(turret_sprite._transform._position).str();
+        LOG(INFO) << get_vector2_info(mouse_position -
+                                      turret_sprite._transform._position)
+                         .str();
 
         // Normalized X-axis vector for relative angle calculation
         auto axes_x_direction = glm::vec2(1.0f, 0.0f);
 
-        m_turret_target_rotation_angle =
-            glm::orientedAngle(axes_x_direction, mouse_position);
+        m_turret_target_rotation_angle = glm::orientedAngle(
+            glm::normalize(axes_x_direction), glm::normalize(mouse_position));
     }
 
     void update(entt::registry &registry,
@@ -282,19 +301,24 @@ private:
 
         // Linear interpolation for the angle in order to get smooth
         // rotation
-        turret_sprite._transform._current_rotation_angle = glm::mix(
-            turret_sprite._transform._current_rotation_angle,
-            m_turret_target_rotation_angle, player::k_turret_rotation_speed);
+        turret_sprite._transform._current_rotation_angle =
+            m_turret_target_rotation_angle;
+        
+        const auto rotor = glm::vec2(
+            glm::cos(turret_sprite._transform._current_rotation_angle),
+            glm::sin(turret_sprite._transform._current_rotation_angle));
 
-        const auto rotation = glm::rotate(
-            offset_matrix, turret_sprite._transform._current_rotation_angle,
-            glm::vec3(0.0f, 0.0f, 1.0f));
+        const auto rotation =
+            glm::rotate(offset_matrix, m_turret_target_rotation_angle,
+                        glm::vec3(0.0f, 0.0f, 1.0f));
         const auto transform = rotation * aspect_matrix;
 
         glUseProgram(turret_sprite._shader._program_id);
         glUniformMatrix4fv(
             turret_sprite._shader.get_uniform_location("transform"), 1,
             GL_FALSE, glm::value_ptr(transform));
+        glUniform2f(turret_sprite._shader.get_uniform_location("direction"),
+                    rotor.x, rotor.y);
         glUseProgram(0);
     }
 

@@ -21,7 +21,7 @@ struct game_system
     entt::entity game_state_entity;
 
     [[no_unique_address]] imgui_system imgui;
-    // audio_system audio{"../resources/wav/car_on.WAV"};
+    // audio_system audio{"../assets/wav/car_on.WAV"};
 
     game_system(entt::registry &registry, const char *title, int height,
                 int width)

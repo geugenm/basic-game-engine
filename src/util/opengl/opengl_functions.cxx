@@ -187,9 +187,8 @@ GLuint opengl_subsdk::get_new_compiled_shader(GLenum shader_type,
 
     if (!success)
     {
-        std::string log;
-        glGetShaderInfoLog(result_shader, OPENGL_INFO_LOG_SIZE, nullptr,
-                           log.data());
+        char log[512];
+        glGetShaderInfoLog(result_shader, OPENGL_INFO_LOG_SIZE, nullptr, log);
 
         std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n" << log << std::endl;
         throw std::domain_error("Failed to compile shader");

@@ -2,7 +2,7 @@ message(STATUS "Copying 'resources' to build folder...")
 
 set(EXCLUDED_EXTENSIONS cpp cxx c hpp hxx h txt)
 
-file(GLOB_RECURSE ALL_FILES resources/*)
+file(GLOB_RECURSE ALL_FILES assets/*)
 
 foreach (FILE ${ALL_FILES})
     get_filename_component(EXTENSION ${FILE} EXT)
