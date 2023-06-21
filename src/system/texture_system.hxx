@@ -58,7 +58,7 @@ struct opengl_texture_system final
 
         for (auto entity : view)
         {
-            auto &ent_sprite = view.get<sprite>(entity);
+            auto const &ent_sprite = view.get<sprite>(entity);
             glUseProgram(ent_sprite._shader._program_id);
 
             glUniform1i(ent_sprite._shader.get_uniform_location("texture"),
