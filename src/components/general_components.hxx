@@ -1,11 +1,15 @@
 #pragma once
 
-#include "../util/opengl/glad/glad.h"
 #include <nlohmann/json.hpp>
+#include <util/opengl/glad/glad.h>
+#include <util/opengl/opengl_functions.hxx>
 
 #include <filesystem>
+#include <fstream>
 #include <glm/glm.hpp>
 #include <vector>
+
+#include <SDL3/SDL.h>
 
 namespace sdk
 {

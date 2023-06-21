@@ -1,16 +1,15 @@
-#include <gengine_core.hxx> // include header file for the sdl_gl_engine class
+#include <system/game_system.hxx>
 
-int main(int argc, char *argv[], char *envp[])
+int main(int argc, char *argv[])
 {
-    entt::registry registry;
-    // create an instance of the game_system struct
-    sdk::game_system system(registry, "My Window", 1000, 1000);
+    entt::registry main_registry;
 
-    // run the update method in a loop until the quit event occurs
-    while (system.render_engine.is_initialized(registry))
+    sdk::game_system system(main_registry, "My Window", 1000, 1000);
+
+    while (system.is_initialized(main_registry))
     {
-        system.update(registry);
-        system.handle_events(registry);
+        system.update(main_registry);
+        system.handle_events(main_registry);
     }
 
     return EXIT_SUCCESS;
