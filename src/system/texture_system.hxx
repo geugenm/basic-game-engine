@@ -10,7 +10,7 @@
 #include "nlohmann/json_fwd.hpp"
 #include "player_system.hxx"
 #include "render/picopng.hxx"
-#include "sdl_render_engine.hxx"
+#include "sdl_render_system.hxx"
 
 #include <entt/entity/entity.hpp>
 #include <entt/entity/fwd.hpp>

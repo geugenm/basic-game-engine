@@ -4,8 +4,8 @@
 #include "components/general_components.hxx"
 #include "imgui_system.hxx"
 #include "opengl_shader_initializer_system.hxx"
-#include "opengl_texture.hxx"
-#include "sdl_render_engine.hxx"
+#include "sdl_render_system.hxx"
+#include "texture_system.hxx"
 
 #include "entt/entt.hpp"
 

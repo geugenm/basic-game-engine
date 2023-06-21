@@ -1,4 +1,4 @@
-#include "opengl_texture.hxx"
+#include "texture_system.hxx"
 
 namespace sdk
 {
