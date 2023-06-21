@@ -1,6 +1,6 @@
 include(${CMAKE_CURRENT_LIST_DIR}/../CPM.cmake.cmake)
 
-CPMAddPackage(
+cpmaddpackage(
         NAME EnTT
         GITHUB_REPOSITORY skypjack/entt
         GIT_TAG v3.11.1
