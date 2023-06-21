@@ -1,5 +1,8 @@
 # Set minimum CMake version and project details
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+
+cmake_policy(SET CMP0048 NEW)
+
 project(basic_game_engine VERSION 1.0.0 LANGUAGES CXX C)
 
 message(STATUS "Configuring ${PROJECT_NAME}...")

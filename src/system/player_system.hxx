@@ -192,7 +192,7 @@ public:
         handle_turret(registry, aspect_matrix);
     }
 
-    [[nodiscard]] player get_player() const
+    [[nodiscard]] player &get_player()
     {
         return m_player;
     }

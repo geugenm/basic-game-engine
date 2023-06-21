@@ -1,21 +1,16 @@
 #pragma once
 
-#include <SDL3/SDL.h>
-
-#include "SDL_events.h"
-#include "SDL_mouse.h"
+#include <SDL_events.h>
+#include <SDL_mouse.h>
 
 #include "components/general_components.hxx"
-#include "nlohmann/json_fwd.hpp"
 #include "player_system.hxx"
-#include "render/picopng.hxx"
 #include "sdl_render_system.hxx"
 
-#include <entt/entity/entity.hpp>
-#include <entt/entity/fwd.hpp>
+#include <nlohmann/json_fwd.hpp>
+#include <render/picopng.hxx>
+
 #include <entt/entt.hpp>
-#include <glm/ext/quaternion_geometric.hpp>
-#include <glm/ext/quaternion_transform.hpp>
 #include <glm/fwd.hpp>
 #include <opengl_functions.hxx>
 
@@ -23,7 +18,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <format>
 #include <glm/gtx/vector_angle.hpp>
 #include <nlohmann/json.hpp>
 
@@ -92,6 +86,7 @@ struct opengl_texture_system final
 
         const float aspect_ratio = static_cast<float>(sdl_context.get_width()) /
                                    static_cast<float>(sdl_context.get_height());
+
         const glm::mat4 aspect_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
 

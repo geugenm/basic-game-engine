@@ -1,11 +1,11 @@
 include(${CMAKE_CURRENT_LIST_DIR}/../CPM.cmake.cmake)
 
-CPMAddPackage(
+cpmaddpackage(
         NAME SDL3
         GITHUB_REPOSITORY libsdl-org/SDL
-        GIT_TAG d032492aaba19c108dfd5e52866573bd02bf6148
+        GIT_TAG 6306ee9f421fac43891b22a417d7c5d5eb4e8b31
         OPTIONS
-        
+
         "SDL_SHARED ON"
 
         "SDL_VIRTUAL_JOYSTICK OFF"
