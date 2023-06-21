@@ -32,14 +32,24 @@ struct game_system
         sdk::opengl_shader_initializer_system::init(registry);
         texture_system.init_on(registry, render_engine._window_entity);
 
-        game_states state = game_states::played;
+        game_states state = game_states::in_menu;
         game_state_entity = registry.create();
         registry.emplace<game_states>(game_state_entity, state);
     }
 
     void update(entt::registry &registry)
     {
-        texture_system.update(registry, render_engine._window_entity);
+        auto const &state = registry.get<game_states>(game_state_entity);
+
+        if (state == game_states::played)
+        {
+            texture_system.update(registry, render_engine._window_entity);
+        }
+
+        if (state == game_states::paused)
+        {
+            texture_system.update(registry, render_engine._window_entity);
+        }
 
         imgui.update(registry);
         render_engine.update(registry);

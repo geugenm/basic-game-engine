@@ -21,7 +21,6 @@ void main()
     const vec4 light_purple = vec4(0.7, 0.3, 0.8, 1.0);
     const float border_thickness = 0.02;
     const float diagonal_thickness = 0.005;
-    const float lineWidth = 0.001;
 
     vec2 diagonal_start = vec2(border_thickness, border_thickness);
     vec2 diagonal_end = vec2(1.0 - border_thickness, 1.0 - border_thickness);
@@ -31,14 +30,10 @@ void main()
 
     bool near_diagonal = near_line(TexCoord, diagonal_start, diagonal_end, diagonal_thickness);
 
-    bool near_red_line = is_near_red_line(TexCoord, direction, lineWidth);
-
     vec4 bottomColor = texture2D(texture, TexCoord);
 
     if (near_border || near_diagonal) {
         color = light_purple;
-    } else if (near_red_line) {
-        color = vec4(1.0, 0.0, 0.0, 1.0); // Red color
     } else {
         color = bottomColor;
     }

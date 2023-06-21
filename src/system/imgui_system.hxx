@@ -1,9 +1,11 @@
 #pragma once
 
 #include "components/general_components.hxx"
+#include "imgui.h"
 #include "imgui_wrapper.hxx"
 #include "sdl_render_engine.hxx"
 
+#include <entt/entity/fwd.hpp>
 #include <entt/entt.hpp>
 
 namespace sdk
@@ -13,8 +15,7 @@ struct imgui_system
 {
     void init(entt::registry &registry, entt::entity &entity)
     {
-        auto view         = registry.view<sdl_render_context>();
-        auto &sdl_context = view.get<sdl_render_context>(entity);
+        auto &sdl_context = registry.get<sdl_render_context>(entity);
 
         imgui_subsdk::init_imgui(sdl_context._window, sdl_context._context);
     }
@@ -23,25 +24,38 @@ struct imgui_system
     {
         imgui_subsdk::new_frame();
 
-        // Add UI elements
-        ImGui::SetNextWindowSize(ImVec2(400, 200));
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::Begin("Game UI", nullptr,
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-                         ImGuiWindowFlags_NoCollapse);
-
-        ImGui::ProgressBar(0.7f, ImVec2(-1, 0), "HP");
-
-        if (ImGui::Button("Pause", ImVec2(80, 40)))
+        for (auto entity : registry.view<game_states>())
         {
-            for (auto entity : registry.view<game_states>())
+            auto &state = registry.get<game_states>(entity);
+
+            if (state == game_states::in_menu)
             {
-                auto &state =
-                    registry.view<game_states>().get<game_states>(entity);
-                state = game_states::paused;
+                on_menu(registry, state);
             }
-            ImGui::OpenPopup("Pause");
+
+            if (state == game_states::played)
+            {
+                on_play(registry, state);
+            }
+
+            if (state == game_states::paused)
+            {
+                on_pause(registry, state);
+            }
+
+            if (state == game_states::exited)
+            {
+                on_exit(registry, state);
+            }
         }
+        
+        imgui_subsdk::render();
+    }
+
+private:
+    void on_pause(entt::registry &registry, game_states &current_state)
+    {
+        ImGui::OpenPopup("Pause");
 
         if (ImGui::BeginPopupModal("Pause", nullptr,
                                    ImGuiWindowFlags_AlwaysAutoResize))
@@ -56,13 +70,12 @@ struct imgui_system
             ImGui::Separator();
 
             // Exit button
-            if (ImGui::Button("Exit", ImVec2(120, 0)))
+            if (ImGui::Button("Main menu", ImVec2(120, 0)))
             {
                 for (auto entity : registry.view<game_states>())
                 {
-                    auto &state =
-                        registry.view<game_states>().get<game_states>(entity);
-                    state = game_states::exited;
+                    auto &state = registry.get<game_states>(entity);
+                    state       = game_states::in_menu;
                 }
                 ImGui::CloseCurrentPopup();
                 // Do something
@@ -74,9 +87,8 @@ struct imgui_system
             {
                 for (auto entity : registry.view<game_states>())
                 {
-                    auto &state =
-                        registry.view<game_states>().get<game_states>(entity);
-                    state = game_states::played;
+                    auto &state = registry.get<game_states>(entity);
+                    state       = game_states::played;
                 }
                 ImGui::CloseCurrentPopup();
                 // Do something
@@ -84,15 +96,84 @@ struct imgui_system
 
             ImGui::EndPopup();
         }
+    }
+
+    void on_menu(entt::registry &registry, game_states &current_state)
+    {
+        ImGui::OpenPopup("Menu");
+
+        if (ImGui::BeginPopupModal("Menu", nullptr,
+                                   ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            // Customize button style
+            ImGuiStyle &style             = ImGui::GetStyle();
+            ImVec4 button_color           = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
+            ImVec4 button_hover_color     = ImVec4(0.2f, 0.2f, 0.2f, 1.0f);
+            ImVec4 button_active_color    = ImVec4(0.3f, 0.3f, 0.3f, 1.0f);
+            style.Colors[ImGuiCol_Button] = button_color;
+            style.Colors[ImGuiCol_ButtonHovered] = button_hover_color;
+            style.Colors[ImGuiCol_ButtonActive]  = button_active_color;
+            style.FrameRounding                  = 4.0f;
+
+            // Customize button layout
+            ImVec2 button_size = ImVec2(120, 30);
+
+            ImGui::Separator();
+            if (ImGui::Button("Play", ImVec2(120, 0)))
+            {
+                current_state = game_states::played;
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Campaign (Soon...)", ImVec2(120, 0)))
+            {
+                // TODO: ...
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::Button("Settings (Soon...)", ImVec2(120, 0)))
+            {
+                // TODO: ...
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Exit", ImVec2(120, 0)))
+            {
+                current_state = game_states::exited;
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+
+    void on_exit(entt::registry &registry, game_states &current_state) {}
+
+    void on_play(entt::registry &registry, game_states &current_state)
+    {
+        // Add UI elements
+        ImGui::SetNextWindowSize(ImVec2(400, 200));
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::Begin("Game UI", nullptr,
+                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                         ImGuiWindowFlags_NoCollapse);
+
+        ImGui::ProgressBar(0.7f, ImVec2(-1, 0), "HP");
+
+        if (ImGui::Button("Pause", ImVec2(80, 40)))
+        {
+            for (auto entity : registry.view<game_states>())
+            {
+                auto &state = registry.get<game_states>(entity);
+                state       = game_states::paused;
+            }
+        }
 
         ImGui::SameLine(ImGui::GetWindowWidth() - 80);
         ImGui::Text("<WeaponID>");
 
         ImGui::End();
-
-        ImGui::ShowDebugLogWindow();
-
-        imgui_subsdk::render();
     }
 };
 

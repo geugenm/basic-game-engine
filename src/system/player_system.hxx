@@ -303,7 +303,7 @@ private:
         // rotation
         turret_sprite._transform._current_rotation_angle =
             m_turret_target_rotation_angle;
-        
+
         const auto rotor = glm::vec2(
             glm::cos(turret_sprite._transform._current_rotation_angle),
             glm::sin(turret_sprite._transform._current_rotation_angle));
@@ -317,8 +317,6 @@ private:
         glUniformMatrix4fv(
             turret_sprite._shader.get_uniform_location("transform"), 1,
             GL_FALSE, glm::value_ptr(transform));
-        glUniform2f(turret_sprite._shader.get_uniform_location("direction"),
-                    rotor.x, rotor.y);
         glUseProgram(0);
     }
 
