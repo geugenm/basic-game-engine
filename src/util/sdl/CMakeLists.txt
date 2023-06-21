@@ -13,3 +13,4 @@ target_link_libraries(sdl3_utils PUBLIC
                       SDL3::SDL3-shared
                       EasyLogging::EasyLogging
                       )
+

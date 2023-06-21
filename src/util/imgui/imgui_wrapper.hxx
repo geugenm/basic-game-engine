@@ -3,15 +3,13 @@
 #include <SDL3/SDL.h>
 #include <imgui.h>
 
-#include <string_view>
 #include <stdexcept>
+#include <string_view>
 
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
 
 #include "imgui_style.hxx"
-
-#include "event.hxx"
 
 namespace imgui_subsdk
 {

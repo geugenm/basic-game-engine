@@ -6,7 +6,6 @@ add_library(opengl_utils SHARED)
 
 target_sources(opengl_utils PUBLIC ${SOURCES})
 target_include_directories(opengl_utils PUBLIC .)
-target_link_libraries(opengl_utils PRIVATE engine_includes)
 
 target_precompile_headers(opengl_utils PUBLIC
                           glad/glad.h
