@@ -1,8 +1,8 @@
 #pragma once
 
+#include <glad/glad.h>
 #include <nlohmann/json.hpp>
-#include <util/opengl/glad/glad.h>
-#include <util/opengl/opengl_functions.hxx>
+#include <opengl_functions.hxx>
 
 #include <filesystem>
 #include <fstream>

@@ -10,9 +10,11 @@ file(GLOB_RECURSE IMGUI_BACKEND_SOURCES CONFIGURE_DEPENDS
 add_library(imgui_utils SHARED)
 
 target_sources(imgui_utils PRIVATE ${SOURCES} ${IMGUI_BACKEND_SOURCES})
-target_include_directories(imgui_utils PUBLIC .)
+target_include_directories(imgui_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(imgui_utils PRIVATE sdl3_utils)
+target_link_libraries(imgui_utils PRIVATE
+                      sdl3_utils)
+
 target_link_libraries(imgui_utils PUBLIC
                       imgui
                       )

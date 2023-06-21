@@ -5,7 +5,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx")
 add_library(opengl_utils SHARED)
 
 target_sources(opengl_utils PUBLIC ${SOURCES})
-target_include_directories(opengl_utils PUBLIC .)
+target_include_directories(opengl_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_precompile_headers(opengl_utils PUBLIC
                           glad/glad.h

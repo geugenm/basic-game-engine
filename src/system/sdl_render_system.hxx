@@ -1,7 +1,8 @@
 #pragma once
 
-#include "engine_error.hxx"
-#include "sdl_functions.hxx"
+#include <engine_error.hxx>
+#include <general_components.hxx>
+#include <sdl_functions.hxx>
 
 #include <entt/entt.hpp>
 

@@ -5,12 +5,11 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx")
 add_library(sdk_components SHARED)
 
 target_sources(sdk_components PUBLIC ${SOURCES})
-target_include_directories(sdk_components PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-
-target_link_libraries(sdk_components PRIVATE EnTT::EnTT)
+target_include_directories(sdk_components PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(sdk_components PUBLIC
-                      opengl_sdk
-                      imgui_sdk
-                      sdl3_sdk
+                      sdl3_utils
+                      opengl_utils
+                      imgui_utils
+                      nlohmann_json
                       )

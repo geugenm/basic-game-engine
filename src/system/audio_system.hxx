@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entt/entt.hpp"
-#include "util/sdl/sdl_sound.hxx"
+#include <sdl_sound.hxx>
 
 namespace sdk
 {

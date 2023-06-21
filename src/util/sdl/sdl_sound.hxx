@@ -1,12 +1,12 @@
 #pragma once
 
-#include "logger.hxx"
-#include "sdl_functions.hxx"
+#include <sdl_functions.hxx>
 
 #include <filesystem>
 
 #include <chrono>
 #include <cmath>
+#include <cstring>
 
 namespace sdl_subsdk
 {
@@ -42,7 +42,7 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
 
     if (first_time)
     {
-        LOG(INFO) << "start audio_callback." << std::endl;
+        std::cout << "start audio_callback." << std::endl;
         first_time = false;
     }
 
@@ -171,31 +171,31 @@ public:
 
     void initialize()
     {
-        LOG(INFO) << "Initializing audio mixer";
+        std::cout << "Initializing audio mixer";
 
         if (SDL_Init(SDL_INIT_AUDIO) < 0)
         {
-            LOG(ERROR) << "Can't init audio: " << SDL_GetError();
+            std::cout << "Can't init audio: " << SDL_GetError();
             throw std::invalid_argument("Failed to initialize SDL audio");
         }
 
-        LOG(INFO) << "SDL audio initialized";
+        std::cout << "SDL audio initialized";
 
-        LOG(INFO) << "Loading sound file: " << sound_file_name_;
+        std::cout << "Loading sound file: " << sound_file_name_;
 
         sound_file_ = SDL_RWFromFile(sound_file_name_, "rb");
         if (sound_file_ == nullptr)
         {
-            LOG(ERROR) << "Can't open file: " << sound_file_name_;
+            std::cout << "Can't open file: " << sound_file_name_;
             throw std::invalid_argument(
                 "Failed to open sound file '" + std::string(sound_file_name_) +
                 "', current directory: " +
                 std::filesystem::current_path().string());
         }
 
-        LOG(INFO) << "Loaded sound file: " << sound_file_name_;
+        std::cout << "Loaded sound file: " << sound_file_name_;
 
-        LOG(INFO) << "Loading audio spec from file: " << sound_file_name_;
+        std::cout << "Loading audio spec from file: " << sound_file_name_;
 
         audio_spec_ = SDL_LoadWAV_RW(
             sound_file_, auto_delete_file_, &audio_spec_from_file_,
@@ -203,12 +203,12 @@ public:
 
         if (audio_spec_ == nullptr)
         {
-            LOG(INFO) << "Can't parse audio spec from file: "
+            std::cout << "Can't parse audio spec from file: "
                       << sound_file_name_;
             throw std::invalid_argument("Failed to parse audio spec");
         }
 
-        LOG(INFO) << "Loaded audio spec from file: " << sound_file_name_;
+        std::cout << "Loaded audio spec from file: " << sound_file_name_;
 
         loaded_audio_buff_ = {
             .start       = sample_buffer_from_file_,
@@ -216,7 +216,7 @@ public:
             .current_pos = 0,
             .note        = {.frequency = 0, .time = 0, .use_note = false}};
 
-        LOG(INFO) << "Audio buffer from file size: "
+        std::cout << "Audio buffer from file size: "
                   << sample_buffer_len_from_file_ << " B ("
                   << sample_buffer_len_from_file_ / double(1024 * 1024)
                   << ") MB";
@@ -241,17 +241,17 @@ public:
             device_name, is_capture_device, &desired, &returned, allow_changes);
         if (audio_device_id_ == 0)
         {
-            LOG(INFO) << "Failed to open audio device: " << SDL_GetError();
+            std::cout << "Failed to open audio device: " << SDL_GetError();
             throw std::invalid_argument("Failed to open audio device");
         }
 
-        LOG(INFO) << "Audio device opened: " << audio_device_id_;
+        std::cout << "Audio device opened: " << audio_device_id_;
 
         if (desired.format != returned.format ||
             desired.channels != returned.channels ||
             desired.freq != returned.freq)
         {
-            LOG(INFO) << "Audio device settings are not equal:";
+            std::cout << "Audio device settings are not equal:";
             throw std::invalid_argument("Failed to open audio device");
         }
 
@@ -259,16 +259,16 @@ public:
         // now callback is firing
         SDL_PlayAudioDevice(audio_device_id_);
 
-        LOG(INFO) << "Audio device started";
+        std::cout << "Audio device started";
     }
 
     void destroy() const
     {
-        LOG(INFO) << "Pause audio device (stop audio thread)";
+        std::cout << "Pause audio device (stop audio thread)";
 
         SDL_PauseAudioDevice(audio_device_id_);
 
-        LOG(INFO) << "Close audio device";
+        std::cout << "Close audio device";
 
         SDL_CloseAudioDevice(audio_device_id_);
 

@@ -9,8 +9,7 @@ add_library(engine_sdk SHARED)
 target_include_directories(engine_sdk PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(engine_sdk PUBLIC
-                      sdk_util
-                      nlohmann_json
+                      sdk_systems
                       )
 
 

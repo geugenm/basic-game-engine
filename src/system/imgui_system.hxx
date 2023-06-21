@@ -1,9 +1,9 @@
 #pragma once
 
-#include "components/general_components.hxx"
-#include "imgui.h"
-#include "imgui_wrapper.hxx"
 #include "sdl_render_system.hxx"
+#include <general_components.hxx>
+#include <imgui.h>
+#include <imgui_wrapper.hxx>
 
 #include <entt/entity/fwd.hpp>
 #include <entt/entt.hpp>

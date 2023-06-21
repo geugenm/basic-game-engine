@@ -3,11 +3,12 @@
 #include <SDL_events.h>
 #include <SDL_mouse.h>
 
-#include "components/general_components.hxx"
 #include "player_system.hxx"
 #include "sdl_render_system.hxx"
+#include <general_components.hxx>
 
 #include <nlohmann/json_fwd.hpp>
+#include <ostream>
 #include <render/picopng.hxx>
 
 #include <entt/entt.hpp>
@@ -157,7 +158,8 @@ private:
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 
-        LOG(INFO) << "Texture loaded: " << texture._image_path.string();
+        std::cout << "Texture loaded: " << texture._image_path.string()
+                  << std::endl;
     }
 
     [[nodiscard]] static std::vector<unsigned char>
