@@ -26,16 +26,41 @@ namespace sdk
 {
 struct opengl_texture_system final
 {
-    entt::entity _battlefield;
+    entt::entity m_garage;
+    entt::entity m_chair;
+    entt::entity m_body;
+    entt::entity m_head;
+    entt::entity m_pants;
+    entt::entity m_hands;
 
     void test(entt::registry &registry)
     {
-        _battlefield = registry.create();
+        m_garage = registry.create();
+        m_body = registry.create();
+        m_chair = registry.create();
+        m_head = registry.create();
+        m_pants = registry.create();
+        m_hands = registry.create();
 
         sprite battlefield = sprite::get_sprite_from_file("level1");
-        battlefield._texture._needs_to_be_scaled = false;
 
-        registry.emplace<sprite>(_battlefield, battlefield);
+        sprite chair = sprite::get_sprite_from_file("chair");
+
+        sprite body = sprite::get_sprite_from_file("body");
+
+        sprite head = sprite::get_sprite_from_file("head");
+
+        sprite pants = sprite::get_sprite_from_file("pants");
+
+        sprite hands = sprite::get_sprite_from_file("hands");
+
+
+        registry.emplace<sprite>(m_garage, battlefield);
+        registry.emplace<sprite>(m_chair, chair);
+        registry.emplace<sprite>(m_body, body);
+        registry.emplace<sprite>(m_head, head);
+        registry.emplace<sprite>(m_pants, pants);
+        registry.emplace<sprite>(m_hands, hands);
     }
 
     void init_on(entt::registry &registry, entt::entity &window_entity)
@@ -76,8 +101,19 @@ struct opengl_texture_system final
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        auto const &battlefield_sprite = registry.get<sprite>(_battlefield);
+        auto const &battlefield_sprite = registry.get<sprite>(m_garage);
+        auto const &chair_sprite = registry.get<sprite>(m_chair);
+        auto const &body_sprite = registry.get<sprite>(m_body);
+        auto const &head_sprite = registry.get<sprite>(m_head);
+        auto const &pants_sprite = registry.get<sprite>(m_pants);
+        auto const &hands_sprite = registry.get<sprite>(m_hands);
+
         battlefield_sprite.render();
+        chair_sprite.render();
+        pants_sprite.render();
+        hands_sprite.render();
+        body_sprite.render();
+        head_sprite.render();
 
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
@@ -91,12 +127,12 @@ struct opengl_texture_system final
 
         const auto transform = glm::mat4(1.0f);
 
-        glUseProgram(battlefield_sprite._shader._program_id);
-
-        glUniformMatrix4fv(
-            battlefield_sprite._shader.get_uniform_location("transform"), 1,
-            GL_FALSE, glm::value_ptr(transform));
-        glUseProgram(0);
+        battlefield_sprite.apply_transform(transform);
+        chair_sprite.apply_transform(transform);
+        body_sprite.apply_transform(transform);
+        head_sprite.apply_transform(transform);
+        pants_sprite.apply_transform(transform);
+        hands_sprite.apply_transform(transform);
     } // namespace sdk
 
 private:

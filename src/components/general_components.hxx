@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
 #include <opengl_functions.hxx>
 
@@ -158,8 +160,8 @@ struct opengl_texture
     std::vector<GLfloat> _vertices;
     std::vector<GLuint> _indices;
 
-    bool _need_generate_mipmaps = true;
-    bool _needs_to_be_scaled    = true;
+    bool _need_generate_mipmaps = false;
+    bool _needs_to_be_scaled    = false;
 
     GLint _number{};
 
@@ -192,6 +194,15 @@ struct sprite
     opengl_texture _texture;
 
     transform _transform;
+
+    void apply_transform(const glm::mat4 & transform) const {
+        glUseProgram(_shader._program_id);
+
+        glUniformMatrix4fv(
+            _shader.get_uniform_location("transform"), 1,
+            GL_FALSE, glm::value_ptr(transform));
+        glUseProgram(0);
+    }
 
     void render() const
     {
