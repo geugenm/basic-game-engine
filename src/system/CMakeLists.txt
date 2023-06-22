@@ -8,8 +8,7 @@ target_sources(sdk_systems PUBLIC ${SOURCES})
 
 target_include_directories(sdk_systems PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(sdk_systems PRIVATE EnTT::EnTT)
-
 target_link_libraries(sdk_systems PUBLIC
                       sdk_components
+                      EnTT::EnTT
                       )

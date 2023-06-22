@@ -26,20 +26,20 @@ namespace sdk
 {
 struct opengl_texture_system final
 {
-    entt::entity _battlefield{};
+    entt::entity _battlefield;
 
     void test(entt::registry &registry)
     {
         _battlefield = registry.create();
 
-        sprite battlefield = sprite::get_sprite_from_file("battlefield");
+        sprite battlefield = sprite::get_sprite_from_file("level1");
+        battlefield._texture._needs_to_be_scaled = false;
 
         registry.emplace<sprite>(_battlefield, battlefield);
     }
 
     void init_on(entt::registry &registry, entt::entity &window_entity)
     {
-        m_player_system.init(registry);
         auto sdl_context = registry.get<sdl_render_context>(window_entity);
 
         auto view = registry.view<sprite>();
@@ -70,7 +70,6 @@ struct opengl_texture_system final
     void handle_events(entt::registry &registry, const SDL_Event &event)
     {
         // TODO: implement frame time in order to fix blazing speed ups
-        m_player_system.handle_events(event, registry);
     }
 
     void update(entt::registry &registry, entt::entity const &window_entity)
@@ -83,7 +82,6 @@ struct opengl_texture_system final
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
 
-        m_player_system.update(registry, sdl_context);
 
         const float aspect_ratio = static_cast<float>(sdl_context.get_width()) /
                                    static_cast<float>(sdl_context.get_height());
@@ -91,7 +89,7 @@ struct opengl_texture_system final
         const glm::mat4 aspect_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
 
-        const auto transform = glm::mat4(1.0f) * aspect_matrix;
+        const auto transform = glm::mat4(1.0f);
 
         glUseProgram(battlefield_sprite._shader._program_id);
 

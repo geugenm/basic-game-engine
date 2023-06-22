@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entt/entt.hpp"
+#include <entt/entt.hpp>
 #include <sdl_sound.hxx>
 
 namespace sdk
