@@ -3,7 +3,6 @@
 #include <SDL_events.h>
 #include <SDL_mouse.h>
 
-#include "player_system.hxx"
 #include "sdl_render_system.hxx"
 #include <general_components.hxx>
 
@@ -63,7 +62,7 @@ struct opengl_texture_system final
         registry.emplace<sprite>(m_hands, hands);
     }
 
-    void init_on(entt::registry &registry, entt::entity &window_entity)
+    void init_on(entt::registry &registry, entt::entity const &window_entity)
     {
         auto sdl_context = registry.get<sdl_render_context>(window_entity);
 
@@ -125,28 +124,23 @@ struct opengl_texture_system final
         const glm::mat4 aspect_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
 
-        const auto transform = glm::mat4(1.0f);
+        const auto transform = glm::mat4(1.0f) * aspect_matrix;
+
+        const glm::mat4 scaling_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.4f, 0.4f, 0.4f));
+        const glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.2f, 0.0f));
+
+        const auto final_transform = translation_matrix * scaling_matrix * transform;
+
 
         battlefield_sprite.apply_transform(transform);
-        chair_sprite.apply_transform(transform);
-        body_sprite.apply_transform(transform);
-        head_sprite.apply_transform(transform);
-        pants_sprite.apply_transform(transform);
-        hands_sprite.apply_transform(transform);
+        chair_sprite.apply_transform(final_transform);
+        body_sprite.apply_transform(final_transform);
+        head_sprite.apply_transform(final_transform);
+        pants_sprite.apply_transform(final_transform);
+        hands_sprite.apply_transform(final_transform);
     } // namespace sdk
 
 private:
-    static void render(opengl_texture const &texture)
-    {
-        glBindTexture(GL_TEXTURE_2D, texture._texture);
-
-        glBindVertexArray(texture._VAO);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-        glBindVertexArray(0);
-    }
-
     static void destroy(opengl_texture const &texture)
     {
         glDeleteVertexArrays(1, &texture._VAO);
@@ -344,7 +338,6 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
-    player_system m_player_system;
 };
 
 } // namespace sdk
