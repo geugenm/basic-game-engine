@@ -129,8 +129,8 @@ struct opengl_texture_system final
 
         const auto transform = projection_matrix;
 
-        const glm::mat4 scaling_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.4f, 0.4f, 0.4f));
-        const glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.2f, 0.0f));
+        const glm::mat4 scaling_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
+        const glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.1f, 0.0f));
 
         const auto final_transform = projection_matrix * translation_matrix * scaling_matrix;
 
