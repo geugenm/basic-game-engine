@@ -218,6 +218,61 @@ private:
         }
 
         ImGui::End();
+
+
+
+
+        ImGui::SetNextWindowSize(ImVec2(400,300));
+
+        if (ImGui::Begin("window_name", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar))
+        {
+
+            ImGui::PushItemWidth(200);
+            static int i27 = 42;
+            ImGui::DragInt("Engine", &i27, 1, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::PopItemWidth();
+
+            ImGui::PushItemWidth(200);
+            static int i28 = 42;
+            ImGui::DragInt("Gameplay", &i28, 1, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::PopItemWidth();
+
+            ImGui::PushItemWidth(200);
+            static int i29 = 42;
+            ImGui::DragInt("Story/Quests", &i29, 1, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::PopItemWidth();
+
+            {
+                const float window_width = ImGui::GetWindowSize().x;
+
+                ImGui::BeginChild(14, ImVec2(window_width, 100), true,
+                                  ImGuiWindowFlags_NoMove |
+                                      ImGuiWindowFlags_NoResize |
+                                      ImGuiWindowFlags_NoScrollbar);
+
+                ImGui::Text("Time allocation (preview)");
+
+                ImGui::PushItemWidth(window_width);
+                static int i216 = 42;
+                ImGui::DragInt("##", &i216, 1, 0, 100, "%d%%",
+                               ImGuiSliderFlags_AlwaysClamp);
+                ImGui::PopItemWidth();
+
+                ImGui::EndChild();
+            }
+
+            {
+                // Center button ...
+                const float window_width = ImGui::GetWindowSize().x;
+                const float button_width = 70.0f;
+
+                const float button_x = (window_width - button_width) * 0.5f;
+                ImGui::SetCursorPosX(button_x);
+
+                ImGui::Button("OK", ImVec2(button_width, 25));
+            }
+        }
+        ImGui::End();
     }
 };
 
