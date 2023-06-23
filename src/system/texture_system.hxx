@@ -124,12 +124,15 @@ struct opengl_texture_system final
         const glm::mat4 aspect_matrix =
             glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
 
-        const auto transform = glm::mat4(1.0f) * aspect_matrix;
+        glm::mat4 projection_matrix = glm::ortho(-aspect_ratio, aspect_ratio, -1.0f, 1.0f, -1.0f, 1.0f);
+
+
+        const auto transform = projection_matrix;
 
         const glm::mat4 scaling_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.4f, 0.4f, 0.4f));
         const glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.2f, 0.0f));
 
-        const auto final_transform = translation_matrix * scaling_matrix * transform;
+        const auto final_transform = projection_matrix * translation_matrix * scaling_matrix;
 
 
         battlefield_sprite.apply_transform(transform);

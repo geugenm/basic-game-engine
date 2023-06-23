@@ -140,26 +140,33 @@ private:
 
     void on_play(entt::registry &registry, game_states &current_state)
     {
-        // Add UI elements
-        ImGui::SetNextWindowSize(ImVec2(400, 200));
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::Begin("Game UI", nullptr,
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-                         ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("Finance");
 
-        ImGui::ProgressBar(0.7f, ImVec2(-1, 0), "HP");
-
-        if (ImGui::Button("Pause", ImVec2(80, 40)))
-        {
-            for (auto entity : registry.view<game_states>())
-            {
-                auto &state = registry.get<game_states>(entity);
-                state       = game_states::paused;
-            }
+        static int cash = 1000;
+        ImGui::Text("Cash: %d", cash);
+        if (ImGui::Button("Increase Cash")) {
+            cash += 100;
         }
 
-        ImGui::SameLine(ImGui::GetWindowWidth() - 80);
-        ImGui::Text("<WeaponID>");
+        ImGui::End();
+
+        ImGui::Begin("Research");
+
+        static int research_points = 0;
+        ImGui::Text("Research Points: %d", research_points);
+        if (ImGui::Button("Gain Research Point")) {
+            research_points++;
+        }
+
+        ImGui::End();
+
+        ImGui::Begin("Development");
+
+        static char game_name[32] = "";
+        ImGui::InputText("Game Name", game_name, IM_ARRAYSIZE(game_name));
+        if (ImGui::Button("Develop Game")) {
+            // Add code to develop the game here
+        }
 
         ImGui::End();
     }
