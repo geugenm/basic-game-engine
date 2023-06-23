@@ -27,6 +27,8 @@ struct imgui_system
     {
         imgui_subsdk::new_frame();
 
+        ImGui::ShowDebugLogWindow();
+
         for (auto entity : registry.view<game_states>())
         {
             auto &state = registry.get<game_states>(entity);
@@ -52,24 +54,7 @@ struct imgui_system
             }
         }
 
-        if (m_tapped_game_creation)
-        {
-            // TODO: make adequate formula for size calculation
-            ImGui::SetNextWindowPos(m_tapped_mouse_position);
-            ImGui::SetNextWindowSize(ImVec2(160.0f, 40.0f));
-
-            ImGui::Begin("##create_new_game", nullptr,
-                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                             ImGuiWindowFlags_NoScrollbar |
-                             ImGuiWindowFlags_NoTitleBar);
-
-            imgui_subsdk::center_next_element_horizontally(140.0f);
-            imgui_subsdk::center_next_element_vertically(25.0f);
-
-            ImGui::Button("Create new game", ImVec2(140.0f, 25));
-
-            ImGui::End();
-        }
+        create_game_window();
 
         imgui_subsdk::render();
     }
@@ -91,6 +76,25 @@ struct imgui_system
     }
 
 private:
+    void create_new_game_popup()
+    {
+        // TODO: make adequate formula for size calculation
+        ImGui::SetNextWindowPos(m_tapped_mouse_position);
+        ImGui::SetNextWindowSize(ImVec2(160.0f, 40.0f));
+
+        ImGui::Begin("##create_new_game", nullptr,
+                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                         ImGuiWindowFlags_NoScrollbar |
+                         ImGuiWindowFlags_NoTitleBar);
+
+        imgui_subsdk::center_next_element_horizontally(140.0f);
+        imgui_subsdk::center_next_element_vertically(25.0f);
+
+        ImGui::Button("Create new game", ImVec2(140.0f, 25));
+
+        ImGui::End();
+    }
+
     void on_pause(entt::registry &registry, game_states &current_state)
     {
         ImGui::OpenPopup("Pause");
@@ -386,7 +390,70 @@ private:
         ImGui::Button("OK", ImVec2(70.0f, 25));
     }
 
+    void create_game_window()
+    {
+        // TODO: Get window size
+        ImGui::SetNextWindowSize(ImVec2(1720, 1080));
+        ImGui::SetNextWindowPos(ImVec2(100, 0));
+
+        if (ImGui::Begin("Game concept", &m_show_create_game_window,
+                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                             ImGuiWindowFlags_NoScrollbar |
+                             ImGuiWindowFlags_MenuBar))
+        {
+
+            ImGui::PushItemWidth(200); // NOTE: (Push/Pop)ItemWidth is optional
+            static char str2[128] = "Game #1";
+            ImGui::InputText("##", str2, IM_ARRAYSIZE(str2));
+            ImGui::PopItemWidth();
+
+            ImGui::SameLine();
+
+            ImGui::Text("Cost:");
+
+            ImGui::Separator();
+
+            ImGui::BeginChild(7, ImVec2(125, 124), true);
+
+            ImGui::Text("Pick topic");
+
+            ImGui::EndChild();
+
+            ImGui::SameLine();
+
+            ImGui::BeginChild(10, ImVec2(125, 124), true);
+
+            ImGui::Text("Pick genre");
+
+            ImGui::EndChild();
+
+            ImGui::NewLine();
+
+            ImGui::BeginChild(13, ImVec2(125, 124), true);
+
+            ImGui::Text("Pick platform");
+
+            ImGui::EndChild();
+
+            ImGui::SameLine();
+
+            ImGui::BeginChild(16, ImVec2(125, 124), true);
+
+            ImGui::Text("Pick engine");
+
+            ImGui::EndChild();
+
+            const ImVec2 button_size(120, 30);
+            ImGui::SetCursorPosX(ImGui::GetWindowSize().x - button_size.x);
+            ImGui::SetCursorPosY(0);
+            ImGui::Button("Next", button_size);
+        }
+        ImGui::End();
+    }
+
     bool m_tapped_game_creation = false;
+
+    bool m_show_create_game_window = false;
 
     ImVec2 m_tapped_mouse_position;
 };

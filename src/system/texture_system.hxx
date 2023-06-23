@@ -97,14 +97,15 @@ struct opengl_texture_system final
 
     void update(entt::registry &registry, entt::entity const &window_entity)
     {
-        glClear(GL_COLOR_BUFFER_BIT);
-
         auto const &battlefield_sprite = registry.get<sprite>(m_garage);
         auto const &chair_sprite       = registry.get<sprite>(m_chair);
         auto const &body_sprite        = registry.get<sprite>(m_body);
         auto const &head_sprite        = registry.get<sprite>(m_head);
         auto const &pants_sprite       = registry.get<sprite>(m_pants);
         auto const &hands_sprite       = registry.get<sprite>(m_hands);
+
+        glClearColor(1, 1, 1, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         battlefield_sprite.render();
         chair_sprite.render();
