@@ -141,6 +141,18 @@ private:
 
     void on_play(entt::registry &registry, game_states &current_state)
     {
+        static constexpr auto points_window  = ImVec2(250, 200);
+        static constexpr auto project_window = ImVec2(700, 200);
+
+        // TODO: Make it a variable
+        static constexpr auto context_window_bounds = ImVec2(1920, 1080);
+
+        ImGui::SetNextWindowSize(points_window);
+
+        const ImVec2 points_window_bounds(
+            context_window_bounds.x - points_window.x, 0);
+        ImGui::SetNextWindowPos(points_window_bounds);
+
         ImGui::Begin("Finance", nullptr,
                      ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
                          ImGuiWindowFlags_NoScrollbar);
@@ -156,7 +168,14 @@ private:
 
         ImGui::End();
 
-        ImGui::Begin("Research", nullptr, ImGuiWindowFlags_NoScrollbar);
+        imgui_subsdk::center_on_screen(
+            project_window, ImVec2(context_window_bounds.x, project_window.y));
+
+        ImGui::SetNextWindowSize(project_window);
+
+        ImGui::Begin("Research", nullptr,
+                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                         ImGuiWindowFlags_NoScrollbar);
 
         {
             ImGui::BeginChild(28, ImVec2(125, 124), true);
@@ -211,8 +230,10 @@ private:
         }
 
         ImGui::End();
+    }
 
-        // TODO: Fix position
+    void event_developement_stage()
+    {
         static constexpr auto dev_stage_window_bounds = ImVec2(400, 400);
         // TODO: Make it a variable
         static constexpr auto context_window_bounds = ImVec2(1920, 1080);

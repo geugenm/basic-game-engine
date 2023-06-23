@@ -130,7 +130,7 @@ struct opengl_texture_system final
         left  = -texture_aspect * scale;
         right = texture_aspect * scale;
 
-        glm::mat4 projection_matrix =
+        const glm::mat4 projection_matrix =
             glm::ortho(left, right, -1.0f, 1.0f, -1.0f, 1.0f);
 
         const auto transform = projection_matrix;

@@ -154,9 +154,9 @@ void center_next_element_horizontally(const float &item_width)
 
 void center_next_element_vertically(const float &item_height)
 {
-    const float window_width = ImGui::GetWindowSize().y;
+    const float window_height = ImGui::GetWindowSize().y;
 
-    const float item_y = (window_width - item_height) * 0.5f;
+    const float item_y = (window_height - item_height) * 0.5f;
     ImGui::SetCursorPosY(item_y);
 }
 
