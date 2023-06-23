@@ -160,14 +160,14 @@ void center_next_element_vertically(const float &item_height)
     ImGui::SetCursorPosY(item_y);
 }
 
-void center_on_screen(const float &item_height, const float &item_width,
+void center_on_screen(const float &item_width, const float &item_height,
                       const float &screen_width, const float &screen_height)
 {
-    const float item_x = (screen_height - item_height) * 0.5f;
-    //    ImGui::SetCursorPosX(item_x);
+    const float item_x = (screen_width - item_width) * 0.5f;
+    ImGui::SetCursorPosX(item_x);
 
-    const float item_y = (screen_width - item_width) * 0.5f;
-    //    ImGui::SetCursorPosY(item_y);
+    const float item_y = (screen_height - item_height) * 0.5f;
+    ImGui::SetCursorPosY(item_y);
 
     ImGui::SetNextWindowPos(ImVec2(item_x, item_y));
 }

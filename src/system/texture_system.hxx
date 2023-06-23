@@ -116,11 +116,22 @@ struct opengl_texture_system final
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
 
+        const float window_aspect_ratio =
+            static_cast<float>(sdl_context.get_width()) /
+            static_cast<float>(sdl_context.get_height());
+
         const float texture_aspect =
             battlefield_sprite._texture.get_image_aspect_ratio();
 
-        glm::mat4 projection_matrix = glm::ortho(
-            -texture_aspect, texture_aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+        float left, right;
+
+        float scale = window_aspect_ratio / texture_aspect;
+
+        left  = -texture_aspect * scale;
+        right = texture_aspect * scale;
+
+        glm::mat4 projection_matrix =
+            glm::ortho(left, right, -1.0f, 1.0f, -1.0f, 1.0f);
 
         const auto transform = projection_matrix;
 
