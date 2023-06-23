@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SDL_events.h"
+#include "SDL_mouse.h"
 #include "sdl_render_system.hxx"
 #include <general_components.hxx>
 #include <imgui.h>
@@ -50,7 +52,42 @@ struct imgui_system
             }
         }
 
+        if (m_tapped_game_creation)
+        {
+            // TODO: make adequate formula for size calculation
+            ImGui::SetNextWindowPos(m_tapped_mouse_position);
+            ImGui::SetNextWindowSize(ImVec2(160.0f, 40.0f));
+
+            ImGui::Begin("##create_new_game", nullptr,
+                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                             ImGuiWindowFlags_NoScrollbar |
+                             ImGuiWindowFlags_NoTitleBar);
+
+            imgui_subsdk::center_next_element_horizontally(140.0f);
+            imgui_subsdk::center_next_element_vertically(25.0f);
+
+            ImGui::Button("Create new game", ImVec2(140.0f, 25));
+
+            ImGui::End();
+        }
+
         imgui_subsdk::render();
+    }
+
+    void handle_events(const SDL_Event &event, entt::registry &registry)
+    {
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+        {
+            if (m_tapped_game_creation == true)
+            {
+                m_tapped_game_creation = false;
+            }
+            else
+            {
+                m_tapped_mouse_position = ImGui::GetMousePos();
+                m_tapped_game_creation  = true;
+            }
+        }
     }
 
 private:
@@ -348,6 +385,10 @@ private:
 
         ImGui::Button("OK", ImVec2(70.0f, 25));
     }
+
+    bool m_tapped_game_creation = false;
+
+    ImVec2 m_tapped_mouse_position;
 };
 
 } // namespace sdk

@@ -194,12 +194,12 @@ struct sprite
 
     transform _transform;
 
-    void apply_transform(const glm::mat4 & transform) const {
+    void apply_transform(const glm::mat4 &transform) const
+    {
         glUseProgram(_shader._program_id);
 
-        glUniformMatrix4fv(
-            _shader.get_uniform_location("transform"), 1,
-            GL_FALSE, glm::value_ptr(transform));
+        glUniformMatrix4fv(_shader.get_uniform_location("transform"), 1,
+                           GL_FALSE, glm::value_ptr(transform));
         glUseProgram(0);
     }
 
@@ -261,6 +261,6 @@ enum class game_states
     paused,
     played,
     in_menu,
-    exited
+    exited,
 };
 } // namespace sdk

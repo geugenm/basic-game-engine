@@ -123,7 +123,8 @@ struct opengl_texture_system final
         const float texture_aspect =
             battlefield_sprite._texture.get_image_aspect_ratio();
 
-        float left, right;
+        float left;
+        float right;
 
         float scale = window_aspect_ratio / texture_aspect;
 

@@ -1,4 +1,5 @@
 #include "game_system.hxx"
+#include "imgui_system.hxx"
 
 namespace sdk
 {
@@ -58,6 +59,7 @@ void game_system::handle_events(entt::registry &registry)
         }
 
         imgui_subsdk::process_event(event);
+        imgui.handle_events(event, registry);
     }
 }
 
