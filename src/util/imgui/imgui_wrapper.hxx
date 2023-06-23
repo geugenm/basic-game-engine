@@ -29,4 +29,5 @@ void render();
 
 void render(ImDrawData *draw_data);
 
+void center_next_element_horizontally(const float &item_width);
 } // namespace imgui_subsdk

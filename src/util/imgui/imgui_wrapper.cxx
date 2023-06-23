@@ -143,4 +143,12 @@ void setup_style(const bool &is_dark, const float &alpha)
     io->Fonts->AddFontFromMemoryTTF((void *)tahoma, sizeof(tahoma), 17.f,
                                     &font_cfg);
 }
+
+void center_next_element_horizontally(const float &item_width)
+{
+    const float window_width = ImGui::GetWindowSize().x;
+
+    const float item_x = (window_width - item_width) * 0.5f;
+    ImGui::SetCursorPosX(item_x);
+}
 } // namespace imgui_subsdk

@@ -161,7 +161,6 @@ struct opengl_texture
     std::vector<GLuint> _indices;
 
     bool _need_generate_mipmaps = false;
-    bool _needs_to_be_scaled    = false;
 
     GLint _number{};
 
