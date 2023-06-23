@@ -117,19 +117,15 @@ struct opengl_texture_system final
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
 
+        const float texture_aspect = static_cast<float>(battlefield_sprite._texture._width) /
+                                   static_cast<float>(battlefield_sprite._texture._height);
 
-        const float aspect_ratio = static_cast<float>(sdl_context.get_width()) /
-                                   static_cast<float>(sdl_context.get_height());
-
-        const glm::mat4 aspect_matrix =
-            glm::scale(glm::mat4(1.0f), glm::vec3(aspect_ratio, 1.0f, 1.0f));
-
-        glm::mat4 projection_matrix = glm::ortho(-aspect_ratio, aspect_ratio, -1.0f, 1.0f, -1.0f, 1.0f);
+        glm::mat4 projection_matrix = glm::ortho(-texture_aspect, texture_aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 
 
         const auto transform = projection_matrix;
 
-        const glm::mat4 scaling_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
+        const glm::mat4 scaling_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 1.0f));
         const glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.1f, 0.0f));
 
         const auto final_transform = projection_matrix * translation_matrix * scaling_matrix;
@@ -167,7 +163,7 @@ private:
         }
 
         generate_buffers(texture);
-        bind_buffers(texture, context);
+        bind_buffers(texture);
 
         enable_attributes();
         glBindVertexArray(0);
@@ -245,45 +241,8 @@ private:
         glGenBuffers(1, &texture._EBO);
     }
 
-    static void bind_buffers(opengl_texture &texture,
-                             const sdl_render_context &sdl_context)
+    static void bind_buffers(opengl_texture &texture)
     {
-        if (texture._needs_to_be_scaled)
-        {
-            float image_aspect_ratio = texture.get_image_aspect_ratio();
-            float window_aspect_ratio =
-                static_cast<float>(sdl_context.get_width()) /
-                static_cast<float>(sdl_context.get_height());
-
-            float scale_x;
-            float scale_y;
-
-            if (image_aspect_ratio > window_aspect_ratio)
-            {
-                scale_x = 1.0f;
-                scale_y = window_aspect_ratio / image_aspect_ratio;
-            }
-            else
-            {
-                scale_x = image_aspect_ratio / window_aspect_ratio;
-                scale_y = 1.0f;
-            }
-
-            // Apply scale to the vertices
-            for (size_t i = 0; i < texture._vertices.size() / 3; ++i)
-            {
-                texture._vertices[i * 3] *= scale_x;
-                texture._vertices[i * 3 + 1] *= scale_y;
-            }
-
-            // Apply scale to the texture coordinates
-            for (size_t i = 0; i < texture._vertices.size() / 3; ++i)
-            {
-                texture._vertices[i * 3 + 2] *= scale_x;
-                texture._vertices[i * 3 + 3] *= scale_y;
-            }
-        }
-
         glBindVertexArray(texture._VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, texture._VBO);

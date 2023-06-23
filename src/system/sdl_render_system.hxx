@@ -37,8 +37,8 @@ struct sdl_gl_engine
         }
 
         sdl_subsdk::init_opengl();
-        
-        glViewport(0, 0, 1200, 1200);
+
+        glViewport(0, 0, width, height);
 
         _window_entity = registry.create();
         registry.emplace<sdl_render_context>(_window_entity, sdl_context);

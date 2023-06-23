@@ -140,27 +140,76 @@ private:
 
     void on_play(entt::registry &registry, game_states &current_state)
     {
-        ImGui::Begin("Finance");
+        ImGui::Begin("Finance", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar);
 
-        static int cash = 1000;
-        ImGui::Text("Cash: %d", cash);
-        if (ImGui::Button("Increase Cash")) {
-            cash += 100;
+        static uint32_t time = 0;
+        ImGui::Text("Date: %d", time);
+
+        static uint32_t fans = 0;
+        ImGui::Text("Fans: %d", fans);
+
+        static uint32_t money = 0;
+        ImGui::Text("Money: %d", money);
+
+        ImGui::End();
+
+        ImGui::Begin("Research", nullptr, ImGuiWindowFlags_NoScrollbar);
+
+        {
+            ImGui::BeginChild(28, ImVec2(125, 124), true);
+
+            ImGui::Text("Bugs:");
+
+            ImGui::EndChild();
+        }
+
+        ImGui::SameLine();
+
+        {
+            ImGui::BeginChild(29, ImVec2(125, 124), true);
+
+            ImGui::Text("Art:");
+
+            ImGui::EndChild();
+        }
+
+        ImGui::SameLine();
+
+        {
+            ImGui::BeginChild(30, ImVec2(125, 124), true);
+
+            ImGui::Text("Project_name");
+
+            ImGui::Text("Genre");
+
+            ImGui::Text("Dev stage");
+
+            ImGui::EndChild();
+        }
+
+        ImGui::SameLine();
+
+        {
+            ImGui::BeginChild(31, ImVec2(125, 124), true);
+
+            ImGui::Text("Engine:");
+
+            ImGui::EndChild();
+        }
+
+        ImGui::SameLine();
+
+        {
+            ImGui::BeginChild(32, ImVec2(125, 124), true);
+
+            ImGui::Text("Study:");
+
+            ImGui::EndChild();
         }
 
         ImGui::End();
 
-        ImGui::Begin("Research");
-
-        static int research_points = 0;
-        ImGui::Text("Research Points: %d", research_points);
-        if (ImGui::Button("Gain Research Point")) {
-            research_points++;
-        }
-
-        ImGui::End();
-
-        ImGui::Begin("Development");
+        ImGui::Begin("Development", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar);
 
         static char game_name[32] = "";
         ImGui::InputText("Game Name", game_name, IM_ARRAYSIZE(game_name));
