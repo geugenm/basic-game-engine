@@ -30,4 +30,11 @@ void render();
 void render(ImDrawData *draw_data);
 
 void center_next_element_horizontally(const float &item_width);
+
+void center_next_element_vertically(const float &item_height);
+
+void center_on_screen(const float &item_height, const float &item_width,
+                      const float &screen_width, const float &screen_height);
+
+void center_on_screen(const ImVec2 &item_bounds, const ImVec2 &window_bounds);
 } // namespace imgui_subsdk

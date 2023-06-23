@@ -151,4 +151,30 @@ void center_next_element_horizontally(const float &item_width)
     const float item_x = (window_width - item_width) * 0.5f;
     ImGui::SetCursorPosX(item_x);
 }
+
+void center_next_element_vertically(const float &item_height)
+{
+    const float window_width = ImGui::GetWindowSize().y;
+
+    const float item_y = (window_width - item_height) * 0.5f;
+    ImGui::SetCursorPosY(item_y);
+}
+
+void center_on_screen(const float &item_height, const float &item_width,
+                      const float &screen_width, const float &screen_height)
+{
+    const float item_x = (screen_height - item_height) * 0.5f;
+    //    ImGui::SetCursorPosX(item_x);
+
+    const float item_y = (screen_width - item_width) * 0.5f;
+    //    ImGui::SetCursorPosY(item_y);
+
+    ImGui::SetNextWindowPos(ImVec2(item_x, item_y));
+}
+
+void center_on_screen(const ImVec2 &item_bounds, const ImVec2 &window_bounds)
+{
+    center_on_screen(item_bounds.x, item_bounds.y, window_bounds.x,
+                     window_bounds.y);
+}
 } // namespace imgui_subsdk

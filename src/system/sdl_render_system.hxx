@@ -14,13 +14,13 @@ struct sdl_gl_engine
     entt::entity _window_entity;
 
     sdl_gl_engine(entt::registry &registry, const char *window_title,
-                  const int &height, const int &width)
+                  const int &width, const int &height)
     {
         sdl_render_context sdl_context;
         sdl_subsdk::init_sdl();
 
         sdl_context._window =
-            sdl_subsdk::get_new_sdl_window(window_title, height, width);
+            sdl_subsdk::get_new_sdl_window(window_title, width, height);
         if (!sdl_context._window)
         {
             SDL_Quit();

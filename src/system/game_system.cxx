@@ -4,8 +4,8 @@ namespace sdk
 {
 
 game_system::game_system(entt::registry &registry, const char *title,
-                         const int &height, const int &width)
-    : m_render_engine(registry, title, height, width),
+                         const int &width, const int &height)
+    : m_render_engine(registry, title, width, height),
       m_game_state_entity(registry.create())
 {
     imgui.init(registry, m_render_engine._window_entity);

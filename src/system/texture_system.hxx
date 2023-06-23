@@ -35,11 +35,11 @@ struct opengl_texture_system final
     void test(entt::registry &registry)
     {
         m_garage = registry.create();
-        m_body = registry.create();
-        m_chair = registry.create();
-        m_head = registry.create();
-        m_pants = registry.create();
-        m_hands = registry.create();
+        m_body   = registry.create();
+        m_chair  = registry.create();
+        m_head   = registry.create();
+        m_pants  = registry.create();
+        m_hands  = registry.create();
 
         sprite battlefield = sprite::get_sprite_from_file("level1");
 
@@ -52,7 +52,6 @@ struct opengl_texture_system final
         sprite pants = sprite::get_sprite_from_file("pants");
 
         sprite hands = sprite::get_sprite_from_file("hands");
-
 
         registry.emplace<sprite>(m_garage, battlefield);
         registry.emplace<sprite>(m_chair, chair);
@@ -101,11 +100,11 @@ struct opengl_texture_system final
         glClear(GL_COLOR_BUFFER_BIT);
 
         auto const &battlefield_sprite = registry.get<sprite>(m_garage);
-        auto const &chair_sprite = registry.get<sprite>(m_chair);
-        auto const &body_sprite = registry.get<sprite>(m_body);
-        auto const &head_sprite = registry.get<sprite>(m_head);
-        auto const &pants_sprite = registry.get<sprite>(m_pants);
-        auto const &hands_sprite = registry.get<sprite>(m_hands);
+        auto const &chair_sprite       = registry.get<sprite>(m_chair);
+        auto const &body_sprite        = registry.get<sprite>(m_body);
+        auto const &head_sprite        = registry.get<sprite>(m_head);
+        auto const &pants_sprite       = registry.get<sprite>(m_pants);
+        auto const &hands_sprite       = registry.get<sprite>(m_hands);
 
         battlefield_sprite.render();
         chair_sprite.render();
@@ -117,18 +116,21 @@ struct opengl_texture_system final
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
 
-        const float texture_aspect = battlefield_sprite._texture.get_image_aspect_ratio();
+        const float texture_aspect =
+            battlefield_sprite._texture.get_image_aspect_ratio();
 
-        glm::mat4 projection_matrix = glm::ortho(-texture_aspect, texture_aspect, -1.0f, 1.0f, -1.0f, 1.0f);
-
+        glm::mat4 projection_matrix = glm::ortho(
+            -texture_aspect, texture_aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 
         const auto transform = projection_matrix;
 
-        const glm::mat4 scaling_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 1.0f));
-        const glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.1f, 0.0f));
+        const glm::mat4 scaling_matrix =
+            glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 1.0f));
+        const glm::mat4 translation_matrix =
+            glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.1f, 0.0f));
 
-        const auto final_transform = projection_matrix * translation_matrix * scaling_matrix;
-
+        const auto final_transform =
+            projection_matrix * translation_matrix * scaling_matrix;
 
         battlefield_sprite.apply_transform(transform);
         chair_sprite.apply_transform(final_transform);
@@ -298,7 +300,6 @@ private:
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
-
 };
 
 } // namespace sdk

@@ -15,7 +15,7 @@ class game_system
 {
 public:
     explicit game_system(entt::registry &registry, const char *title,
-                         const int &height, const int &width);
+                         const int &width, const int &height);
 
     void update(entt::registry &registry);
 

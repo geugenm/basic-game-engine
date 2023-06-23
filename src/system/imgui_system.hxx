@@ -7,6 +7,7 @@
 
 #include <entt/entity/fwd.hpp>
 #include <entt/entt.hpp>
+#include <string_view>
 
 namespace sdk
 {
@@ -211,83 +212,35 @@ private:
 
         ImGui::End();
 
-        ImGui::Begin("Development", nullptr,
-                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                         ImGuiWindowFlags_NoScrollbar);
+        // TODO: Fix position
+        static constexpr auto dev_stage_window_bounds = ImVec2(400, 400);
+        // TODO: Make it a variable
+        static constexpr auto context_window_bounds = ImVec2(1920, 1080);
 
-        static char game_name[32] = "";
-        ImGui::InputText("Game Name", game_name, IM_ARRAYSIZE(game_name));
-        if (ImGui::Button("Develop Game"))
-        {
-            // Add code to develop the game here
-        }
+        imgui_subsdk::center_on_screen(dev_stage_window_bounds,
+                                       context_window_bounds);
 
-        ImGui::End();
-
-        ImGui::SetNextWindowSize(ImVec2(400, 400));
+        ImGui::SetNextWindowSize(dev_stage_window_bounds);
 
         if (ImGui::Begin("dev_stage_1", nullptr,
                          ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
                              ImGuiWindowFlags_NoScrollbar))
         {
 
-            static int i27 = 42;
-            ImGui::Text("Engine");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##Engine", &i27, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
+            create_slider("Engine", 200.0f);
+            create_slider("Gameplay", 200.0f);
+            create_slider("Story/Quests", 200.0f);
 
-            static int i28 = 42;
-            ImGui::Text("Gameplay");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##Gameplay", &i28, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
+            create_time_allocation_bar("1");
 
-            static int i29 = 42;
-            ImGui::Text("Story/Quests");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##Story/Quests", &i29, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
-
-            {
-                const float &window_width = ImGui::GetWindowSize().x;
-
-                const ImGuiStyle &style = ImGui::GetStyle();
-                const float offset      = 2.0f * style.WindowPadding.x;
-                ImGui::BeginChild(14, ImVec2(window_width - offset, 100), true,
-                                  ImGuiWindowFlags_NoMove |
-                                      ImGuiWindowFlags_NoResize |
-                                      ImGuiWindowFlags_NoScrollbar);
-
-                ImGui::Text("Time allocation (preview)");
-
-                const float child_window_width = ImGui::GetWindowSize().x;
-
-                ImGui::PushItemWidth(child_window_width - offset);
-                static int i216 = 42;
-                ImGui::DragInt("##Stage1TimeAlloc", &i216, 1, 0, 100, "%d%%",
-                               ImGuiSliderFlags_AlwaysClamp);
-                ImGui::PopItemWidth();
-
-                ImGui::EndChild();
-            }
-
-            {
-                // Center button ...
-                imgui_subsdk::center_next_element_horizontally(70.0f);
-
-                ImGui::Button("OK", ImVec2(70.0f, 25));
-            }
+            create_ok_button();
         }
         ImGui::End();
 
-        ImGui::SetNextWindowSize(ImVec2(400, 400));
+        imgui_subsdk::center_on_screen(dev_stage_window_bounds,
+                                       context_window_bounds);
+
+        ImGui::SetNextWindowSize(dev_stage_window_bounds);
 
         ImGui::NewLine();
 
@@ -296,63 +249,20 @@ private:
                              ImGuiWindowFlags_NoScrollbar))
         {
 
-            static int i27 = 42;
-            ImGui::Text("Dialogues");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##Dialogues", &i27, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
+            create_slider("Dialogues", 200.0f);
+            create_slider("Level Design", 200.0f);
+            create_slider("AI", 200.0f);
 
-            static int i28 = 42;
-            ImGui::Text("Level Design");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##LevelDesign", &i28, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
+            create_time_allocation_bar("2");
 
-            static int i29 = 42;
-            ImGui::Text("AI");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##AI", &i29, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
-
-            {
-                const float &window_width = ImGui::GetWindowSize().x;
-
-                const ImGuiStyle &style = ImGui::GetStyle();
-                const float offset      = 2.0f * style.WindowPadding.x;
-                ImGui::BeginChild(110, ImVec2(window_width - offset, 100), true,
-                                  ImGuiWindowFlags_NoMove |
-                                      ImGuiWindowFlags_NoResize |
-                                      ImGuiWindowFlags_NoScrollbar);
-
-                ImGui::Text("Time allocation (preview)");
-
-                const float child_window_width = ImGui::GetWindowSize().x;
-
-                ImGui::PushItemWidth(child_window_width - offset);
-                static int i216 = 42;
-                ImGui::DragInt("##Stage2TimeAlloc", &i216, 1, 0, 100, "%d%%",
-                               ImGuiSliderFlags_AlwaysClamp);
-                ImGui::PopItemWidth();
-
-                ImGui::EndChild();
-            }
-
-            {
-                // Center button ...
-                imgui_subsdk::center_next_element_horizontally(70.0f);
-
-                ImGui::Button("OK", ImVec2(70.0f, 25));
-            }
+            create_ok_button();
         }
         ImGui::End();
 
-        ImGui::SetNextWindowSize(ImVec2(400, 400));
+        imgui_subsdk::center_on_screen(dev_stage_window_bounds,
+                                       context_window_bounds);
+
+        ImGui::SetNextWindowSize(dev_stage_window_bounds);
 
         ImGui::NewLine();
 
@@ -360,62 +270,62 @@ private:
                          ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
                              ImGuiWindowFlags_NoScrollbar))
         {
+            create_slider("World Design", 200.0f);
+            create_slider("Graphic", 200.0f);
+            create_slider("Sound", 200.0f);
 
-            static int i27 = 42;
-            ImGui::Text("World Design");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##WorldDesign", &i27, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
+            create_time_allocation_bar("3");
 
-            static int i28 = 42;
-            ImGui::Text("Graphic");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##Graphic", &i28, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
-
-            static int i29 = 42;
-            ImGui::Text("Sound");
-            imgui_subsdk::center_next_element_horizontally(200.0f);
-            ImGui::PushItemWidth(200.0f);
-            ImGui::DragInt("##Sound", &i29, 1, 0, 100, "%d%%",
-                           ImGuiSliderFlags_AlwaysClamp);
-            ImGui::PopItemWidth();
-
-            {
-                const float &window_width = ImGui::GetWindowSize().x;
-
-                const ImGuiStyle &style = ImGui::GetStyle();
-                const float offset      = 2.0f * style.WindowPadding.x;
-                ImGui::BeginChild(110, ImVec2(window_width - offset, 100), true,
-                                  ImGuiWindowFlags_NoMove |
-                                      ImGuiWindowFlags_NoResize |
-                                      ImGuiWindowFlags_NoScrollbar);
-
-                ImGui::Text("Time allocation (preview)");
-
-                const float child_window_width = ImGui::GetWindowSize().x;
-
-                ImGui::PushItemWidth(child_window_width - offset);
-                static int i216 = 42;
-                ImGui::DragInt("##Stage3TimeAlloc", &i216, 1, 0, 100, "%d%%",
-                               ImGuiSliderFlags_AlwaysClamp);
-                ImGui::PopItemWidth();
-
-                ImGui::EndChild();
-            }
-
-            {
-                // Center button ...
-                imgui_subsdk::center_next_element_horizontally(70.0f);
-
-                ImGui::Button("OK", ImVec2(70.0f, 25));
-            }
+            create_ok_button();
         }
         ImGui::End();
+    }
+
+    void create_slider(const char *name, const uint32_t &width = 200.0f)
+    {
+        std::string id_sharps = "##";
+        id_sharps.append(name);
+
+        static int i27 = 42;
+        ImGui::Text(name);
+        imgui_subsdk::center_next_element_horizontally(200.0f);
+        ImGui::PushItemWidth(200.0f);
+        ImGui::DragInt(id_sharps.data(), &i27, 1, 0, 100, "%d%%",
+                       ImGuiSliderFlags_AlwaysClamp);
+        ImGui::PopItemWidth();
+    }
+
+    void create_time_allocation_bar(const std::string_view &id)
+    {
+        const float &window_width = ImGui::GetWindowSize().x;
+
+        std::string final_id = "##";
+        final_id.append(id);
+
+        const ImGuiStyle &style = ImGui::GetStyle();
+        const float offset      = 2.0f * style.WindowPadding.x;
+        ImGui::BeginChild(110, ImVec2(window_width - offset, 100), true,
+                          ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                              ImGuiWindowFlags_NoScrollbar);
+
+        ImGui::Text("Time allocation (preview)");
+
+        const float child_window_width = ImGui::GetWindowSize().x;
+
+        ImGui::PushItemWidth(child_window_width - offset);
+        static int i216 = 42;
+        ImGui::DragInt(final_id.data(), &i216, 1, 0, 100, "%d%%",
+                       ImGuiSliderFlags_AlwaysClamp);
+        ImGui::PopItemWidth();
+
+        ImGui::EndChild();
+    }
+
+    void create_ok_button()
+    {
+        imgui_subsdk::center_next_element_horizontally(70.0f);
+
+        ImGui::Button("OK", ImVec2(70.0f, 25));
     }
 };
 
