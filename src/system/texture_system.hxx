@@ -212,7 +212,8 @@ public:
         pants_sprite.render();
         body_sprite.render();
         head_sprite.render();
-        hands_sprite.render();
+
+        hands_sprite.render_animated();
 
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);

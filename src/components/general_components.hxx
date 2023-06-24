@@ -182,6 +182,31 @@ struct opengl_texture
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    void render_animated() const
+    {
+        glBindTexture(GL_TEXTURE_2D, _texture);
+        glBindVertexArray(_VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, _VBO);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            static_cast<GLsizeiptr>(_vertices.size() * sizeof(GLfloat)),
+            _vertices.data(), GL_DYNAMIC_DRAW);
+
+        // Update vertex attributes
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              (void *)0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              (void *)(3 * sizeof(float)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              (void *)(6 * sizeof(float)));
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     [[nodiscard]] std::size_t
     get_tex_coord_index(const std::size_t &index) const
     {
@@ -217,6 +242,15 @@ struct sprite
         auto target = static_cast<GLenum>(GL_TEXTURE0 + _texture._number);
         glActiveTexture(target);
         _texture.render();
+        glUseProgram(0);
+    }
+
+    void render_animated() const
+    {
+        glUseProgram(_shader._program_id);
+        auto target = static_cast<GLenum>(GL_TEXTURE0 + _texture._number);
+        glActiveTexture(target);
+        _texture.render_animated();
         glUseProgram(0);
     }
 
