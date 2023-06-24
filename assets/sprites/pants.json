@@ -1,7 +1,7 @@
 {
   "shader": {
     "vertex_source_path": "shaders/texture.vert",
-    "fragment_source_path": "shaders/turret.frag"
+    "fragment_source_path": "shaders/texture.frag"
   },
   "texture": {
     "image_path": "textures/pants.png",
