@@ -52,13 +52,14 @@ struct sdl_gl_engine
 
     void update(entt::registry &registry) const
     {
-        auto view         = registry.view<sdl_render_context>();
-        auto &sdl_context = view.get<sdl_render_context>(_window_entity);
+        auto sdl_context = registry.get<sdl_render_context>(_window_entity);
 
         if (!sdl_context.is_initialized())
         {
             throw sdk::engine_error("SDL engine is not initialized");
         }
+
+        glViewport(0, 0, sdl_context.get_width(), sdl_context.get_height());
 
         SDL_GL_SwapWindow(sdl_context._window);
     }

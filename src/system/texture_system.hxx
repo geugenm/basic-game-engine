@@ -6,22 +6,17 @@
 #include "sdl_render_system.hxx"
 #include <general_components.hxx>
 
-#include <nlohmann/json_fwd.hpp>
-#include <ostream>
-
 #include <entt/entt.hpp>
 #include <glm/fwd.hpp>
 #include <opengl_functions.hxx>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-#include <glm/gtx/vector_angle.hpp>
-#include <nlohmann/json.hpp>
 #include <stdexcept>
 
 #include <stb_image.h>
+#include <string>
 
 namespace sdk
 {
@@ -41,23 +36,24 @@ struct sprite_animator final
                 "Can't update frame: `vertices` is empty.");
         }
 
+        // Handle one frame case
+        if (_columns == 1 && _rows == 1)
+        {
+            std::cout << "WARNING: No frames, just a sprite, skipping update..."
+                      << std::endl;
+            return;
+        }
+
         const int X = 0;
         const int Y = 1;
 
         const float frameWidth  = 1.f / static_cast<float>(_columns);
         const float frameHeight = 1.f / static_cast<float>(_rows);
 
-        auto floated_rows =
+        const auto floated_rows =
             static_cast<float>(_rows - _current_frame / _columns);
-        auto floated_columns = static_cast<float>(_current_frame % _columns);
-
-        // Handle one frame case
-        if (_columns == 1 && _rows == 1)
-        {
-            std::cout << "WARNING: No frames, just a sprite!" << std::endl;
-            floated_rows    = 0.0f;
-            floated_columns = 0.0f;
-        }
+        const auto floated_columns =
+            static_cast<float>(_current_frame % _columns);
 
         auto &vertices = sprite._texture._vertices;
 
@@ -81,6 +77,13 @@ struct sprite_animator final
     [[nodiscard]] static sprite_animator
     init_new_animator(const std::size_t &rows, const std::size_t &cols)
     {
+        if (rows == 0 || cols == 0)
+        {
+            throw std::invalid_argument(
+                "Can't create sprite animator: `rows={}` or "
+                "`cols={}` is 0: rows");
+        }
+
         // TODO: Handle texture coordinates verify according to size given
         sprite_animator animator{
             ._current_frame = 0,
@@ -209,10 +212,10 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         battlefield_sprite.render();
-        //        chair_sprite.render();
-        //        pants_sprite.render();
-        //        body_sprite.render();
-        //        head_sprite.render();
+        chair_sprite.render();
+        pants_sprite.render();
+        body_sprite.render();
+        head_sprite.render();
 
         hands_sprite.render();
 
@@ -226,10 +229,10 @@ public:
         const float texture_aspect =
             battlefield_sprite._texture.get_image_aspect_ratio();
 
-        float scale = window_aspect_ratio / texture_aspect;
+        const float scale = window_aspect_ratio / texture_aspect;
 
         const glm::mat4 projection_matrix = glm::ortho(
-            -texture_aspect, texture_aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+            -texture_aspect, texture_aspect, -0.57f, 0.57f, -1.0f, 1.0f);
 
         const auto transform = projection_matrix;
 
