@@ -47,12 +47,6 @@ void game_system::handle_events(entt::registry &registry)
         }
 
         if (registry.view<game_states>().get<game_states>(
-                m_game_state_entity) == game_states::played)
-        {
-            m_texture_system.handle_events(registry, event);
-        }
-
-        if (registry.view<game_states>().get<game_states>(
                 m_game_state_entity) == game_states::exited)
         {
             m_render_engine.destroy(registry);

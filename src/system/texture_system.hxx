@@ -1,13 +1,14 @@
 #pragma once
 
+#include "sdl_render_system.hxx"
+#include "sprite_animation_system.hxx"
+
 #include <SDL_events.h>
 #include <SDL_mouse.h>
 
-#include "sdl_render_system.hxx"
 #include <general_components.hxx>
 
 #include <entt/entt.hpp>
-#include <glm/fwd.hpp>
 #include <opengl_functions.hxx>
 
 #include <glm/glm.hpp>
@@ -21,110 +22,9 @@
 namespace sdk
 {
 
-struct sprite_animator final
-{
-    std::size_t _current_frame;
-    std::size_t _rows;
-    std::size_t _columns;
-
-    // TODO: Make it handling sprites directly not just texture coordinates
-    void update(sprite &sprite) const
-    {
-        if (sprite._texture._vertices.empty())
-        {
-            throw std::invalid_argument(
-                "Can't update frame: `vertices` is empty.");
-        }
-
-        // Handle one frame case
-        if (_columns == 1 && _rows == 1)
-        {
-            std::cout << "WARNING: No frames, just a sprite, skipping update..."
-                      << std::endl;
-            return;
-        }
-
-        const int X = 0;
-        const int Y = 1;
-
-        const float frameWidth  = 1.f / static_cast<float>(_columns);
-        const float frameHeight = 1.f / static_cast<float>(_rows);
-
-        const auto floated_rows =
-            static_cast<float>(_rows - _current_frame / _columns);
-        const auto floated_columns =
-            static_cast<float>(_current_frame % _columns);
-
-        auto &vertices = sprite._texture._vertices;
-
-        const auto first_vertex    = sprite._texture.get_tex_coord_index(0);
-        vertices[first_vertex + X] = frameWidth * floated_columns;
-        vertices[first_vertex + Y] = frameHeight * floated_rows;
-
-        const auto second_vertex    = sprite._texture.get_tex_coord_index(1);
-        vertices[second_vertex + X] = frameWidth * (floated_columns + 1);
-        vertices[second_vertex + Y] = frameHeight * floated_rows;
-
-        const auto third_vertex    = sprite._texture.get_tex_coord_index(2);
-        vertices[third_vertex + X] = frameWidth * (floated_columns + 1);
-        vertices[third_vertex + Y] = frameHeight * (floated_rows + 1);
-
-        const auto fourth_vertex    = sprite._texture.get_tex_coord_index(3);
-        vertices[fourth_vertex + X] = frameWidth * floated_columns;
-        vertices[fourth_vertex + Y] = frameHeight * (floated_rows + 1);
-    }
-
-    [[nodiscard]] static sprite_animator
-    init_new_animator(const std::size_t &rows, const std::size_t &cols)
-    {
-        if (rows == 0 || cols == 0)
-        {
-            throw std::invalid_argument(
-                "Can't create sprite animator: `rows={}` or "
-                "`cols={}` is 0: rows");
-        }
-
-        // TODO: Handle texture coordinates verify according to size given
-        sprite_animator animator{
-            ._current_frame = 0,
-            ._rows          = rows,
-            ._columns       = cols,
-        };
-
-        return animator;
-    }
-
-    void next_frame(sprite &sprite)
-    {
-        const auto max_frame = _columns * _rows - 1;
-
-        if (max_frame == _current_frame)
-        {
-            _current_frame = 0;
-        }
-        else
-        {
-            _current_frame++;
-        }
-
-        std::cout << "Frame: " << _current_frame << std::endl;
-
-        update(sprite);
-    }
-};
-
 class opengl_texture_system final
 {
 public:
-    entt::entity m_garage;
-    entt::entity m_chair;
-    entt::entity m_body;
-    entt::entity m_head;
-    entt::entity m_pants;
-    entt::entity m_hands;
-
-    sprite_animator m_sprite_animator{};
-
     void test(entt::registry &registry)
     {
         m_garage = registry.create();
@@ -160,13 +60,6 @@ public:
 
         auto view = registry.view<sprite>();
 
-        { // Init sprite animator
-            const auto sprite_rows = 1;
-            const auto sprite_cols = 1;
-            m_sprite_animator =
-                sprite_animator::init_new_animator(sprite_rows, sprite_cols);
-        }
-
         for (auto entity : view)
         {
             auto &entity_sprite = view.get<sprite>(entity);
@@ -188,11 +81,9 @@ public:
                         ent_sprite._texture._number);
             glUseProgram(0);
         }
-    }
 
-    void handle_events(entt::registry &registry, const SDL_Event &event) const
-    {
-        // TODO: implement frame time in order to fix blazing speed ups
+        registry.emplace<sprite_animation>(
+            m_hands, sprite_animation::create_new_animation(3, 3));
     }
 
     void update(entt::registry &registry, entt::entity const &window_entity)
@@ -204,9 +95,7 @@ public:
         auto const &pants_sprite       = registry.get<sprite>(m_pants);
         auto const &hands_sprite       = registry.get<sprite>(m_hands);
 
-        {
-            // m_sprite_animator.next_frame(hands_sprite);
-        }
+        m_animation_system.update(registry);
 
         glClearColor(1, 1, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -217,7 +106,7 @@ public:
         body_sprite.render();
         head_sprite.render();
 
-        hands_sprite.render();
+        hands_sprite.render_animated();
 
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
@@ -404,6 +293,15 @@ private:
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
+
+    entt::entity m_garage{};
+    entt::entity m_chair{};
+    entt::entity m_body{};
+    entt::entity m_head{};
+    entt::entity m_pants{};
+    entt::entity m_hands{};
+
+    sprite_animation_system m_animation_system{};
 };
 
 } // namespace sdk
