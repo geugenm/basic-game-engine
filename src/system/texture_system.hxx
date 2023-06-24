@@ -8,7 +8,6 @@
 
 #include <nlohmann/json_fwd.hpp>
 #include <ostream>
-#include <render/picopng.hxx>
 
 #include <entt/entt.hpp>
 #include <glm/fwd.hpp>
@@ -21,6 +20,8 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
+
+#include <stb_image.h>
 
 namespace sdk
 {
@@ -157,8 +158,8 @@ public:
             auto &player_hands = registry.get<sprite>(m_hands);
 
             // Columns and rows of animated sprite (number of frames)
-            const auto sprite_rows = 3;
-            const auto sprite_cols = 2;
+            const auto sprite_rows = 25;
+            const auto sprite_cols = 13;
             m_sprite_animator      = sprite_animator::init_new_animator(
                 sprite_rows, sprite_cols, player_hands);
         }
@@ -304,37 +305,28 @@ private:
     [[nodiscard]] static std::vector<unsigned char>
     get_png_data(opengl_texture &texture)
     {
-        if (!exists(texture._image_path))
+        if (!std::filesystem::exists(texture._image_path))
         {
             throw std::invalid_argument("Failed to open PNG image: " +
                                         texture._image_path.string());
         }
 
-        std::ifstream file(texture._image_path,
-                           std::ios::binary | std::ios::ate);
+        int width;
+        int height;
+        int channels;
+        unsigned char *data = stbi_load(texture._image_path.c_str(), &width,
+                                        &height, &channels, STBI_rgb_alpha);
 
-        if (!file.is_open())
-        {
-            throw std::invalid_argument("Failed to open PNG image");
-        }
-
-        const std::streamsize file_size = file.tellg();
-        file.seekg(0, std::ios::beg);
-
-        std::vector<unsigned char> buffer(static_cast<size_t>(file_size));
-        if (!file.read(reinterpret_cast<char *>(buffer.data()), file_size))
-        {
-            throw std::invalid_argument("Failed to read PNG image");
-        }
-
-        std::vector<unsigned char> png_data;
-        png_data.reserve(static_cast<size_t>(file_size));
-
-        if (decodePNG(png_data, texture._width, texture._height, buffer.data(),
-                      static_cast<size_t>(file_size), true) != 0)
+        if (!data)
         {
             throw std::invalid_argument("Failed to decode PNG image");
         }
+
+        texture._width  = static_cast<unsigned long>(width);
+        texture._height = static_cast<unsigned long>(height);
+
+        std::vector<unsigned char> png_data(data, data + width * height * 4);
+        stbi_image_free(data);
 
         if (png_data.empty())
         {
