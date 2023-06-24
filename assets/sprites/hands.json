@@ -1,10 +1,10 @@
 {
   "shader": {
     "vertex_source_path": "shaders/texture.vert",
-    "fragment_source_path": "shaders/turret.frag"
+    "fragment_source_path": "shaders/texture.frag"
   },
   "texture": {
-    "image_path": "textures/hands.png",
+    "image_path": "textures/hands_animated.png",
     "vertices": [
       1.0, 0.5, 0.2, 0.0, 0.0, 0.0, 1.0, 1.0,
       1.0, -0.5, 0.2, 0.0, 1.0, 0.0, 1.0, 0.0,

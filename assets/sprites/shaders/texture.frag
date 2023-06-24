@@ -32,7 +32,7 @@ void main()
     vec4 bottomColor = texture2D(texture, TexCoord);
 
     if (near_border || near_diagonal) {
-        color = light_purple;
+        color = bottomColor;
     } else {
         color = bottomColor;
     }

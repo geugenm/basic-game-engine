@@ -25,28 +25,23 @@
 namespace sdk
 {
 
-struct sprite_animator
+struct sprite_animator final
 {
     std::size_t _current_frame;
     std::size_t _rows;
     std::size_t _columns;
 
     // TODO: Make it handling sprites directly not just texture coordinates
-    void sprite_animation_update(float *texture_coordinates) const
+    void update(sprite &sprite) const
     {
-        if (texture_coordinates == nullptr)
+        if (sprite._texture._vertices.empty())
         {
             throw std::invalid_argument(
-                "Can't update frame: `texture_coordinates` is null.");
+                "Can't update frame: `vertices` is empty.");
         }
 
         const int X = 0;
         const int Y = 1;
-
-        const int V0 = 0;
-        const int V1 = 2;
-        const int V2 = 4;
-        const int V3 = 6;
 
         const float frameWidth  = 1.f / static_cast<float>(_columns);
         const float frameHeight = 1.f / static_cast<float>(_rows);
@@ -56,22 +51,28 @@ struct sprite_animator
         const auto floated_columns =
             static_cast<float>(_current_frame % _columns);
 
-        texture_coordinates[V0 + X] = frameWidth * floated_columns;
-        texture_coordinates[V0 + Y] = frameHeight * floated_rows;
+        auto &vertices = sprite._texture._vertices;
 
-        texture_coordinates[V1 + X] = frameWidth * (floated_columns + 1);
-        texture_coordinates[V1 + Y] = frameHeight * floated_rows;
+        const auto first_vertex    = sprite._texture.get_tex_coord_index(0);
+        vertices[first_vertex + X] = frameWidth * floated_columns;
+        vertices[first_vertex + Y] = frameHeight * floated_rows;
 
-        texture_coordinates[V2 + X] = frameWidth * (floated_columns + 1);
-        texture_coordinates[V2 + Y] = frameHeight * (floated_rows + 1);
+        const auto second_vertex    = sprite._texture.get_tex_coord_index(1);
+        vertices[second_vertex + X] = frameWidth * (floated_columns + 1);
+        vertices[second_vertex + Y] = frameHeight * floated_rows;
 
-        texture_coordinates[V3 + X] = frameWidth * floated_columns;
-        texture_coordinates[V3 + Y] = frameHeight * (floated_rows + 1);
+        const auto third_vertex    = sprite._texture.get_tex_coord_index(2);
+        vertices[third_vertex + X] = frameWidth * (floated_columns + 1);
+        vertices[third_vertex + Y] = frameHeight * (floated_rows + 1);
+
+        const auto fourth_vertex    = sprite._texture.get_tex_coord_index(3);
+        vertices[fourth_vertex + X] = frameWidth * floated_columns;
+        vertices[fourth_vertex + Y] = frameHeight * (floated_rows + 1);
     }
 
-    [[nodiscard]] sprite_animator init_new_animator(const std::size_t &rows,
-                                                    const std::size_t &cols,
-                                                    float *texture_coordinates)
+    [[nodiscard]] static sprite_animator
+    init_new_animator(const std::size_t &rows, const std::size_t &cols,
+                      sprite &sprite)
     {
         // TODO: Handle texture coordinates verify according to size given
         sprite_animator animator{
@@ -80,18 +81,12 @@ struct sprite_animator
             ._columns       = cols,
         };
 
-        if (texture_coordinates == nullptr)
-        {
-            throw std::invalid_argument(
-                "Failed to init animator: `texture_coordinates` is null.");
-        }
-
-        sprite_animation_update(texture_coordinates);
+        animator.update(sprite);
 
         return animator;
     }
 
-    void sprite_animation_next_frame(float *texture_coordinates)
+    void next_frame(sprite &sprite)
     {
         const auto max_frame = _columns * _rows - 1;
 
@@ -104,7 +99,9 @@ struct sprite_animator
             _current_frame++;
         }
 
-        sprite_animation_update(texture_coordinates);
+        std::cout << "Frame: " << _current_frame << std::endl;
+
+        update(sprite);
     }
 };
 
@@ -155,6 +152,17 @@ public:
 
         auto view = registry.view<sprite>();
 
+        { // Init sprite animator
+            // TODO: take all this parameters from sprite
+            auto &player_hands = registry.get<sprite>(m_hands);
+
+            // Columns and rows of animated sprite (number of frames)
+            const auto sprite_rows = 3;
+            const auto sprite_cols = 2;
+            m_sprite_animator      = sprite_animator::init_new_animator(
+                sprite_rows, sprite_cols, player_hands);
+        }
+
         for (auto entity : view)
         {
             auto &entity_sprite = view.get<sprite>(entity);
@@ -176,17 +184,6 @@ public:
                         ent_sprite._texture._number);
             glUseProgram(0);
         }
-
-        { // Init sprite animator
-            // TODO: take all this parameters from sprite
-            auto &player_hands_vertices =
-                registry.get<sprite>(m_hands)._texture._vertices;
-
-            const auto sprite_rows = 4;
-            const auto sprite_cols = 4;
-            m_sprite_animator      = m_sprite_animator.init_new_animator(
-                sprite_rows, sprite_cols, player_hands_vertices.data());
-        }
     }
 
     void handle_events(entt::registry &registry, const SDL_Event &event)
@@ -201,7 +198,11 @@ public:
         auto const &body_sprite        = registry.get<sprite>(m_body);
         auto const &head_sprite        = registry.get<sprite>(m_head);
         auto const &pants_sprite       = registry.get<sprite>(m_pants);
-        auto const &hands_sprite       = registry.get<sprite>(m_hands);
+        auto &hands_sprite             = registry.get<sprite>(m_hands);
+
+        {
+            m_sprite_animator.next_frame(hands_sprite);
+        }
 
         glClearColor(1, 1, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -209,9 +210,9 @@ public:
         battlefield_sprite.render();
         chair_sprite.render();
         pants_sprite.render();
-        hands_sprite.render();
         body_sprite.render();
         head_sprite.render();
+        hands_sprite.render();
 
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
@@ -223,13 +224,10 @@ public:
         const float texture_aspect =
             battlefield_sprite._texture.get_image_aspect_ratio();
 
-        float left;
-        float right;
-
         float scale = window_aspect_ratio / texture_aspect;
 
-        left  = -texture_aspect * scale;
-        right = texture_aspect * scale;
+        const float left  = -texture_aspect * scale;
+        const float right = texture_aspect * scale;
 
         const glm::mat4 projection_matrix =
             glm::ortho(left, right, -1.0f, 1.0f, -1.0f, 1.0f);
