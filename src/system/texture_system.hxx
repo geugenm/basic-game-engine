@@ -49,8 +49,7 @@ struct sprite_animator final
 
         const auto floated_rows =
             static_cast<float>(_rows - _current_frame / _columns);
-        const auto floated_columns =
-            static_cast<float>(_current_frame % _columns);
+        auto floated_columns = static_cast<float>(_current_frame % _columns);
 
         auto &vertices = sprite._texture._vertices;
 
@@ -82,7 +81,7 @@ struct sprite_animator final
             ._columns       = cols,
         };
 
-        animator.update(sprite);
+        // animator.update(sprite);
 
         return animator;
     }
@@ -158,10 +157,11 @@ public:
             auto &player_hands = registry.get<sprite>(m_hands);
 
             // Columns and rows of animated sprite (number of frames)
-            const auto sprite_rows = 25;
-            const auto sprite_cols = 13;
+            const auto sprite_rows = 1;
+            const auto sprite_cols = 1;
             m_sprite_animator      = sprite_animator::init_new_animator(
                 sprite_rows, sprite_cols, player_hands);
+            m_sprite_animator.update(player_hands);
         }
 
         for (auto entity : view)
@@ -202,17 +202,17 @@ public:
         auto &hands_sprite             = registry.get<sprite>(m_hands);
 
         {
-            m_sprite_animator.next_frame(hands_sprite);
+            // m_sprite_animator.next_frame(hands_sprite);
         }
 
         glClearColor(1, 1, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        battlefield_sprite.render();
-        chair_sprite.render();
-        pants_sprite.render();
-        body_sprite.render();
-        head_sprite.render();
+        //        battlefield_sprite.render();
+        //        chair_sprite.render();
+        //        pants_sprite.render();
+        //        body_sprite.render();
+        //        head_sprite.render();
 
         hands_sprite.render_animated();
 
@@ -228,11 +228,8 @@ public:
 
         float scale = window_aspect_ratio / texture_aspect;
 
-        const float left  = -texture_aspect * scale;
-        const float right = texture_aspect * scale;
-
-        const glm::mat4 projection_matrix =
-            glm::ortho(left, right, -1.0f, 1.0f, -1.0f, 1.0f);
+        const glm::mat4 projection_matrix = glm::ortho(
+            -texture_aspect, texture_aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 
         const auto transform = projection_matrix;
 
