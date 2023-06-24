@@ -1,7 +1,7 @@
 {
   "shader": {
     "vertex_source_path": "shaders/texture.vert",
-    "fragment_source_path": "shaders/texture_debug.frag"
+    "fragment_source_path": "shaders/texture.frag"
   },
   "texture": {
     "image_path": "textures/body_typing.png",

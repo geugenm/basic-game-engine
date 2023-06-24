@@ -136,7 +136,7 @@ public:
         typing_body.render_animated();
 
         head_sprite.render();
-        //        computer_sprite.render();
+        //         computer_sprite.render();
 
         const auto &sdl_context =
             registry.get<sdl_render_context>(window_entity);
@@ -150,8 +150,8 @@ public:
 
         const float scale = window_aspect_ratio / texture_aspect;
 
-        const glm::mat4 projection_matrix = glm::ortho(
-            -texture_aspect, texture_aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+        const glm::mat4 projection_matrix =
+            glm::ortho(-scale, scale, -1.0f, 1.0f, -1.0f, 1.0f);
 
         const auto transform = projection_matrix;
 
@@ -171,20 +171,9 @@ public:
 
         computer_sprite_animated.apply_transform(final_transform);
 
-        const glm::mat4 scaling_matrix1 =
-            glm::scale(glm::mat4(1.0f), glm::vec3(0.468f, 0.714f, 1.0f));
+        hands_typing_animated.apply_transform(final_transform);
 
-        const glm::mat4 translation_matrix1 =
-            glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.1f, 0.0f));
-
-        const glm::mat4 translation_matrix2 = glm::translate(
-            glm::mat4(1.0f), glm::vec3(-0.2f * 4.0f, 0.1f * 4.87f, 0.0f));
-
-        hands_typing_animated.apply_transform(transform * translation_matrix2 *
-                                              scaling_matrix1 * scaling_matrix);
-
-        typing_body.apply_transform(transform * translation_matrix1 *
-                                    scaling_matrix1 * scaling_matrix);
+        typing_body.apply_transform(final_transform);
     } // namespace sdk
 
 private:

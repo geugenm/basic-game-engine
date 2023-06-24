@@ -16,6 +16,149 @@
 namespace sdk
 {
 
+class settings_window final
+{
+public:
+    void update(entt::registry &registry, sdl_render_context *sdl_window)
+    {
+        if (sdl_window == nullptr)
+        {
+            throw std::invalid_argument(
+                "Failed to open resolution settings: `sdl_window` is null");
+        }
+
+        if (m_is_window_opened)
+        {
+            show_window(registry, sdl_window);
+        }
+
+        if (m_is_showing_debug_window)
+        {
+            ImGui::ShowDebugLogWindow();
+        }
+    }
+
+    void make_visible()
+    {
+        m_is_window_opened = true;
+    }
+
+private:
+    void show_window(entt::registry &registry, sdl_render_context *sdl_window)
+    {
+        if (ImGui::Begin("Settings", &m_is_window_opened))
+        {
+            ImGui::Text("FPS:");
+
+            ImGui::PushItemWidth(200);
+            ImGui::DragInt("##fps", &m_chosen_fps, 1, 25, 700);
+            ImGui::PopItemWidth();
+
+            ImGui::Checkbox("VSync", &m_use_vsync);
+
+            ImGui::SameLine();
+
+            ImGui::Checkbox("Show Debug", &m_is_showing_debug_window);
+
+            ImGui::Text("Resolution:");
+
+            ImGui::PushItemWidth(200);
+            ImGui::ListBox("##resolution_list", &m_chosen_resolution,
+                           m_resolution_items.data(), m_resolution_items.size(),
+                           5);
+            ImGui::PopItemWidth();
+
+            if (ImGui::Button("Apply"))
+            {
+                apply_resolution_settings(sdl_window);
+            }
+        }
+        ImGui::End();
+    }
+
+    void apply_resolution_settings(sdl_render_context *sdl_window)
+    {
+        if (m_chosen_resolution == 0)
+        {
+            SDL_SetWindowSize(sdl_window->_window, 7680, 4320);
+        }
+        if (m_chosen_resolution == 1)
+        {
+            SDL_SetWindowSize(sdl_window->_window, 3840, 2160);
+        }
+        if (m_chosen_resolution == 2)
+        {
+            SDL_SetWindowSize(sdl_window->_window, 1920, 1080);
+        }
+        if (m_chosen_resolution == 3)
+        {
+            SDL_SetWindowSize(sdl_window->_window, 720, 480);
+        }
+        if (m_chosen_resolution == 4)
+        {
+            SDL_SetWindowSize(sdl_window->_window, 640, 480);
+        }
+    }
+
+    bool m_is_window_opened = false;
+
+    bool m_is_showing_debug_window = false;
+
+    bool m_use_vsync = false;
+
+    int m_chosen_resolution = 2;
+
+    int m_chosen_fps = 60;
+
+    static constexpr std::array<const char *, 5> m_resolution_items = {
+        "8K", "4K", "FullHD", "HD", "480p"};
+};
+
+class main_menu_window final
+{
+public:
+    void update(entt::registry &registry, sdl_render_context *sdl_window)
+    {
+        ImGui::OpenPopup("Menu");
+
+        if (ImGui::BeginPopupModal("Menu", nullptr,
+                                   ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGuiEntityEditor entityEditor;
+
+            ImGui::Separator();
+            if (ImGui::Button("Play", ImVec2(120, 0)))
+            {
+                current_state = game_states::played;
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Campaign (Soon...)", ImVec2(120, 0)))
+            {
+                // TODO: ...
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::Button("Settings (Soon...)", ImVec2(120, 0)))
+            {
+                // TODO: ...
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Exit", ImVec2(120, 0)))
+            {
+                current_state = game_states::exited;
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+
+private:
+};
+
 struct imgui_system
 {
     void init(entt::registry &registry, entt::entity &entity)
@@ -28,8 +171,6 @@ struct imgui_system
     void update(entt::registry &registry)
     {
         imgui_subsdk::new_frame();
-
-        ImGui::ShowDebugLogWindow();
 
         for (auto entity : registry.view<game_states>())
         {
@@ -76,7 +217,6 @@ struct imgui_system
 
         if (ImGui::IsKeyDown(ImGuiKey_Escape))
         {
-            std::cout << "Paused." << std::endl;
 
             for (auto entity : registry.view<game_states>())
             {
@@ -118,7 +258,7 @@ private:
             ImGui::Separator();
             if (ImGui::Button("Settings", ImVec2(120, 0)))
             {
-                settings_window(registry);
+                m_settings_window.make_visible();
             }
 
             ImGui::Separator();
@@ -141,47 +281,17 @@ private:
                 // Do something
             }
 
-            ImGui::EndPopup();
-        }
-    }
-
-    void on_menu(entt::registry &registry, game_states &current_state)
-    {
-        ImGui::OpenPopup("Menu");
-
-        if (ImGui::BeginPopupModal("Menu", nullptr,
-                                   ImGuiWindowFlags_AlwaysAutoResize))
-        {
-
-            ImGui::Separator();
-            if (ImGui::Button("Play", ImVec2(120, 0)))
+            for (auto entity : registry.view<sdl_render_context>())
             {
-                current_state = game_states::played;
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Campaign (Soon...)", ImVec2(120, 0)))
-            {
-                // TODO: ...
-            }
-
-            ImGui::Separator();
-
-            if (ImGui::Button("Settings (Soon...)", ImVec2(120, 0)))
-            {
-                // TODO: ...
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Exit", ImVec2(120, 0)))
-            {
-                current_state = game_states::exited;
-                ImGui::CloseCurrentPopup();
+                auto &window = registry.get<sdl_render_context>(entity);
+                m_settings_window.update(registry, &window);
             }
 
             ImGui::EndPopup();
         }
     }
+
+    void on_menu(entt::registry &registry, game_states &current_state) {}
 
     void on_exit(entt::registry &registry, game_states &current_state) {}
 
@@ -456,70 +566,13 @@ private:
         ImGui::End();
     }
 
-    void settings_window(entt::registry &registry)
-    {
-        static bool window_opened = true;
-        if (ImGui::Begin("Settings", &window_opened))
-        {
-
-            ImGui::Text("FPS:");
-
-            ImGui::PushItemWidth(200);
-            static int f5 = 0.001f;
-            ImGui::InputInt("##fps", &f5, 1, 10);
-            ImGui::PopItemWidth();
-
-            static bool r17 = false;
-            ImGui::RadioButton("VSync", r17);
-
-            ImGui::Text("Resolution:");
-
-            ImGui::PushItemWidth(200);
-            static int item_current9    = 0;
-            static const char *items9[] = {"8K", "4K", "FullHD", "HD", "480p"};
-            ImGui::ListBox("##resolution_list", &item_current9, items9,
-                           IM_ARRAYSIZE(items9));
-            ImGui::PopItemWidth();
-
-            auto view = registry.view<sdl_render_context>();
-
-            for (auto entity : view)
-            {
-                auto &sdl_window = view.get<sdl_render_context>(entity)._window;
-                auto &sdl_context = view.get<sdl_render_context>(entity);
-
-                if (item_current9 == 0)
-                {
-                    SDL_SetWindowSize(sdl_window, 7680, 4320);
-                }
-                if (item_current9 == 1)
-                {
-                    SDL_SetWindowSize(sdl_window, 3840, 2160);
-                }
-                if (item_current9 == 2)
-                {
-                    SDL_SetWindowSize(sdl_window, 1920, 1080);
-                }
-                if (item_current9 == 3)
-                {
-                    SDL_SetWindowSize(sdl_window, 720, 480);
-                }
-                if (item_current9 == 4)
-                {
-                    SDL_SetWindowSize(sdl_window, 640, 480);
-                }
-
-                sdl_context._frames_per_second = f5;
-            }
-        }
-        ImGui::End();
-    }
-
     bool m_tapped_game_creation = false;
 
     bool m_show_create_game_window = false;
 
     ImVec2 m_tapped_mouse_position;
+
+    settings_window m_settings_window;
 };
 
 } // namespace sdk
