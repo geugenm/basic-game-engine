@@ -47,9 +47,17 @@ struct sprite_animator final
         const float frameWidth  = 1.f / static_cast<float>(_columns);
         const float frameHeight = 1.f / static_cast<float>(_rows);
 
-        const auto floated_rows =
+        auto floated_rows =
             static_cast<float>(_rows - _current_frame / _columns);
         auto floated_columns = static_cast<float>(_current_frame % _columns);
+
+        // Handle one frame case
+        if (_columns == 1 && _rows == 1)
+        {
+            std::cout << "WARNING: No frames, just a sprite!" << std::endl;
+            floated_rows    = 0.0f;
+            floated_columns = 0.0f;
+        }
 
         auto &vertices = sprite._texture._vertices;
 
@@ -71,8 +79,7 @@ struct sprite_animator final
     }
 
     [[nodiscard]] static sprite_animator
-    init_new_animator(const std::size_t &rows, const std::size_t &cols,
-                      sprite &sprite)
+    init_new_animator(const std::size_t &rows, const std::size_t &cols)
     {
         // TODO: Handle texture coordinates verify according to size given
         sprite_animator animator{
@@ -80,8 +87,6 @@ struct sprite_animator final
             ._rows          = rows,
             ._columns       = cols,
         };
-
-        // animator.update(sprite);
 
         return animator;
     }
@@ -153,15 +158,10 @@ public:
         auto view = registry.view<sprite>();
 
         { // Init sprite animator
-            // TODO: take all this parameters from sprite
-            auto &player_hands = registry.get<sprite>(m_hands);
-
-            // Columns and rows of animated sprite (number of frames)
             const auto sprite_rows = 1;
             const auto sprite_cols = 1;
-            m_sprite_animator      = sprite_animator::init_new_animator(
-                sprite_rows, sprite_cols, player_hands);
-            m_sprite_animator.update(player_hands);
+            m_sprite_animator =
+                sprite_animator::init_new_animator(sprite_rows, sprite_cols);
         }
 
         for (auto entity : view)
@@ -187,7 +187,7 @@ public:
         }
     }
 
-    void handle_events(entt::registry &registry, const SDL_Event &event)
+    void handle_events(entt::registry &registry, const SDL_Event &event) const
     {
         // TODO: implement frame time in order to fix blazing speed ups
     }
@@ -199,7 +199,7 @@ public:
         auto const &body_sprite        = registry.get<sprite>(m_body);
         auto const &head_sprite        = registry.get<sprite>(m_head);
         auto const &pants_sprite       = registry.get<sprite>(m_pants);
-        auto &hands_sprite             = registry.get<sprite>(m_hands);
+        auto const &hands_sprite       = registry.get<sprite>(m_hands);
 
         {
             // m_sprite_animator.next_frame(hands_sprite);
@@ -208,13 +208,13 @@ public:
         glClearColor(1, 1, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //        battlefield_sprite.render();
+        battlefield_sprite.render();
         //        chair_sprite.render();
         //        pants_sprite.render();
         //        body_sprite.render();
         //        head_sprite.render();
 
-        hands_sprite.render_animated();
+        hands_sprite.render();
 
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
