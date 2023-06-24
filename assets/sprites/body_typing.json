@@ -1,10 +1,10 @@
 {
   "shader": {
     "vertex_source_path": "shaders/texture.vert",
-    "fragment_source_path": "shaders/texture.frag"
+    "fragment_source_path": "shaders/texture_debug.frag"
   },
   "texture": {
-    "image_path": "textures/body.png",
+    "image_path": "textures/body_typing.png",
     "vertices": [
       -1.0, -0.5, 0.2, 0.0, 1.0, 0.0, 0.0, 0.0,
       1.0, -0.5, 0.2, 0.0, 0.0, 0.0, 1.0, 0.0,

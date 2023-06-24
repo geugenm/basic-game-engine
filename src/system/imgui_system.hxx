@@ -1,7 +1,9 @@
 #pragma once
 
 #include "SDL_events.h"
+#include "SDL_keycode.h"
 #include "SDL_mouse.h"
+#include "SDL_video.h"
 #include "sdl_render_system.hxx"
 #include <general_components.hxx>
 #include <imgui.h>
@@ -53,7 +55,7 @@ struct imgui_system
                 on_exit(registry, state);
             }
         }
-        
+
         imgui_subsdk::render();
     }
 
@@ -69,6 +71,18 @@ struct imgui_system
             {
                 m_tapped_mouse_position = ImGui::GetMousePos();
                 m_tapped_game_creation  = true;
+            }
+        }
+
+        if (ImGui::IsKeyDown(ImGuiKey_Escape))
+        {
+            std::cout << "Paused." << std::endl;
+
+            for (auto entity : registry.view<game_states>())
+            {
+                auto &state = registry.get<game_states>(entity);
+
+                state = game_states::paused;
             }
         }
     }
@@ -104,7 +118,7 @@ private:
             ImGui::Separator();
             if (ImGui::Button("Settings", ImVec2(120, 0)))
             {
-                // Do something
+                settings_window(registry);
             }
 
             ImGui::Separator();
@@ -112,11 +126,8 @@ private:
             // Exit button
             if (ImGui::Button("Main menu", ImVec2(120, 0)))
             {
-                for (auto entity : registry.view<game_states>())
-                {
-                    auto &state = registry.get<game_states>(entity);
-                    state       = game_states::in_menu;
-                }
+                current_state = game_states::in_menu;
+
                 ImGui::CloseCurrentPopup();
                 // Do something
             }
@@ -125,11 +136,7 @@ private:
             ImGui::SameLine();
             if (ImGui::Button("Resume", ImVec2(120, 0)))
             {
-                for (auto entity : registry.view<game_states>())
-                {
-                    auto &state = registry.get<game_states>(entity);
-                    state       = game_states::played;
-                }
+                current_state = game_states::played;
                 ImGui::CloseCurrentPopup();
                 // Do something
             }
@@ -445,6 +452,65 @@ private:
             ImGui::SetCursorPosX(ImGui::GetWindowSize().x - button_size.x);
             ImGui::SetCursorPosY(0);
             ImGui::Button("Next", button_size);
+        }
+        ImGui::End();
+    }
+
+    void settings_window(entt::registry &registry)
+    {
+        static bool window_opened = true;
+        if (ImGui::Begin("Settings", &window_opened))
+        {
+
+            ImGui::Text("FPS:");
+
+            ImGui::PushItemWidth(200);
+            static int f5 = 0.001f;
+            ImGui::InputInt("##fps", &f5, 1, 10);
+            ImGui::PopItemWidth();
+
+            static bool r17 = false;
+            ImGui::RadioButton("VSync", r17);
+
+            ImGui::Text("Resolution:");
+
+            ImGui::PushItemWidth(200);
+            static int item_current9    = 0;
+            static const char *items9[] = {"8K", "4K", "FullHD", "HD", "480p"};
+            ImGui::ListBox("##resolution_list", &item_current9, items9,
+                           IM_ARRAYSIZE(items9));
+            ImGui::PopItemWidth();
+
+            auto view = registry.view<sdl_render_context>();
+
+            for (auto entity : view)
+            {
+                auto &sdl_window = view.get<sdl_render_context>(entity)._window;
+                auto &sdl_context = view.get<sdl_render_context>(entity);
+
+                if (item_current9 == 0)
+                {
+                    SDL_SetWindowSize(sdl_window, 7680, 4320);
+                }
+                if (item_current9 == 1)
+                {
+                    SDL_SetWindowSize(sdl_window, 3840, 2160);
+                }
+                if (item_current9 == 2)
+                {
+                    SDL_SetWindowSize(sdl_window, 1920, 1080);
+                }
+                if (item_current9 == 3)
+                {
+                    SDL_SetWindowSize(sdl_window, 720, 480);
+                }
+                if (item_current9 == 4)
+                {
+                    SDL_SetWindowSize(sdl_window, 640, 480);
+                }
+
+                sdl_context._frames_per_second = f5;
+            }
         }
         ImGui::End();
     }

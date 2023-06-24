@@ -17,8 +17,9 @@ namespace sdk
 {
 struct sdl_render_context
 {
-    SDL_Window *_window    = nullptr;
-    SDL_GLContext _context = nullptr;
+    SDL_Window *_window            = nullptr;
+    SDL_GLContext _context         = nullptr;
+    std::size_t _frames_per_second = 60;
 
     [[nodiscard]] bool is_initialized() const
     {

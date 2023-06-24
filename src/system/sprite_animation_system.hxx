@@ -132,9 +132,6 @@ private:
         }
 
         update_texture_coordinates(animation, sprite);
-
-        std::cout << "INFO: Rendered texture animation frame: "
-                  << animation._current_frame << std::endl;
     }
 };
 
