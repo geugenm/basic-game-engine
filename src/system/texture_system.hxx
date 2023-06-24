@@ -34,6 +34,9 @@ public:
         m_pants  = registry.create();
         m_hands  = registry.create();
 
+        m_computer_screen          = registry.create();
+        m_computer_screen_animated = registry.create();
+
         sprite battlefield = sprite::get_sprite_from_file("level1");
 
         sprite chair = sprite::get_sprite_from_file("chair");
@@ -46,12 +49,28 @@ public:
 
         sprite hands = sprite::get_sprite_from_file("hands");
 
+        sprite computer_screen =
+            sprite::get_sprite_from_file("computer_screen");
+
+        sprite computer_screen_animated =
+            sprite::get_sprite_from_file("computer_screen_animated");
+
         registry.emplace<sprite>(m_garage, battlefield);
         registry.emplace<sprite>(m_chair, chair);
         registry.emplace<sprite>(m_body, body);
         registry.emplace<sprite>(m_head, head);
         registry.emplace<sprite>(m_pants, pants);
         registry.emplace<sprite>(m_hands, hands);
+        registry.emplace<sprite>(m_computer_screen, computer_screen);
+        registry.emplace<sprite>(m_computer_screen_animated,
+                                 computer_screen_animated);
+
+        registry.emplace<sprite_animation>(
+            m_hands, sprite_animation::create_new_animation(3, 3));
+
+        registry.emplace<sprite_animation>(
+            m_computer_screen_animated,
+            sprite_animation::create_new_animation(2, 14));
     }
 
     void init_on(entt::registry &registry, entt::entity const &window_entity)
@@ -81,9 +100,6 @@ public:
                         ent_sprite._texture._number);
             glUseProgram(0);
         }
-
-        registry.emplace<sprite_animation>(
-            m_hands, sprite_animation::create_new_animation(3, 3));
     }
 
     void update(entt::registry &registry, entt::entity const &window_entity)
@@ -94,6 +110,9 @@ public:
         auto const &head_sprite        = registry.get<sprite>(m_head);
         auto const &pants_sprite       = registry.get<sprite>(m_pants);
         auto const &hands_sprite       = registry.get<sprite>(m_hands);
+        auto const &computer_sprite = registry.get<sprite>(m_computer_screen);
+        auto const &computer_sprite_animated =
+            registry.get<sprite>(m_computer_screen_animated);
 
         m_animation_system.update(registry);
 
@@ -103,10 +122,12 @@ public:
         battlefield_sprite.render();
         chair_sprite.render();
         pants_sprite.render();
+        hands_sprite.render_animated();
         body_sprite.render();
         head_sprite.render();
+        computer_sprite.render();
 
-        hands_sprite.render_animated();
+        computer_sprite_animated.render_animated();
 
         const auto sdl_context =
             registry.get<sdl_render_context>(window_entity);
@@ -139,6 +160,9 @@ public:
         head_sprite.apply_transform(final_transform);
         pants_sprite.apply_transform(final_transform);
         hands_sprite.apply_transform(final_transform);
+
+        computer_sprite.apply_transform(final_transform);
+        computer_sprite_animated.apply_transform(final_transform);
     } // namespace sdk
 
 private:
@@ -300,6 +324,8 @@ private:
     entt::entity m_head{};
     entt::entity m_pants{};
     entt::entity m_hands{};
+    entt::entity m_computer_screen{};
+    entt::entity m_computer_screen_animated{};
 
     sprite_animation_system m_animation_system{};
 };
