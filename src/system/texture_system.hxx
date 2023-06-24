@@ -20,17 +20,105 @@
 
 #include <glm/gtx/vector_angle.hpp>
 #include <nlohmann/json.hpp>
+#include <stdexcept>
 
 namespace sdk
 {
-struct opengl_texture_system final
+
+struct sprite_animator
 {
+    std::size_t _current_frame;
+    std::size_t _rows;
+    std::size_t _columns;
+
+    // TODO: Make it handling sprites directly not just texture coordinates
+    void sprite_animation_update(float *texture_coordinates) const
+    {
+        if (texture_coordinates == nullptr)
+        {
+            throw std::invalid_argument(
+                "Can't update frame: `texture_coordinates` is null.");
+        }
+
+        const int X = 0;
+        const int Y = 1;
+
+        const int V0 = 0;
+        const int V1 = 2;
+        const int V2 = 4;
+        const int V3 = 6;
+
+        const float frameWidth  = 1.f / static_cast<float>(_columns);
+        const float frameHeight = 1.f / static_cast<float>(_rows);
+
+        const auto floated_rows =
+            static_cast<float>(_rows - _current_frame / _columns);
+        const auto floated_columns =
+            static_cast<float>(_current_frame % _columns);
+
+        texture_coordinates[V0 + X] = frameWidth * floated_columns;
+        texture_coordinates[V0 + Y] = frameHeight * floated_rows;
+
+        texture_coordinates[V1 + X] = frameWidth * (floated_columns + 1);
+        texture_coordinates[V1 + Y] = frameHeight * floated_rows;
+
+        texture_coordinates[V2 + X] = frameWidth * (floated_columns + 1);
+        texture_coordinates[V2 + Y] = frameHeight * (floated_rows + 1);
+
+        texture_coordinates[V3 + X] = frameWidth * floated_columns;
+        texture_coordinates[V3 + Y] = frameHeight * (floated_rows + 1);
+    }
+
+    [[nodiscard]] sprite_animator init_new_animator(const std::size_t &rows,
+                                                    const std::size_t &cols,
+                                                    float *texture_coordinates)
+    {
+        // TODO: Handle texture coordinates verify according to size given
+        sprite_animator animator{
+            ._current_frame = 0,
+            ._rows          = rows,
+            ._columns       = cols,
+        };
+
+        if (texture_coordinates == nullptr)
+        {
+            throw std::invalid_argument(
+                "Failed to init animator: `texture_coordinates` is null.");
+        }
+
+        sprite_animation_update(texture_coordinates);
+
+        return animator;
+    }
+
+    void sprite_animation_next_frame(float *texture_coordinates)
+    {
+        const auto max_frame = _columns * _rows - 1;
+
+        if (max_frame == _current_frame)
+        {
+            _current_frame = 0;
+        }
+        else
+        {
+            _current_frame++;
+        }
+
+        sprite_animation_update(texture_coordinates);
+    }
+};
+
+class opengl_texture_system final
+{
+public:
     entt::entity m_garage;
     entt::entity m_chair;
     entt::entity m_body;
     entt::entity m_head;
     entt::entity m_pants;
     entt::entity m_hands;
+
+    sprite_animator m_sprite_animator{};
 
     void test(entt::registry &registry)
     {
@@ -87,6 +175,17 @@ struct opengl_texture_system final
             glUniform1i(ent_sprite._shader.get_uniform_location("texture"),
                         ent_sprite._texture._number);
             glUseProgram(0);
+        }
+
+        { // Init sprite animator
+            // TODO: take all this parameters from sprite
+            auto &player_hands_vertices =
+                registry.get<sprite>(m_hands)._texture._vertices;
+
+            const auto sprite_rows = 4;
+            const auto sprite_cols = 4;
+            m_sprite_animator      = m_sprite_animator.init_new_animator(
+                sprite_rows, sprite_cols, player_hands_vertices.data());
         }
     }
 

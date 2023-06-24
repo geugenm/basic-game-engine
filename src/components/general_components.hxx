@@ -179,6 +179,62 @@ struct opengl_texture
 
         glBindVertexArray(0);
     }
+
+    std::size_t get_vertex_index(const std::size_t &index)
+    {
+        return index * 8;
+    }
+
+    std::size_t get_color_index(const std::size_t &index)
+    {
+        return index * 8 + 3;
+    }
+
+    std::size_t get_tex_coord_index(const std::size_t &index)
+    {
+        return index * 8 + 6;
+    }
+
+    glm::vec3 get_vertex(const std::size_t &index)
+    {
+        const auto idx = get_vertex_index(index);
+        return {_vertices[idx], _vertices[idx + 1], _vertices[idx + 2]};
+    }
+
+    glm::vec3 get_color(const std::size_t &index)
+    {
+        const auto idx = get_color_index(index);
+        return {_vertices[idx], _vertices[idx + 1], _vertices[idx + 2]};
+    }
+
+    glm::vec2 get_tex_coord(const std::size_t &index)
+    {
+        const auto idx = get_tex_coord_index(index);
+        return {_vertices[idx], _vertices[idx + 1]};
+    }
+
+    void set_vertex(const std::size_t &index, const glm::vec3 &vertex)
+    {
+        const auto idx     = get_vertex_index(index);
+        _vertices[idx]     = vertex.x;
+        _vertices[idx + 1] = vertex.y;
+        _vertices[idx + 2] = vertex.z;
+    }
+
+    void set_color(const std::size_t &index, const glm::vec3 &color)
+    {
+        const auto idx     = get_color_index(index);
+        _vertices[idx]     = color.r;
+        _vertices[idx + 1] = color.g;
+        _vertices[idx + 2] = color.b;
+    }
+
+    void set_tex_coord(const std::size_t &index, const glm::vec2 &tex_coord)
+    {
+        const auto idx     = get_tex_coord_index(index);
+        _vertices[idx]     = tex_coord.s;
+        _vertices[idx + 1] = tex_coord.t;
+    }
 };
 
 struct transform

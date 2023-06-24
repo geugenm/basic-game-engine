@@ -53,9 +53,7 @@ struct imgui_system
                 on_exit(registry, state);
             }
         }
-
-        create_game_window();
-
+        
         imgui_subsdk::render();
     }
 
