@@ -132,11 +132,18 @@ public:
             const glm::mat4 translation_matrix1 = glm::translate(
                 glm::mat4(1.0f), entity_sprite._transform._position);
 
+            // Create the rotation matrix
+            const glm::mat4 rotation_matrix1 =
+                glm::rotate(glm::mat4(1.0f),
+                            entity_sprite._transform._current_rotation_angle,
+                            glm::vec3(0.0f, 0.0f, 1.0f));
+
             const glm::mat4 scaling_matrix1 =
                 glm::scale(glm::mat4(1.0f), entity_sprite._transform._scale);
 
-            entity_sprite.apply_transform(
-                projection_matrix * translation_matrix1 * scaling_matrix1);
+            entity_sprite.apply_transform(projection_matrix *
+                                          translation_matrix1 *
+                                          rotation_matrix1 * scaling_matrix1);
         }
     } // namespace sdk
 
