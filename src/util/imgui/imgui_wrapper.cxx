@@ -1,5 +1,6 @@
 #include "imgui_wrapper.hxx"
 
+#include "imgui.h"
 #include "tahoma.h"
 
 namespace imgui_subsdk
@@ -22,6 +23,8 @@ void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
     {
         throw std::invalid_argument("Failed to create ImGui _context.");
     }
+
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     setup_style(k_use_dark_style, k_window_alpha);
 

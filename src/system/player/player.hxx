@@ -2,7 +2,6 @@
 
 #include "entt/entity/fwd.hpp"
 #include <entt/entt.hpp>
-#include <game_logic.hxx>
 #include <general_components.hxx>
 
 namespace sdk

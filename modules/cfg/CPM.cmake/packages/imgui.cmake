@@ -3,7 +3,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../CPM.cmake.cmake)
 CPMAddPackage(
         NAME imgui
         GITHUB_REPOSITORY ocornut/imgui
-        GIT_TAG v1.89.6
+        GIT_TAG 6b011140576d5b7f94a6716235fc287ffb34ae34
         DOWNLOAD_ONLY True
 )
 
