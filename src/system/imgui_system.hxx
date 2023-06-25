@@ -23,7 +23,16 @@ public:
 
     void imgui_sprite_transform()
     {
-        ImGui::Begin("Transform");
+        const std::string title =
+            "Transform: " + m_sprite._texture._image_path.filename().string();
+        ImGui::Begin(title.data());
+
+        ImGui::Checkbox("Modify position", &m_dragging_sprite);
+
+        if (m_dragging_sprite)
+        {
+        }
+
         ImGui::InputFloat("X position", &m_sprite._transform._position.x);
         ImGui::InputFloat("Y position", &m_sprite._transform._position.y);
         ImGui::InputFloat("Angle",
@@ -35,7 +44,42 @@ public:
         ImGui::End();
     }
 
+    void handle_events()
+    {
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+        {
+            m_dragging_sprite = false;
+        }
+
+        if (m_dragging_sprite == false)
+        {
+            return;
+        }
+        // Normalize mouse position
+        m_mouse_position.x =
+            ImGui::GetMousePos().x / ImGui::GetIO().DisplaySize.x;
+        m_mouse_position.y =
+            ImGui::GetMousePos().y / ImGui::GetIO().DisplaySize.y;
+
+        // Convert to NDC
+        m_sprite._transform._position.x = m_mouse_position.x * 2.0f - 1.0f;
+        m_sprite._transform._position.y = 1.0f - m_mouse_position.y * 2.0f;
+
+        // Handle mouse wheel rotation for scaling
+        auto const &wheel_rotation = ImGui::GetIO().MouseWheel;
+        if (wheel_rotation != 0.0f)
+        {
+            float scale_factor =
+                1.0f + wheel_rotation *
+                           0.05f; // Adjust 0.1f to control the scaling speed
+            m_sprite._transform._scale.x *= scale_factor;
+            m_sprite._transform._scale.y *= scale_factor;
+        }
+    }
+
 private:
+    bool m_dragging_sprite = false;
+    ImVec2 m_mouse_position;
     sprite &m_sprite;
 };
 
@@ -249,6 +293,19 @@ struct imgui_system
             }
         }
 
+        if (event.type == SDL_EVENT_MOUSE_WHEEL)
+        {
+            ImGuiIO &io = ImGui::GetIO();
+            if (event.wheel.y > 0)      // Upward scroll
+            {
+                io.MouseWheel += 1.0f;  // Increase mouse wheel value
+            }
+            else if (event.wheel.y < 0) // Downward scroll
+            {
+                io.MouseWheel -= 1.0f;  // Decrease mouse wheel value
+            }
+        }
+
         if (ImGui::IsKeyDown(ImGuiKey_Escape))
         {
 
@@ -258,6 +315,12 @@ struct imgui_system
 
                 state = game_states::paused;
             }
+        }
+
+        for (auto entity : registry.view<imgui_sprite_editor>())
+        {
+            auto &sprite_editor = registry.get<imgui_sprite_editor>(entity);
+            sprite_editor.handle_events();
         }
     }
 

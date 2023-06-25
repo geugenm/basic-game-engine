@@ -65,6 +65,13 @@ public:
                         ent_sprite._texture._number);
             glUseProgram(0);
         }
+
+        // TODO: remove debug
+        for (auto entity : view)
+        {
+            auto &ent_sprite = view.get<sprite>(entity);
+            registry.emplace<imgui_sprite_editor>(entity, ent_sprite);
+        }
     }
 
     struct RenderableComparator
