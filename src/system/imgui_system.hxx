@@ -16,6 +16,23 @@
 namespace sdk
 {
 
+class imgui_sprite_editor final
+{
+public:
+    imgui_sprite_editor(sprite &sprite) : m_sprite(sprite) {}
+
+    void imgui_sprite_transform()
+    {
+        ImGui::Begin("Transform");
+        ImGui::InputFloat("X position", &m_sprite._transform._position.x);
+        ImGui::InputFloat("Y position", &m_sprite._transform._position.y);
+        ImGui::End();
+    }
+
+private:
+    sprite &m_sprite;
+};
+
 class settings_window final
 {
 public:
@@ -188,6 +205,12 @@ struct imgui_system
     {
         imgui_subsdk::new_frame();
 
+        for (auto entity : registry.view<imgui_sprite_editor>())
+        {
+            auto &sprite_editor = registry.get<imgui_sprite_editor>(entity);
+            sprite_editor.imgui_sprite_transform();
+        }
+
         for (auto entity : registry.view<game_states>())
         {
             auto &state = registry.get<game_states>(entity);
@@ -200,7 +223,7 @@ struct imgui_system
             if (state == game_states::played)
             {
                 on_play(registry, state);
-                create_new_game_popup();
+                // create_new_game_popup();
             }
 
             if (state == game_states::paused)

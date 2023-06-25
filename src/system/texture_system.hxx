@@ -1,5 +1,6 @@
 #pragma once
 
+#include "imgui_system.hxx"
 #include "sdl_render_system.hxx"
 #include "sprite_animation_system.hxx"
 
@@ -63,6 +64,11 @@ public:
         registry.emplace<sprite>(m_typing_hands_animation,
                                  typing_hands_animations);
 
+        // TODO: remove
+        registry.emplace<imgui_sprite_editor>(
+            m_typing_hands_animation, imgui_sprite_editor(registry.get<sprite>(
+                                          m_typing_hands_animation)));
+
         registry.emplace<sprite>(m_typing_body, typing_body_animations);
 
         registry.emplace<sprite>(m_computer_screen, computer_screen);
@@ -111,7 +117,7 @@ public:
         auto const &head_sprite        = registry.get<sprite>(m_head);
         auto const &pants_sprite       = registry.get<sprite>(m_pants);
 
-        auto const &hands_typing_animated =
+        auto &hands_typing_animated =
             registry.get<sprite>(m_typing_hands_animation);
 
         auto const &typing_body = registry.get<sprite>(m_typing_body);
@@ -131,7 +137,6 @@ public:
         typing_body.render_animated();
 
         head_sprite.render();
-        //         computer_sprite.render();
 
         const auto &sdl_context =
             registry.get<sdl_render_context>(window_entity);
@@ -155,6 +160,11 @@ public:
         const glm::mat4 translation_matrix =
             glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.1f, 0.0f));
 
+        const glm::mat4 translation_matrix1 = glm::translate(
+            glm::mat4(1.0f),
+            glm::vec3(hands_typing_animated._transform._position.x,
+                      hands_typing_animated._transform._position.y, 0.0f));
+
         const auto final_transform =
             projection_matrix * translation_matrix * scaling_matrix;
 
@@ -165,7 +175,8 @@ public:
 
         computer_sprite_animated.apply_transform(final_transform);
 
-        hands_typing_animated.apply_transform(final_transform);
+        hands_typing_animated.apply_transform(
+            projection_matrix * translation_matrix1 * scaling_matrix);
 
         typing_body.apply_transform(final_transform);
     } // namespace sdk
