@@ -1,10 +1,10 @@
 #pragma once
 
-#include "SDL_events.h"
-#include "SDL_keycode.h"
-#include "SDL_mouse.h"
-#include "SDL_video.h"
 #include "sdl_render_system.hxx"
+#include <SDL_events.h>
+#include <SDL_keycode.h>
+#include <SDL_mouse.h>
+#include <SDL_video.h>
 #include <general_components.hxx>
 #include <imgui.h>
 #include <imgui_wrapper.hxx>
@@ -119,44 +119,60 @@ class main_menu_window final
 public:
     void update(entt::registry &registry, sdl_render_context *sdl_window)
     {
+        show_window(registry, sdl_window);
+    }
+
+private:
+    void show_window(entt::registry &registry, sdl_render_context *sdl_window)
+    {
         ImGui::OpenPopup("Menu");
 
         if (ImGui::BeginPopupModal("Menu", nullptr,
                                    ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGuiEntityEditor entityEditor;
 
-            ImGui::Separator();
+            for (auto entity : registry.view<sprite>())
+            {
+                auto sprite1 = registry.get<sprite>(entity);
+                ImGui::Begin("My Image Window");
+                ImGui::Image(
+                    (void *)(intptr_t)sprite1._texture._texture,
+                    ImVec2(sprite1._texture._width, sprite1._texture._height));
+                ImGui::End();
+                break;
+            }
+
             if (ImGui::Button("Play", ImVec2(120, 0)))
             {
-                current_state = game_states::played;
+                for (auto entity : registry.view<game_states>())
+                {
+                    auto &current_state = registry.get<game_states>(entity);
+                    current_state       = game_states::played;
+                }
             }
 
-            ImGui::SameLine();
-            if (ImGui::Button("Campaign (Soon...)", ImVec2(120, 0)))
+            if (ImGui::Button("Settings", ImVec2(120, 0)))
             {
-                // TODO: ...
+                m_settings_window.make_visible();
             }
 
-            ImGui::Separator();
-
-            if (ImGui::Button("Settings (Soon...)", ImVec2(120, 0)))
-            {
-                // TODO: ...
-            }
-
-            ImGui::SameLine();
             if (ImGui::Button("Exit", ImVec2(120, 0)))
             {
-                current_state = game_states::exited;
+                for (auto entity : registry.view<game_states>())
+                {
+                    auto &current_state = registry.get<game_states>(entity);
+                    current_state       = game_states::exited;
+                }
                 ImGui::CloseCurrentPopup();
             }
+
+            m_settings_window.update(registry, sdl_window);
 
             ImGui::EndPopup();
         }
     }
 
-private:
+    settings_window m_settings_window;
 };
 
 struct imgui_system
@@ -184,6 +200,7 @@ struct imgui_system
             if (state == game_states::played)
             {
                 on_play(registry, state);
+                create_new_game_popup();
             }
 
             if (state == game_states::paused)
@@ -230,6 +247,15 @@ struct imgui_system
 private:
     void create_new_game_popup()
     {
+        if (m_tapped_game_creation == false)
+        {
+            return;
+        }
+
+        if (m_is_creating_new_game == true)
+        {
+            return;
+        }
         // TODO: make adequate formula for size calculation
         ImGui::SetNextWindowPos(m_tapped_mouse_position);
         ImGui::SetNextWindowSize(ImVec2(160.0f, 40.0f));
@@ -242,7 +268,15 @@ private:
         imgui_subsdk::center_next_element_horizontally(140.0f);
         imgui_subsdk::center_next_element_vertically(25.0f);
 
-        ImGui::Button("Create new game", ImVec2(140.0f, 25));
+        if (ImGui::Button("Create new game", ImVec2(140.0f, 25)))
+        {
+            m_is_creating_new_game = true;
+        }
+
+        if (m_is_creating_new_game)
+        {
+            create_game_window();
+        }
 
         ImGui::End();
     }
@@ -291,7 +325,14 @@ private:
         }
     }
 
-    void on_menu(entt::registry &registry, game_states &current_state) {}
+    void on_menu(entt::registry &registry, game_states &current_state)
+    {
+        for (auto entity : registry.view<sdl_render_context>())
+        {
+            auto &window = registry.get<sdl_render_context>(entity);
+            m_main_menu_window.update(registry, &window);
+        }
+    }
 
     void on_exit(entt::registry &registry, game_states &current_state) {}
 
@@ -388,77 +429,8 @@ private:
         ImGui::End();
     }
 
-    void event_developement_stage()
-    {
-        static constexpr auto dev_stage_window_bounds = ImVec2(400, 400);
-        // TODO: Make it a variable
-        static constexpr auto context_window_bounds = ImVec2(1920, 1080);
-
-        imgui_subsdk::center_on_screen(dev_stage_window_bounds,
-                                       context_window_bounds);
-
-        ImGui::SetNextWindowSize(dev_stage_window_bounds);
-
-        if (ImGui::Begin("dev_stage_1", nullptr,
-                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                             ImGuiWindowFlags_NoScrollbar))
-        {
-
-            create_slider("Engine", 200.0f);
-            create_slider("Gameplay", 200.0f);
-            create_slider("Story/Quests", 200.0f);
-
-            create_time_allocation_bar("1");
-
-            create_ok_button();
-        }
-        ImGui::End();
-
-        imgui_subsdk::center_on_screen(dev_stage_window_bounds,
-                                       context_window_bounds);
-
-        ImGui::SetNextWindowSize(dev_stage_window_bounds);
-
-        ImGui::NewLine();
-
-        if (ImGui::Begin("dev_stage_2", nullptr,
-                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                             ImGuiWindowFlags_NoScrollbar))
-        {
-
-            create_slider("Dialogues", 200.0f);
-            create_slider("Level Design", 200.0f);
-            create_slider("AI", 200.0f);
-
-            create_time_allocation_bar("2");
-
-            create_ok_button();
-        }
-        ImGui::End();
-
-        imgui_subsdk::center_on_screen(dev_stage_window_bounds,
-                                       context_window_bounds);
-
-        ImGui::SetNextWindowSize(dev_stage_window_bounds);
-
-        ImGui::NewLine();
-
-        if (ImGui::Begin("dev_stage_3", nullptr,
-                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                             ImGuiWindowFlags_NoScrollbar))
-        {
-            create_slider("World Design", 200.0f);
-            create_slider("Graphic", 200.0f);
-            create_slider("Sound", 200.0f);
-
-            create_time_allocation_bar("3");
-
-            create_ok_button();
-        }
-        ImGui::End();
-    }
-
-    void create_slider(const char *name, const uint32_t &width = 200.0f)
+    void create_slider(const char *name, int *value,
+                       const uint32_t &width = 200.0f)
     {
         std::string id_sharps = "##";
         id_sharps.append(name);
@@ -474,6 +446,7 @@ private:
 
     void create_time_allocation_bar(const std::string_view &id)
     {
+
         const float &window_width = ImGui::GetWindowSize().x;
 
         std::string final_id = "##";
@@ -498,23 +471,30 @@ private:
         ImGui::EndChild();
     }
 
-    void create_ok_button()
+    [[nodiscard]] bool create_ok_button()
     {
         imgui_subsdk::center_next_element_horizontally(70.0f);
 
-        ImGui::Button("OK", ImVec2(70.0f, 25));
+        if (ImGui::Button("OK", ImVec2(70.0f, 25)))
+        {
+            return true;
+        }
+        return false;
     }
 
     void create_game_window()
     {
+        static bool stage_1 = false;
+        static bool stage_2 = false;
+        static bool stage_3 = false;
+
         // TODO: Get window size
         ImGui::SetNextWindowSize(ImVec2(1720, 1080));
         ImGui::SetNextWindowPos(ImVec2(100, 0));
 
-        if (ImGui::Begin("Game concept", &m_show_create_game_window,
+        if (ImGui::Begin("Game concept", &m_is_creating_new_game,
                          ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                             ImGuiWindowFlags_NoScrollbar |
-                             ImGuiWindowFlags_MenuBar))
+                             ImGuiWindowFlags_NoScrollbar))
         {
 
             ImGui::PushItemWidth(200); // NOTE: (Push/Pop)ItemWidth is optional
@@ -559,20 +539,127 @@ private:
             ImGui::EndChild();
 
             const ImVec2 button_size(120, 30);
-            ImGui::SetCursorPosX(ImGui::GetWindowSize().x - button_size.x);
-            ImGui::SetCursorPosY(0);
-            ImGui::Button("Next", button_size);
+            if (ImGui::Button("Next", button_size))
+            {
+                m_is_creating_new_game = false;
+                stage_1                = true;
+            }
         }
         ImGui::End();
+
+        static constexpr auto dev_stage_window_bounds = ImVec2(400, 400);
+        // TODO: Make it a variable
+        static constexpr auto context_window_bounds = ImVec2(1920, 1080);
+
+        if (stage_1)
+        {
+            imgui_subsdk::center_on_screen(dev_stage_window_bounds,
+                                           context_window_bounds);
+
+            ImGui::SetNextWindowSize(dev_stage_window_bounds);
+
+            if (ImGui::Begin("dev_stage_1", nullptr,
+                             ImGuiWindowFlags_NoMove |
+                                 ImGuiWindowFlags_NoResize |
+                                 ImGuiWindowFlags_NoScrollbar))
+            {
+
+                static int engine   = 0;
+                static int gameplay = 0;
+                static int story    = 0;
+
+                create_slider("Engine", &engine, 200.0f);
+                create_slider("Gameplay", &gameplay, 200.0f);
+                create_slider("Story/Quests", &story, 200.0f);
+
+                create_time_allocation_bar("1");
+
+                if (create_ok_button())
+                {
+                    stage_1 = false;
+                    stage_2 = true;
+                }
+            }
+            ImGui::End();
+        }
+
+        if (stage_2)
+        {
+
+            imgui_subsdk::center_on_screen(dev_stage_window_bounds,
+                                           context_window_bounds);
+
+            ImGui::SetNextWindowSize(dev_stage_window_bounds);
+
+            ImGui::NewLine();
+
+            if (ImGui::Begin("dev_stage_2", nullptr,
+                             ImGuiWindowFlags_NoMove |
+                                 ImGuiWindowFlags_NoResize |
+                                 ImGuiWindowFlags_NoScrollbar))
+            {
+
+                static int dialogues    = 0;
+                static int level_design = 0;
+                static int ai           = 0;
+
+                create_slider("Dialogues", &dialogues, 200.0f);
+                create_slider("Level Design", &level_design, 200.0f);
+                create_slider("AI", &ai, 200.0f);
+
+                create_time_allocation_bar("2");
+
+                if (create_ok_button())
+                {
+                    stage_2 = false;
+                    stage_3 = true;
+                }
+            }
+            ImGui::End();
+        }
+
+        if (stage_3)
+        {
+            imgui_subsdk::center_on_screen(dev_stage_window_bounds,
+                                           context_window_bounds);
+
+            ImGui::SetNextWindowSize(dev_stage_window_bounds);
+
+            ImGui::NewLine();
+
+            if (ImGui::Begin("dev_stage_3", nullptr,
+                             ImGuiWindowFlags_NoMove |
+                                 ImGuiWindowFlags_NoResize |
+                                 ImGuiWindowFlags_NoScrollbar))
+            {
+                static int world_design = 0;
+                static int graphics     = 0;
+                static int sound        = 0;
+
+                create_slider("World Design", &world_design, 200.0f);
+                create_slider("Graphics", &graphics, 200.0f);
+                create_slider("Sound", &sound, 200.0f);
+
+                create_time_allocation_bar("3");
+
+                if (create_ok_button())
+                {
+                    stage_3 = false;
+                }
+            }
+            ImGui::End();
+        }
     }
 
     bool m_tapped_game_creation = false;
 
-    bool m_show_create_game_window = false;
+    bool m_is_creating_new_game = false;
 
     ImVec2 m_tapped_mouse_position;
 
     settings_window m_settings_window;
+
+    main_menu_window m_main_menu_window;
 };
 
 } // namespace sdk

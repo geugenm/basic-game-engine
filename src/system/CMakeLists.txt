@@ -12,5 +12,4 @@ target_link_libraries(sdk_systems PUBLIC
                       sdk_components
                       EnTT::EnTT
                       stb_image
-                      imgui_entt_entity_editor
                       )

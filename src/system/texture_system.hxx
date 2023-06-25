@@ -28,7 +28,6 @@ public:
     void test(entt::registry &registry)
     {
         m_garage = registry.create();
-        m_body   = registry.create();
         m_chair  = registry.create();
         m_head   = registry.create();
         m_pants  = registry.create();
@@ -42,8 +41,6 @@ public:
         sprite battlefield = sprite::get_sprite_from_file("level1");
 
         sprite chair = sprite::get_sprite_from_file("chair");
-
-        sprite body = sprite::get_sprite_from_file("body");
 
         sprite head = sprite::get_sprite_from_file("head");
 
@@ -60,7 +57,6 @@ public:
 
         registry.emplace<sprite>(m_garage, battlefield);
         registry.emplace<sprite>(m_chair, chair);
-        registry.emplace<sprite>(m_body, body);
         registry.emplace<sprite>(m_head, head);
         registry.emplace<sprite>(m_pants, pants);
 
@@ -112,7 +108,6 @@ public:
     {
         auto const &battlefield_sprite = registry.get<sprite>(m_garage);
         auto const &chair_sprite       = registry.get<sprite>(m_chair);
-        auto const &body_sprite        = registry.get<sprite>(m_body);
         auto const &head_sprite        = registry.get<sprite>(m_head);
         auto const &pants_sprite       = registry.get<sprite>(m_pants);
 
@@ -165,7 +160,6 @@ public:
 
         battlefield_sprite.apply_transform(transform);
         chair_sprite.apply_transform(final_transform);
-        body_sprite.apply_transform(final_transform);
         head_sprite.apply_transform(final_transform);
         pants_sprite.apply_transform(final_transform);
 
@@ -331,7 +325,6 @@ private:
 
     entt::entity m_garage{};
     entt::entity m_chair{};
-    entt::entity m_body{};
     entt::entity m_head{};
     entt::entity m_pants{};
     entt::entity m_computer_screen{};
