@@ -19,7 +19,7 @@ namespace sdk
 class imgui_sprite_editor final
 {
 public:
-    imgui_sprite_editor(sprite &sprite) : m_sprite(sprite) {}
+    explicit imgui_sprite_editor(sprite &sprite) : m_sprite(sprite) {}
 
     void imgui_sprite_transform()
     {
@@ -153,18 +153,6 @@ private:
         if (ImGui::BeginPopupModal("Menu", nullptr,
                                    ImGuiWindowFlags_AlwaysAutoResize))
         {
-
-            for (auto entity : registry.view<sprite>())
-            {
-                auto sprite1 = registry.get<sprite>(entity);
-                ImGui::Begin("My Image Window");
-                ImGui::Image(
-                    (void *)(intptr_t)sprite1._texture._texture,
-                    ImVec2(sprite1._texture._width, sprite1._texture._height));
-                ImGui::End();
-                break;
-            }
-
             if (ImGui::Button("Play", ImVec2(120, 0)))
             {
                 for (auto entity : registry.view<game_states>())

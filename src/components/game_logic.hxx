@@ -84,4 +84,12 @@ struct game
     game_pursuance _pursuance;
 };
 
+struct skills
+{
+    int _art;
+    int _coding;
+    int _speed;
+    int _anialytcis;
+};
+
 } // namespace sdk

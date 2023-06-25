@@ -3,12 +3,14 @@
 #include <glad/glad.h>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 #include <nlohmann/json.hpp>
 #include <opengl_functions.hxx>
 
 #include <filesystem>
 #include <fstream>
 #include <glm/glm.hpp>
+#include <ostream>
 #include <vector>
 
 #include <SDL3/SDL.h>
@@ -217,8 +219,8 @@ struct opengl_texture
 
 struct transform
 {
-    glm::vec2 _position{0.0f, -0.0f};
-    glm::vec2 _scale{1.0f, 1.0f};
+    glm::vec3 _position{0.0f, 0.0f, 0.0f};
+    glm::vec3 _scale{1.0f, 1.0f, 1.0f};
     float _current_rotation_angle = 0.0f;
 };
 
@@ -297,6 +299,46 @@ struct sprite
         };
 
         return result;
+    }
+};
+
+struct sprite_animation final
+{
+    std::size_t _current_frame{};
+    std::size_t _rows{};
+    std::size_t _columns{};
+
+    [[nodiscard]] static sprite_animation
+    create_new_animation(const std::size_t &rows, const std::size_t &cols)
+    {
+        if (rows == 0 || cols == 0)
+        {
+            throw std::invalid_argument(
+                "Can't create sprite animation: `rows={}` or "
+                "`cols={}` is 0");
+        }
+
+        sprite_animation new_animation{
+            ._current_frame = 0,
+            ._rows          = rows,
+            ._columns       = cols,
+        };
+
+        return new_animation;
+    }
+
+    [[nodiscard]] bool is_properly_initialized() const
+    {
+        if (_rows == 0 || _columns == 0)
+        {
+
+            std::cout << "WARNING: sprite animation is not properly "
+                         "initialized: `rows={}` or "
+                         "`cols={}` is 0";
+            return false;
+        }
+
+        return true;
     }
 };
 

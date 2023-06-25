@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx")
 
+add_subdirectory(player)
+
 add_library(sdk_systems SHARED)
 
 target_sources(sdk_systems PUBLIC ${SOURCES})
@@ -12,4 +14,5 @@ target_link_libraries(sdk_systems PUBLIC
                       sdk_components
                       EnTT::EnTT
                       stb_image
+                      player_system
                       )

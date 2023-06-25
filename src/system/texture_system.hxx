@@ -3,6 +3,7 @@
 #include "imgui_system.hxx"
 #include "sdl_render_system.hxx"
 #include "sprite_animation_system.hxx"
+#include <player.hxx>
 
 #include <SDL_events.h>
 #include <SDL_mouse.h>
@@ -30,41 +31,14 @@ public:
     {
         m_garage = registry.create();
 
-        m_computer_screen = registry.create();
-
-        m_typing_hands_animation = registry.create();
-
         sprite battlefield = sprite::get_sprite_from_file("level1");
-
-        sprite typing_hands_animations =
-            sprite::get_sprite_from_file("hands_typing");
-
-        typing_hands_animations._transform = {
-            ._position = glm::vec2(-0.244f, 0.115f),
-            ._scale    = glm::vec2(0.044f, 0.044f)};
-
-        sprite computer_screen =
-            sprite::get_sprite_from_file("computer_screen");
 
         registry.emplace<sprite>(m_garage, battlefield);
 
-        registry.emplace<sprite>(m_typing_hands_animation,
-                                 typing_hands_animations);
-
-        // TODO: remove
-        registry.emplace<imgui_sprite_editor>(
-            m_typing_hands_animation, imgui_sprite_editor(registry.get<sprite>(
-                                          m_typing_hands_animation)));
-
-        registry.emplace<sprite>(m_computer_screen, computer_screen);
-
-        registry.emplace<sprite_animation>(
-            m_typing_hands_animation,
-            sprite_animation::create_new_animation(2, 40));
+        m_player_system.init(registry);
     }
 
-    void init_on(entt::registry &registry,
-                 entt::entity const &window_entity) const
+    void init_on(entt::registry &registry, entt::entity const &window_entity)
     {
         auto sdl_context = registry.get<sdl_render_context>(window_entity);
 
@@ -93,20 +67,30 @@ public:
         }
     }
 
+    struct RenderableComparator
+    {
+        entt::registry &registry;
+
+        explicit RenderableComparator(entt::registry &registry)
+            : registry(registry)
+        {
+        }
+
+        bool operator()(const entt::entity lhs, const entt::entity rhs) const
+        {
+            const auto &lhs_sprite = registry.get<sprite>(lhs);
+            const auto &rhs_sprite = registry.get<sprite>(rhs);
+            return lhs_sprite._transform._position.z <
+                   rhs_sprite._transform._position.z;
+        }
+    };
+
     void update(entt::registry &registry, entt::entity const &window_entity)
     {
-        auto const &battlefield_sprite = registry.get<sprite>(m_garage);
-
-        auto const &hands_typing_animated =
-            registry.get<sprite>(m_typing_hands_animation);
-
         m_animation_system.update(registry);
 
         glClearColor(1, 1, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        battlefield_sprite.render();
-        hands_typing_animated.render_animated();
 
         const auto &sdl_context =
             registry.get<sdl_render_context>(window_entity);
@@ -115,28 +99,38 @@ public:
             static_cast<float>(sdl_context.get_width()) /
             static_cast<float>(sdl_context.get_height());
 
-        const float texture_aspect =
-            battlefield_sprite._texture.get_image_aspect_ratio();
+        registry.sort<sprite>(RenderableComparator{registry});
 
-        const float scale = window_aspect_ratio / texture_aspect;
+        auto view = registry.view<sprite>();
 
-        const glm::mat4 projection_matrix =
-            glm::ortho(-scale, scale, -1.0f, 1.0f, -1.0f, 1.0f);
+        for (auto entity : view)
+        {
+            auto const &entity_sprite = view.get<sprite>(entity);
 
-        const glm::mat4 translation_matrix1 = glm::translate(
-            glm::mat4(1.0f),
-            glm::vec3(hands_typing_animated._transform._position.x,
-                      hands_typing_animated._transform._position.y, 0.0f));
+            entity_sprite.render_animated();
+            entity_sprite.render();
+        }
 
-        const glm::mat4 scaling_matrix1 = glm::scale(
-            glm::mat4(1.0f),
-            glm::vec3(hands_typing_animated._transform._scale.x,
-                      hands_typing_animated._transform._scale.y, 1.0f));
+        for (auto entity : view)
+        {
+            auto const &entity_sprite = view.get<sprite>(entity);
 
-        battlefield_sprite.apply_transform(projection_matrix);
+            const float texture_aspect =
+                entity_sprite._texture.get_image_aspect_ratio();
 
-        hands_typing_animated.apply_transform(
-            projection_matrix * translation_matrix1 * scaling_matrix1);
+            const glm::mat4 projection_matrix =
+                glm::ortho(-window_aspect_ratio, window_aspect_ratio, -1.0f,
+                           1.0f, -1.0f, 1.0f);
+
+            const glm::mat4 translation_matrix1 = glm::translate(
+                glm::mat4(1.0f), entity_sprite._transform._position);
+
+            const glm::mat4 scaling_matrix1 =
+                glm::scale(glm::mat4(1.0f), entity_sprite._transform._scale);
+
+            entity_sprite.apply_transform(
+                projection_matrix * translation_matrix1 * scaling_matrix1);
+        }
     } // namespace sdk
 
 private:
@@ -293,9 +287,8 @@ private:
     }
 
     entt::entity m_garage{};
-    entt::entity m_computer_screen{};
 
-    entt::entity m_typing_hands_animation{};
+    player_system m_player_system;
 
     [[no_unique_address]] sprite_animation_system m_animation_system{};
 };

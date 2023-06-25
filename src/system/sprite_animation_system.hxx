@@ -1,52 +1,12 @@
 #pragma once
 
-#include "general_components.hxx"
+#include <general_components.hxx>
 
 #include <entt/entt.hpp>
 #include <iostream>
 
 namespace sdk
 {
-
-struct sprite_animation final
-{
-    std::size_t _current_frame{};
-    std::size_t _rows{};
-    std::size_t _columns{};
-
-    [[nodiscard]] static sprite_animation
-    create_new_animation(const std::size_t &rows, const std::size_t &cols)
-    {
-        if (rows == 0 || cols == 0)
-        {
-            throw std::invalid_argument(
-                "Can't create sprite animation: `rows={}` or "
-                "`cols={}` is 0");
-        }
-
-        sprite_animation new_animation{
-            ._current_frame = 0,
-            ._rows          = rows,
-            ._columns       = cols,
-        };
-
-        return new_animation;
-    }
-
-    [[nodiscard]] bool is_properly_initialized() const
-    {
-        if (_rows == 0 || _columns == 0)
-        {
-
-            std::cout << "WARNING: sprite animation is not properly "
-                         "initialized: `rows={}` or "
-                         "`cols={}` is 0";
-            return false;
-        }
-
-        return true;
-    }
-};
 
 class sprite_animation_system
 {
