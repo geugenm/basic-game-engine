@@ -29,37 +29,24 @@ public:
     void test(entt::registry &registry)
     {
         m_garage = registry.create();
-        m_chair  = registry.create();
-        m_head   = registry.create();
-        m_pants  = registry.create();
 
         m_computer_screen = registry.create();
 
         m_typing_hands_animation = registry.create();
 
-        m_typing_body = registry.create();
-
         sprite battlefield = sprite::get_sprite_from_file("level1");
-
-        sprite chair = sprite::get_sprite_from_file("chair");
-
-        sprite head = sprite::get_sprite_from_file("head");
-
-        sprite pants = sprite::get_sprite_from_file("pants");
 
         sprite typing_hands_animations =
             sprite::get_sprite_from_file("hands_typing");
 
-        sprite typing_body_animations =
-            sprite::get_sprite_from_file("body_typing");
+        typing_hands_animations._transform = {
+            ._position = glm::vec2(-0.244f, 0.115f),
+            ._scale    = glm::vec2(0.044f, 0.044f)};
 
         sprite computer_screen =
             sprite::get_sprite_from_file("computer_screen");
 
         registry.emplace<sprite>(m_garage, battlefield);
-        registry.emplace<sprite>(m_chair, chair);
-        registry.emplace<sprite>(m_head, head);
-        registry.emplace<sprite>(m_pants, pants);
 
         registry.emplace<sprite>(m_typing_hands_animation,
                                  typing_hands_animations);
@@ -69,19 +56,15 @@ public:
             m_typing_hands_animation, imgui_sprite_editor(registry.get<sprite>(
                                           m_typing_hands_animation)));
 
-        registry.emplace<sprite>(m_typing_body, typing_body_animations);
-
         registry.emplace<sprite>(m_computer_screen, computer_screen);
 
         registry.emplace<sprite_animation>(
             m_typing_hands_animation,
             sprite_animation::create_new_animation(2, 40));
-
-        registry.emplace<sprite_animation>(
-            m_typing_body, sprite_animation::create_new_animation(3, 24));
     }
 
-    void init_on(entt::registry &registry, entt::entity const &window_entity)
+    void init_on(entt::registry &registry,
+                 entt::entity const &window_entity) const
     {
         auto sdl_context = registry.get<sdl_render_context>(window_entity);
 
@@ -113,17 +96,9 @@ public:
     void update(entt::registry &registry, entt::entity const &window_entity)
     {
         auto const &battlefield_sprite = registry.get<sprite>(m_garage);
-        auto const &chair_sprite       = registry.get<sprite>(m_chair);
-        auto const &head_sprite        = registry.get<sprite>(m_head);
-        auto const &pants_sprite       = registry.get<sprite>(m_pants);
 
-        auto &hands_typing_animated =
+        auto const &hands_typing_animated =
             registry.get<sprite>(m_typing_hands_animation);
-
-        auto const &typing_body = registry.get<sprite>(m_typing_body);
-
-        auto const &computer_sprite_animated =
-            registry.get<sprite>(m_computer_screen);
 
         m_animation_system.update(registry);
 
@@ -131,12 +106,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         battlefield_sprite.render();
-        chair_sprite.render();
-        pants_sprite.render();
         hands_typing_animated.render_animated();
-        typing_body.render_animated();
-
-        head_sprite.render();
 
         const auto &sdl_context =
             registry.get<sdl_render_context>(window_entity);
@@ -153,32 +123,20 @@ public:
         const glm::mat4 projection_matrix =
             glm::ortho(-scale, scale, -1.0f, 1.0f, -1.0f, 1.0f);
 
-        const auto transform = projection_matrix;
-
-        const glm::mat4 scaling_matrix =
-            glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 1.0f));
-        const glm::mat4 translation_matrix =
-            glm::translate(glm::mat4(1.0f), glm::vec3(-0.2f, 0.1f, 0.0f));
-
         const glm::mat4 translation_matrix1 = glm::translate(
             glm::mat4(1.0f),
             glm::vec3(hands_typing_animated._transform._position.x,
                       hands_typing_animated._transform._position.y, 0.0f));
 
-        const auto final_transform =
-            projection_matrix * translation_matrix * scaling_matrix;
+        const glm::mat4 scaling_matrix1 = glm::scale(
+            glm::mat4(1.0f),
+            glm::vec3(hands_typing_animated._transform._scale.x,
+                      hands_typing_animated._transform._scale.y, 1.0f));
 
-        battlefield_sprite.apply_transform(transform);
-        chair_sprite.apply_transform(final_transform);
-        head_sprite.apply_transform(final_transform);
-        pants_sprite.apply_transform(final_transform);
-
-        computer_sprite_animated.apply_transform(final_transform);
+        battlefield_sprite.apply_transform(projection_matrix);
 
         hands_typing_animated.apply_transform(
-            projection_matrix * translation_matrix1 * scaling_matrix);
-
-        typing_body.apply_transform(final_transform);
+            projection_matrix * translation_matrix1 * scaling_matrix1);
     } // namespace sdk
 
 private:
@@ -335,16 +293,11 @@ private:
     }
 
     entt::entity m_garage{};
-    entt::entity m_chair{};
-    entt::entity m_head{};
-    entt::entity m_pants{};
     entt::entity m_computer_screen{};
 
     entt::entity m_typing_hands_animation{};
 
-    entt::entity m_typing_body{};
-
-    sprite_animation_system m_animation_system{};
+    [[no_unique_address]] sprite_animation_system m_animation_system{};
 };
 
 } // namespace sdk

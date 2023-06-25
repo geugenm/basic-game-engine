@@ -26,6 +26,12 @@ public:
         ImGui::Begin("Transform");
         ImGui::InputFloat("X position", &m_sprite._transform._position.x);
         ImGui::InputFloat("Y position", &m_sprite._transform._position.y);
+        ImGui::InputFloat("Angle",
+                          &m_sprite._transform._current_rotation_angle);
+
+        ImGui::InputFloat("X scale", &m_sprite._transform._scale.x);
+        ImGui::InputFloat("Y scale", &m_sprite._transform._scale.y);
+
         ImGui::End();
     }
 
