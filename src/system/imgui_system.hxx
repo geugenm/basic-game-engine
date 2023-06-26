@@ -22,50 +22,29 @@ class imgui_sprite_editor final
 public:
     explicit imgui_sprite_editor(sprite &sprite) : m_sprite(sprite) {}
 
-    void imgui_sprite_transform()
+    void render()
     {
         const std::string title =
             "Transform: " + m_sprite._texture._image_path.filename().string();
-        ImGui::Begin(title.data());
+        ImGui::BeginChild(title.data());
 
         ImGui::Checkbox("Modify position", &m_dragging_sprite);
 
-        if (m_dragging_sprite)
-        {
-        }
-
         ImGui::InputFloat("X position", &m_sprite._transform._position.x);
         ImGui::InputFloat("Y position", &m_sprite._transform._position.y);
+        ImGui::InputFloat("Z position", &m_sprite._transform._position.z);
         ImGui::InputFloat("Angle",
                           &m_sprite._transform._current_rotation_angle);
 
         ImGui::InputFloat("X scale", &m_sprite._transform._scale.x);
         ImGui::InputFloat("Y scale", &m_sprite._transform._scale.y);
+        ImGui::InputFloat("Z scale", &m_sprite._transform._scale.z);
 
-        if (ImGui::Button("Apply"))
-        {
-            nlohmann::json output = m_sprite.serialize();
-            const std::filesystem::path output_path =
-                "../assets/sprites/" + m_sprite._name + ".json";
-            std::ofstream output_file;
-            output_file.open(output_path);
+        ImGui::InputText("Sprite name", m_sprite._name.data(), 4096);
 
-            if (output_file.is_open() == false)
-            {
-                throw std::invalid_argument(
-                    "Could not write to file `" + output_path.string() +
-                    ".json`. Current searching path: " +
-                    std::filesystem::current_path().string());
-            }
+        apply();
 
-            std::cout << "Saved to `" + output_path.string() << std::endl;
-
-            const std::string result = output.dump();
-            output_file << result;
-            output_file.close();
-        }
-
-        ImGui::End();
+        ImGui::EndChild();
     }
 
     void handle_events()
@@ -90,19 +69,43 @@ public:
         m_sprite._transform._position.x = m_mouse_position.x * 2.0f - 1.0f;
         m_sprite._transform._position.y = 1.0f - m_mouse_position.y * 2.0f;
 
+        if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+        {
+            // Handle mouse wheel rotation for scaling
+            auto const &wheel_rotation = ImGui::GetIO().MouseWheel;
+            if (wheel_rotation != 0.0f)
+            {
+                m_sprite._transform._position.z += wheel_rotation * 0.05f;
+            }
+            return;
+        }
+
         // Handle mouse wheel rotation for scaling
         auto const &wheel_rotation = ImGui::GetIO().MouseWheel;
         if (wheel_rotation != 0.0f)
         {
-            const float scale_factor =
-                1.0f + wheel_rotation *
-                           0.05f; // Adjust 0.1f to control the scaling speed
+            const float scale_factor = 1.0f + wheel_rotation * 0.05f;
             m_sprite._transform._scale.x *= scale_factor;
             m_sprite._transform._scale.y *= scale_factor;
         }
     }
 
+    [[nodiscard]] const sprite &get_sprite() const
+    {
+        return m_sprite;
+    }
+
 private:
+    void apply() const
+    {
+        if (!ImGui::Button("Apply"))
+        {
+            return;
+        }
+
+        m_sprite.save_to_file();
+    }
+
     bool m_dragging_sprite = false;
     ImVec2 m_mouse_position;
     sprite &m_sprite;
@@ -262,16 +265,57 @@ struct imgui_system
         auto &sdl_context = registry.get<sdl_render_context>(entity);
 
         imgui_subsdk::init_imgui(sdl_context._window, sdl_context._context);
+
+        for (auto entity : registry.view<imgui_sprite_editor>())
+        {
+            auto const &sprite_editor =
+                registry.get<imgui_sprite_editor>(entity);
+            m_sprite_editors.push_back(sprite_editor.get_sprite()._name);
+        }
     }
 
     void update(entt::registry &registry)
     {
         imgui_subsdk::new_frame();
 
+        static std::size_t selected_index = 0;
+
+        if (ImGui::BeginCombo("List", m_sprite_editors[selected_index].data()))
+        {
+            for (size_t i = 0; i < m_sprite_editors.size(); ++i)
+            {
+                const std::string &item = m_sprite_editors[i];
+                const bool isSelected   = (selected_index == i);
+                if (ImGui::Selectable(item.c_str(), isSelected))
+                {
+                    selected_index = i;
+                }
+                if (isSelected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+
         for (auto entity : registry.view<imgui_sprite_editor>())
         {
             auto &sprite_editor = registry.get<imgui_sprite_editor>(entity);
-            sprite_editor.imgui_sprite_transform();
+            if (m_sprite_editors[selected_index] ==
+                sprite_editor.get_sprite()._name)
+            {
+                sprite_editor.render();
+            }
+        }
+
+        if (ImGui::Button("Save All"))
+        {
+            for (auto entity : registry.view<imgui_sprite_editor>())
+            {
+                auto const &sprite_editor =
+                    registry.get<imgui_sprite_editor>(entity);
+                sprite_editor.get_sprite().save_to_file();
+            }
         }
 
         for (auto entity : registry.view<game_states>())
@@ -765,6 +809,8 @@ private:
     settings_window m_settings_window;
 
     main_menu_window m_main_menu_window;
+
+    std::vector<std::string> m_sprite_editors;
 };
 
 } // namespace sdk

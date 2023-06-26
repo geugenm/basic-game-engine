@@ -11,7 +11,7 @@ if (BUILD_TESTS)
     endfunction()
 
     enable_testing()
-    
+
     add_test_executable(test_entt test_entt.cxx)
     target_link_libraries(test_entt PUBLIC engine_sdk EnTT::EnTT)
 endif ()

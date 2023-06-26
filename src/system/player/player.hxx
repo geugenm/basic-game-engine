@@ -70,7 +70,7 @@ public:
         {
             m_chair = registry.create();
 
-            sprite current_sprite = sprite::get_sprite_from_file("null");
+            sprite current_sprite = sprite::get_sprite_from_file("chair");
 
             registry.emplace<sprite>(m_chair, current_sprite);
         }

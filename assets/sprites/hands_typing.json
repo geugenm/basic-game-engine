@@ -1,4 +1,5 @@
 {
+  "name": "hands_typing",
   "shader": {
     "vertex_source_path": "shaders/texture.vert",
     "fragment_source_path": "shaders/texture.frag"

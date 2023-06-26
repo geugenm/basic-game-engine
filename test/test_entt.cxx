@@ -13,6 +13,7 @@ TEST(GameSystemTest, UpdateAndHandleEvents)
         std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
 
         system.update(main_registry);
+
         system.handle_events(main_registry);
     }
 

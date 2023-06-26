@@ -4,7 +4,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx")
 
 add_subdirectory(player)
 
-add_library(sdk_systems SHARED)
+add_library(sdk_systems STATIC)
 
 target_sources(sdk_systems PUBLIC ${SOURCES})
 

@@ -2,7 +2,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../CPM.cmake.cmake)
 
 CPMAddPackage(
         NAME ccache
-        GITHUB_REPOSITORY "TheLartians/Ccache.cmake"
+        GITHUB_REPOSITORY TheLartians/Ccache.cmake
         VERSION 1.2.4
         GIT_TAG "v1.2.4"
 )

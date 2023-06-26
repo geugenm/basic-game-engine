@@ -9,10 +9,10 @@ game_system::game_system(entt::registry &registry, const char *title,
     : m_render_engine(registry, title, width, height),
       m_game_state_entity(registry.create())
 {
-    imgui.init(registry, m_render_engine._window_entity);
     m_texture_system.test(registry);
     sdk::opengl_shader_initializer_system::init(registry);
     m_texture_system.init_on(registry, m_render_engine._window_entity);
+    imgui.init(registry, m_render_engine._window_entity);
 
     game_states state = game_states::in_menu;
     registry.emplace<game_states>(m_game_state_entity, state);

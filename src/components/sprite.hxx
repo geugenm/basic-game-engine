@@ -81,6 +81,25 @@ struct sprite
         glUseProgram(0);
     }
 
+    void save_to_file() const
+    {
+        const std::filesystem::path output_path =
+            "../assets/sprites/" + _name + ".json";
+        std::ofstream output_file(output_path);
+
+        if (!output_file.is_open())
+        {
+            throw std::invalid_argument(
+                "Could not write to file `" + output_path.string() +
+                ".json`. Current searching path: " +
+                std::filesystem::current_path().string());
+        }
+
+        const nlohmann::json output = serialize();
+        output_file << output;
+        output_file.close();
+    }
+
     [[nodiscard]] static sprite get_sprite_from_file(
         const std::string_view &json_parameters_file_name,
         const std::filesystem::path &resources_path = "../assets/sprites")
@@ -98,7 +117,10 @@ struct sprite
                                         texture_path.string());
         }
 
-        return sprite::deserialize(json_texture_properties);
+        auto result  = sprite::deserialize(json_texture_properties);
+        result._name = json_parameters_file_name;
+
+        return result;
     }
 
     [[nodiscard]] static sprite deserialize(const nlohmann::json &input_json)
