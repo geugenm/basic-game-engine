@@ -125,6 +125,7 @@ public:
             const float texture_aspect =
                 entity_sprite._texture.get_image_aspect_ratio();
 
+            // Translate to origin
             const glm::mat4 projection_matrix =
                 glm::ortho(-window_aspect_ratio, window_aspect_ratio, -1.0f,
                            1.0f, -1.0f, 1.0f);
@@ -141,9 +142,9 @@ public:
             const glm::mat4 scaling_matrix1 =
                 glm::scale(glm::mat4(1.0f), entity_sprite._transform._scale);
 
-            entity_sprite.apply_transform(projection_matrix *
-                                          translation_matrix1 *
-                                          rotation_matrix1 * scaling_matrix1);
+            entity_sprite.apply_transform(translation_matrix1 *
+                                          projection_matrix * rotation_matrix1 *
+                                          scaling_matrix1);
         }
     } // namespace sdk
 

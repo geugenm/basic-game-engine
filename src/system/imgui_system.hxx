@@ -55,6 +55,7 @@ public:
         {
             return;
         }
+
         // Normalize mouse position
         m_mouse_position.x =
             ImGui::GetMousePos().x / ImGui::GetIO().DisplaySize.x;
@@ -69,7 +70,7 @@ public:
         auto const &wheel_rotation = ImGui::GetIO().MouseWheel;
         if (wheel_rotation != 0.0f)
         {
-            float scale_factor =
+            const float scale_factor =
                 1.0f + wheel_rotation *
                            0.05f; // Adjust 0.1f to control the scaling speed
             m_sprite._transform._scale.x *= scale_factor;

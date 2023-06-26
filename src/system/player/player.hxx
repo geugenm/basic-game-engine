@@ -53,9 +53,8 @@ public:
                 sprite::get_sprite_from_file("computer_screen");
 
             compute_screen._transform = {
-                ._position               = glm::vec3(-0.345f, 0.141f, 0.2f),
-                ._scale                  = glm::vec3(0.030f, 0.030f, 1.0f),
-                ._current_rotation_angle = 0.090f};
+                ._position = glm::vec3(-0.181f, 0.141f, 0.2f),
+                ._scale    = glm::vec3(0.030f, 0.050f, 1.0f)};
 
             registry.emplace<sprite>(m_computer_screen, compute_screen);
 
