@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imgui_system.hxx"
+#include "opengl_texture.hxx"
 #include "sdl_render_system.hxx"
 #include "sprite_animation_system.hxx"
 #include <player.hxx>
@@ -151,11 +152,11 @@ public:
 private:
     static void destroy(opengl_texture const &texture)
     {
-        glDeleteVertexArrays(1, &texture._VAO);
+        glDeleteVertexArrays(1, &texture._vertex_array_object);
 
-        glDeleteBuffers(1, &texture._VBO);
+        glDeleteBuffers(1, &texture._vertex_buffer_object);
 
-        glDeleteBuffers(1, &texture._EBO);
+        glDeleteBuffers(1, &texture._element_buffer_object);
     }
 
     static void initialize(opengl_texture &texture,
@@ -235,25 +236,25 @@ private:
 
     static void generate_buffers(opengl_texture &texture)
     {
-        glGenVertexArrays(1, &texture._VAO);
+        glGenVertexArrays(1, &texture._vertex_array_object);
 
-        glGenBuffers(1, &texture._VBO);
+        glGenBuffers(1, &texture._vertex_buffer_object);
 
-        glGenBuffers(1, &texture._EBO);
+        glGenBuffers(1, &texture._element_buffer_object);
     }
 
     static void bind_buffers(opengl_texture &texture)
     {
-        glBindVertexArray(texture._VAO);
+        glBindVertexArray(texture._vertex_array_object);
 
-        glBindBuffer(GL_ARRAY_BUFFER, texture._VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, texture._vertex_buffer_object);
 
         glBufferData(
             GL_ARRAY_BUFFER,
             static_cast<GLsizeiptr>(texture._vertices.size() * sizeof(GLfloat)),
             texture._vertices.data(), GL_DYNAMIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texture._EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, texture._element_buffer_object);
 
         glBufferData(
             GL_ELEMENT_ARRAY_BUFFER,
