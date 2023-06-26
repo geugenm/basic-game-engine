@@ -5,6 +5,7 @@
 #include <SDL_keycode.h>
 #include <SDL_mouse.h>
 #include <SDL_video.h>
+#include <filesystem>
 #include <general_components.hxx>
 #include <imgui.h>
 #include <imgui_wrapper.hxx>
@@ -40,6 +41,29 @@ public:
 
         ImGui::InputFloat("X scale", &m_sprite._transform._scale.x);
         ImGui::InputFloat("Y scale", &m_sprite._transform._scale.y);
+
+        if (ImGui::Button("Apply"))
+        {
+            nlohmann::json output = m_sprite.serialize();
+            const std::filesystem::path output_path =
+                "../assets/sprites/" + m_sprite._name + ".json";
+            std::ofstream output_file;
+            output_file.open(output_path);
+
+            if (output_file.is_open() == false)
+            {
+                throw std::invalid_argument(
+                    "Could not write to file `" + output_path.string() +
+                    ".json`. Current searching path: " +
+                    std::filesystem::current_path().string());
+            }
+
+            std::cout << "Saved to `" + output_path.string() << std::endl;
+
+            const std::string result = output.dump();
+            output_file << result;
+            output_file.close();
+        }
 
         ImGui::End();
     }

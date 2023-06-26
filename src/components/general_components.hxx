@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nlohmann/json_fwd.hpp"
 #include <glad/glad.h>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -73,6 +74,15 @@ get_file_json_content(std::filesystem::path file_path)
 
     return json_content;
 }
+
+[[nodiscard]] nlohmann::json glm_vec3_to_json(const glm::vec3 &vec);
+
+[[nodiscard]] glm::vec3 glm_vec3_from_json(const nlohmann::json &j,
+                                           const glm::vec3 &default_value = {
+                                               0.f, 0.f, 0.f});
+
+[[nodiscard]] std::string
+get_json_relative_path(const std::filesystem::path &full_path);
 } // namespace util
 
 struct opengl_shader
@@ -144,21 +154,23 @@ struct opengl_shader
         const nlohmann::json &input_json,
         const std::filesystem::path &resources_path = "../assets/sprites")
     {
-        opengl_shader result_shader;
-        result_shader._vertex_source_path =
-            resources_path /
-            input_json.value("vertex_source_path", "shaders/missing.vert");
-        result_shader._fragment_source_path =
-            resources_path /
-            input_json.value("fragment_source_path", "shaders/missing.frag");
-        result_shader._program_id = input_json.value("program_id", GLuint{});
-        return result_shader;
+        return {
+            ._vertex_source_path =
+                resources_path /
+                input_json.value("vertex_source_path", "shaders/missing.vert"),
+            ._fragment_source_path =
+                resources_path / input_json.value("fragment_source_path",
+                                                  "shaders/missing.frag"),
+            ._program_id = input_json.value("program_id", GLuint{}),
+        };
     }
 
     [[nodiscard]] nlohmann::json serialize() const
     {
-        return {{"vertex_source_path", _vertex_source_path.string()},
-                {"fragment_source_path", _fragment_source_path.string()},
+        return {{"vertex_source_path",
+                 util::get_json_relative_path(_vertex_source_path)},
+                {"fragment_source_path",
+                 util::get_json_relative_path(_fragment_source_path)},
                 {"program_id", _program_id}};
     }
 };
@@ -236,8 +248,7 @@ struct opengl_texture
         const nlohmann::json &input_json,
         const std::filesystem::path &resources_path = "../assets/sprites")
     {
-        opengl_texture result_texture{
-
+        return {
             ._image_path =
                 resources_path /
                 input_json.value("image_path", "textures/missing_texture.png"),
@@ -248,14 +259,12 @@ struct opengl_texture
                 input_json.value("need_generate_mipmaps", false),
             ._number = input_json.value("number", 0),
         };
-
-        return result_texture;
     }
 
     [[nodiscard]] nlohmann::json serialize() const
     {
         return {
-            {"image_path", _image_path.string()},
+            {"image_path", util::get_json_relative_path(_image_path)},
             {"vertices", _vertices},
             {"indices", _indices},
             {"need_generate_mipmaps", _need_generate_mipmaps},
@@ -268,6 +277,34 @@ struct transform
     glm::vec3 _position{0.0f, 0.0f, 0.0f};
     glm::vec3 _scale{1.0f, 1.0f, 1.0f};
     float _current_rotation_angle = 0.0f;
+
+    [[nodiscard]] static transform deserialize(
+        const nlohmann::json &input_json,
+        const std::filesystem::path &resources_path = "../assets/sprites")
+    {
+
+        return {
+            ._position = util::glm_vec3_from_json(
+                input_json.value("position", nlohmann::json::object())),
+            ._scale = util::glm_vec3_from_json(
+                input_json.value("scale", nlohmann::json::object()),
+                {1.0f, 1.0f, 1.0f}),
+
+            ._current_rotation_angle = input_json.value("rotation_angle", 0.0f),
+        };
+    }
+
+    [[nodiscard]] nlohmann::json serialize() const
+    {
+        nlohmann::json result{
+            {"position", nlohmann::json::object()},
+            {"scale", nlohmann::json::object()},
+            {"rotation_angle", _current_rotation_angle},
+        };
+        result["position"].merge_patch(util::glm_vec3_to_json(_position));
+        result["scale"].merge_patch(util::glm_vec3_to_json(_scale));
+        return result;
+    }
 };
 
 struct sprite
@@ -276,6 +313,8 @@ struct sprite
     opengl_texture _texture;
 
     transform _transform;
+
+    std::string _name;
 
     void apply_transform(const glm::mat4 &transform) const
     {
@@ -321,14 +360,38 @@ struct sprite
                                         texture_path.string());
         }
 
-        sprite result{
-            ._shader =
-                opengl_shader::deserialize(json_texture_properties["shader"]),
+        return sprite::deserialize(json_texture_properties);
+    }
 
-            ._texture =
-                opengl_texture::deserialize(json_texture_properties["texture"]),
+    [[nodiscard]] static sprite deserialize(
+        const nlohmann::json &input_json,
+        const std::filesystem::path &resources_path = "../assets/sprites")
+    {
+        return {
+            ._shader = opengl_shader::deserialize(
+                input_json.value("shader", nlohmann::json::object())),
+
+            ._texture = opengl_texture::deserialize(
+                input_json.value("texture", nlohmann::json::object())),
+
+            ._transform = transform::deserialize(
+                input_json.value("transform", nlohmann::json::object())),
+
+            ._name = input_json.value("name", "null"),
         };
+    }
 
+    [[nodiscard]] nlohmann::json serialize() const
+    {
+        nlohmann::json result{
+            {"shader", nlohmann::json::object()},
+            {"texture", nlohmann::json::object()},
+            {"transform", nlohmann::json::object()},
+            {"json_path", _name},
+        };
+        result["shader"].merge_patch(_shader.serialize());
+        result["texture"].merge_patch(_texture.serialize());
+        result["transform"].merge_patch(_transform.serialize());
         return result;
     }
 };
