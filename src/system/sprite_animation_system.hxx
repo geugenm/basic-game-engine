@@ -61,19 +61,19 @@ private:
 
         auto &vertices = sprite._texture._vertices;
 
-        const auto first_vertex    = sprite._texture.get_tex_coord_index(0);
+        const auto first_vertex = sprite._texture.get_tex_coordinates_index(0);
         vertices[first_vertex + X] = frameWidth * floated_columns;
         vertices[first_vertex + Y] = frameHeight * floated_rows;
 
-        const auto second_vertex    = sprite._texture.get_tex_coord_index(1);
+        const auto second_vertex = sprite._texture.get_tex_coordinates_index(1);
         vertices[second_vertex + X] = frameWidth * (floated_columns + 1);
         vertices[second_vertex + Y] = frameHeight * floated_rows;
 
-        const auto third_vertex    = sprite._texture.get_tex_coord_index(2);
+        const auto third_vertex = sprite._texture.get_tex_coordinates_index(2);
         vertices[third_vertex + X] = frameWidth * (floated_columns + 1);
         vertices[third_vertex + Y] = frameHeight * (floated_rows + 1);
 
-        const auto fourth_vertex    = sprite._texture.get_tex_coord_index(3);
+        const auto fourth_vertex = sprite._texture.get_tex_coordinates_index(3);
         vertices[fourth_vertex + X] = frameWidth * floated_columns;
         vertices[fourth_vertex + Y] = frameHeight * (floated_rows + 1);
     }

@@ -97,11 +97,6 @@ struct opengl_shader
         return uniform_location;
     }
 
-    [[nodiscard]] opengl_shader get_initialized_shader() const
-    {
-        return get_new_shader(_vertex_source_path, _fragment_source_path);
-    }
-
     [[nodiscard]] static opengl_shader
     get_new_shader(const std::filesystem::path &vertex_source_path,
                    const std::filesystem::path &fragment_source_path)
@@ -143,6 +138,28 @@ struct opengl_shader
         opengl_subsdk::delete_shader(fragment);
 
         return shader;
+    }
+
+    [[nodiscard]] static opengl_shader deserialize(
+        const nlohmann::json &input_json,
+        const std::filesystem::path &resources_path = "../assets/sprites")
+    {
+        opengl_shader result_shader;
+        result_shader._vertex_source_path =
+            resources_path /
+            input_json.value("vertex_source_path", "shaders/missing.vert");
+        result_shader._fragment_source_path =
+            resources_path /
+            input_json.value("fragment_source_path", "shaders/missing.frag");
+        result_shader._program_id = input_json.value("program_id", GLuint{});
+        return result_shader;
+    }
+
+    [[nodiscard]] nlohmann::json serialize() const
+    {
+        return {{"vertex_source_path", _vertex_source_path.string()},
+                {"fragment_source_path", _fragment_source_path.string()},
+                {"program_id", _program_id}};
     }
 };
 
@@ -197,7 +214,7 @@ struct opengl_texture
 
         // Update vertex attributes
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                              (void *)0);
+                              nullptr);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                               (void *)(3 * sizeof(float)));
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
@@ -209,10 +226,40 @@ struct opengl_texture
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    [[nodiscard]] std::size_t
-    get_tex_coord_index(const std::size_t &index) const
+    [[nodiscard]] static std::size_t
+    get_tex_coordinates_index(const std::size_t &index)
     {
         return index * 8 + 6;
+    }
+
+    [[nodiscard]] static opengl_texture deserialize(
+        const nlohmann::json &input_json,
+        const std::filesystem::path &resources_path = "../assets/sprites")
+    {
+        opengl_texture result_texture{
+
+            ._image_path =
+                resources_path /
+                input_json.value("image_path", "textures/missing_texture.png"),
+            ._vertices = input_json.value("vertices", std::vector<GLfloat>{}),
+
+            ._indices = input_json.value("indices", std::vector<GLuint>{}),
+            ._need_generate_mipmaps =
+                input_json.value("need_generate_mipmaps", false),
+            ._number = input_json.value("number", 0),
+        };
+
+        return result_texture;
+    }
+
+    [[nodiscard]] nlohmann::json serialize() const
+    {
+        return {
+            {"image_path", _image_path.string()},
+            {"vertices", _vertices},
+            {"indices", _indices},
+            {"need_generate_mipmaps", _need_generate_mipmaps},
+        };
     }
 };
 
@@ -275,26 +322,11 @@ struct sprite
         }
 
         sprite result{
-            ._shader{
-                ._vertex_source_path =
-                    resources_path /
-                    json_texture_properties["shader"]["vertex_source_path"],
-                ._fragment_source_path =
-                    resources_path /
-                    json_texture_properties["shader"]["fragment_source_path"],
-                ._program_id = opengl_subsdk::get_new_program(),
-            },
+            ._shader =
+                opengl_shader::deserialize(json_texture_properties["shader"]),
 
-            ._texture{
-                ._image_path = resources_path /
-                               json_texture_properties["texture"]["image_path"],
-                ._vertices = json_texture_properties["texture"]["vertices"],
-
-                ._indices = json_texture_properties["texture"]["indices"],
-                ._need_generate_mipmaps =
-                    json_texture_properties["texture"]["need_generate_mipmaps"],
-                ._number = json_texture_properties["texture"]["number"],
-            },
+            ._texture =
+                opengl_texture::deserialize(json_texture_properties["texture"]),
         };
 
         return result;
