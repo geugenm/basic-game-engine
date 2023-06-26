@@ -13,5 +13,6 @@ if (BUILD_TESTS)
     enable_testing()
 
     add_test_executable(test_entt test_entt.cxx)
-    target_link_libraries(test_entt PUBLIC engine_sdk EnTT::EnTT)
+    target_link_libraries(test_entt PUBLIC engine_sdk EnTT::EnTT Tracy::TracyClient)
+    target_compile_options(test_entt PRIVATE -fPIE)
 endif ()
