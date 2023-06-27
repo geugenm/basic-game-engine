@@ -12,4 +12,5 @@ target_link_libraries(sdk_components PUBLIC
                       opengl_utils
                       imgui_utils
                       nlohmann_json
+                      glm::glm
                       )

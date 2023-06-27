@@ -3,8 +3,6 @@
 
 #include <thread>
 
-#include <tracy/Tracy.hpp>
-
 TEST(GameSystemTest, UpdateAndHandleEvents)
 {
     entt::registry main_registry;
@@ -15,12 +13,10 @@ TEST(GameSystemTest, UpdateAndHandleEvents)
         std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
 
         {
-            ZoneScopedNC("Frame beginning.", 1);
             system.update(main_registry);
         }
 
         {
-            ZoneScopedNC("Event handling.", 2);
             system.handle_events(main_registry);
         }
     }
