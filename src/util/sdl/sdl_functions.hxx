@@ -4,6 +4,12 @@
 #include <iostream>
 #include <stdexcept>
 
+#ifdef __ANDROID__
+
+#include <SDL3/SDL_main.h>
+
+#endif // __ANDROID__
+
 #ifndef OPENGL_MAJOR_VERSION
 #define OPENGL_MAJOR_VERSION 3
 #endif

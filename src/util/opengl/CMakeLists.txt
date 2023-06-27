@@ -12,7 +12,7 @@ target_precompile_headers(opengl_utils PUBLIC
                           KHR/khrplatform.h)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
-    target_link_libraries(opengl_utils PRIVATE
+    target_link_libraries(opengl_utils PUBLIC
                           android
                           log
                           EGL
