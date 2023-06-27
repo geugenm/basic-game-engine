@@ -10,14 +10,6 @@
 
 #endif // __ANDROID__
 
-#ifndef OPENGL_MAJOR_VERSION
-#define OPENGL_MAJOR_VERSION 3
-#endif
-
-#ifndef OPENGL_MINOR_VERSION
-#define OPENGL_MINOR_VERSION 2
-#endif
-
 namespace sdl_subsdk
 {
 void init_sdl();
