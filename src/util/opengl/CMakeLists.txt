@@ -10,3 +10,13 @@ target_include_directories(opengl_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_precompile_headers(opengl_utils PUBLIC
                           glad/glad.h
                           KHR/khrplatform.h)
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+    target_link_libraries(opengl_utils PRIVATE
+                          android
+                          log
+                          EGL
+                          GLESv2
+                          GLESv3
+                          )
+endif ()

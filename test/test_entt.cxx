@@ -1,5 +1,5 @@
+#include <gengine_core.hxx>
 #include <gtest/gtest.h>
-#include <system/game_system.hxx>
 
 #include <thread>
 
@@ -12,13 +12,9 @@ TEST(GameSystemTest, UpdateAndHandleEvents)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
 
-        {
-            system.update(main_registry);
-        }
+        system.update(main_registry);
 
-        {
-            system.handle_events(main_registry);
-        }
+        system.handle_events(main_registry);
     }
 
     assert(system.is_initialized(main_registry) == false);

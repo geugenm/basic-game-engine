@@ -8,6 +8,15 @@
 
 #include <fstream>
 
+#ifdef __ANDROID__
+
+#include <android/log.h>
+
+#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
+
+#endif // __ANDROID__
+
 #ifndef OPENGL_MAJOR_VERSION
 #define OPENGL_MAJOR_VERSION 3
 #endif
