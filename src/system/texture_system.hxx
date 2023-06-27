@@ -39,7 +39,8 @@ public:
         m_player_system.init(registry);
     }
 
-    void init_on(entt::registry &registry, entt::entity const &window_entity)
+    static void init_on(entt::registry &registry,
+                        entt::entity const &window_entity)
     {
         auto sdl_context = registry.get<sdl_render_context>(window_entity);
 
@@ -75,11 +76,11 @@ public:
         }
     }
 
-    struct RenderableComparator
+    struct sprite_comparator
     {
         entt::registry &registry;
 
-        explicit RenderableComparator(entt::registry &registry)
+        explicit sprite_comparator(entt::registry &registry)
             : registry(registry)
         {
         }
@@ -107,7 +108,7 @@ public:
             static_cast<float>(sdl_context.get_width()) /
             static_cast<float>(sdl_context.get_height());
 
-        registry.sort<sprite>(RenderableComparator{registry});
+        registry.sort<sprite>(sprite_comparator{registry});
 
         auto view = registry.view<sprite>();
 
@@ -122,9 +123,6 @@ public:
         for (auto entity : view)
         {
             auto const &entity_sprite = view.get<sprite>(entity);
-
-            const float texture_aspect =
-                entity_sprite._texture.get_image_aspect_ratio();
 
             // Translate to origin
             const glm::mat4 projection_matrix =

@@ -6,6 +6,15 @@
 #include <nlohmann/json.hpp>
 #include <opengl_functions.hxx>
 
+namespace sdk
+{
+#ifdef __ANDROID__
+constexpr std::filesystem::path resources_path = "sprites";
+#else // __ANDROID__
+const std::filesystem::path resources_path = "../assets/sprites";
+#endif
+} // namespace sdk
+
 namespace sdk::suppl
 {
 [[nodiscard]] std::string
@@ -14,6 +23,7 @@ get_json_relative_path(const std::filesystem::path &full_path);
 
 namespace sdk
 {
+
 struct opengl_shader
 {
     std::filesystem::path _vertex_source_path;
@@ -27,9 +37,8 @@ struct opengl_shader
     get_new_shader(const std::filesystem::path &vertex_source_path,
                    const std::filesystem::path &fragment_source_path);
 
-    [[nodiscard]] static opengl_shader deserialize(
-        const nlohmann::json &input_json,
-        const std::filesystem::path &resources_path = "../assets/sprites");
+    [[nodiscard]] static opengl_shader
+    deserialize(const nlohmann::json &input_json);
 
     [[nodiscard]] nlohmann::json serialize() const;
 };

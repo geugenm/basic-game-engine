@@ -68,9 +68,7 @@ opengl_shader::get_new_shader(const std::filesystem::path &vertex_source_path,
     return shader;
 }
 
-opengl_shader
-opengl_shader::deserialize(const nlohmann::json &input_json,
-                           const std::filesystem::path &resources_path)
+opengl_shader opengl_shader::deserialize(const nlohmann::json &input_json)
 {
     return {
         ._vertex_source_path =
