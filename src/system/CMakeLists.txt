@@ -4,9 +4,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx")
 
 add_subdirectory(player)
 
-add_library(sdk_systems SHARED)
-
-target_sources(sdk_systems PUBLIC ${SOURCES})
+add_library(sdk_systems SHARED ${SOURCES})
 
 target_include_directories(sdk_systems PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

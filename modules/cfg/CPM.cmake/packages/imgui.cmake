@@ -19,5 +19,7 @@ if (imgui_ADDED)
             )
 
     target_include_directories(imgui PUBLIC "${imgui_SOURCE_DIR}")
+
+    message(STATUS "ImGui added to CPM")
 endif ()
 

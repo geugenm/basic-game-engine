@@ -8,4 +8,5 @@ CPMAddPackage(
 
 if (GTest_ADDED)
     add_library(GTest::GTest ALIAS gtest)
+    message(STATUS "GTest + alias added to CPM")
 endif ()
