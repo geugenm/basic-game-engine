@@ -12,4 +12,12 @@ target_link_libraries(engine_sdk PUBLIC
                       sdk_systems
                       )
 
+set_target_properties(engine_sdk PROPERTIES
+                      UNITY_BUILD "ON"
+                      UNITY_BUILD_BATCH_SIZE 8
+                      UNITY_BUILD_MODE BATCH
+                      UNITY_BUILD_UNIQUE_ID "SDK_UNITY_ID"
+                      )
+
+
 

@@ -16,10 +16,3 @@ target_link_libraries(sdk_systems PUBLIC
                       stb_image
                       player_system
                       )
-
-set_target_properties(sdk_systems PROPERTIES
-                      UNITY_BUILD "ON"
-                      UNITY_BUILD_BATCH_SIZE 8
-                      UNITY_BUILD_MODE BATCH
-                      UNITY_BUILD_UNIQUE_ID "MY_UNITY_ID"
-                      )
