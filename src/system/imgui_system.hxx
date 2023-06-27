@@ -54,7 +54,7 @@ public:
             m_dragging_sprite = false;
         }
 
-        if (m_dragging_sprite == false)
+        if (!m_dragging_sprite)
         {
             return;
         }
@@ -114,7 +114,7 @@ private:
 class settings_window final
 {
 public:
-    void update(entt::registry &registry, sdl_render_context *sdl_window)
+    void update(entt::registry const &registry, sdl_render_context *sdl_window)
     {
         if (sdl_window == nullptr)
         {
@@ -139,7 +139,8 @@ public:
     }
 
 private:
-    void show_window(entt::registry &registry, sdl_render_context *sdl_window)
+    void show_window([[maybe_unused]] entt::registry const &registry,
+                     sdl_render_context *sdl_window)
     {
         if (ImGui::Begin("Settings", &m_is_window_opened))
         {
@@ -171,7 +172,7 @@ private:
         ImGui::End();
     }
 
-    void apply_resolution_settings(sdl_render_context *sdl_window)
+    void apply_resolution_settings(sdl_render_context *sdl_window) const
     {
         if (m_chosen_resolution == 0)
         {
@@ -260,16 +261,15 @@ private:
 
 struct imgui_system
 {
-    void init(entt::registry &registry, entt::entity &entity)
+    void init(entt::registry &registry, entt::entity const &entity)
     {
         auto &sdl_context = registry.get<sdl_render_context>(entity);
 
         imgui_subsdk::init_imgui(sdl_context._window, sdl_context._context);
 
-        for (auto entity : registry.view<imgui_sprite_editor>())
+        for (auto ent : registry.view<imgui_sprite_editor>())
         {
-            auto const &sprite_editor =
-                registry.get<imgui_sprite_editor>(entity);
+            auto const &sprite_editor = registry.get<imgui_sprite_editor>(ent);
             m_sprite_editors.push_back(sprite_editor.get_sprite()._name);
         }
     }
@@ -320,6 +320,8 @@ struct imgui_system
 
         for (auto entity : registry.view<game_states>())
         {
+            using sdk::game_states;
+
             auto &state = registry.get<game_states>(entity);
 
             if (state == game_states::in_menu)
@@ -330,17 +332,11 @@ struct imgui_system
             if (state == game_states::played)
             {
                 on_play(registry, state);
-                // create_new_game_popup();
             }
 
             if (state == game_states::paused)
             {
                 on_pause(registry, state);
-            }
-
-            if (state == game_states::exited)
-            {
-                on_exit(registry, state);
             }
         }
 
@@ -351,7 +347,7 @@ struct imgui_system
     {
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
         {
-            if (m_tapped_game_creation == true)
+            if (m_tapped_game_creation)
             {
                 m_tapped_game_creation = false;
             }
@@ -396,16 +392,15 @@ struct imgui_system
 private:
     void create_new_game_popup()
     {
-        if (m_tapped_game_creation == false)
+        if (!m_tapped_game_creation)
         {
             return;
         }
 
-        if (m_is_creating_new_game == true)
+        if (m_is_creating_new_game)
         {
             return;
         }
-        // TODO: make adequate formula for size calculation
         ImGui::SetNextWindowPos(m_tapped_mouse_position);
         ImGui::SetNextWindowSize(ImVec2(160.0f, 40.0f));
 
@@ -474,7 +469,7 @@ private:
         }
     }
 
-    void on_menu(entt::registry &registry, game_states &current_state)
+    void on_menu(entt::registry &registry, game_states const &current_state)
     {
         for (auto entity : registry.view<sdl_render_context>())
         {
@@ -483,9 +478,8 @@ private:
         }
     }
 
-    void on_exit(entt::registry &registry, game_states &current_state) {}
-
-    void on_play(entt::registry &registry, game_states &current_state)
+    static void on_play([[maybe_unused]] entt::registry const &registry,
+                        [[maybe_unused]] game_states const &current_state)
     {
         static constexpr auto points_window  = ImVec2(250, 200);
         static constexpr auto project_window = ImVec2(700, 200);
@@ -578,22 +572,22 @@ private:
         ImGui::End();
     }
 
-    void create_slider(const char *name, int *value,
-                       const uint32_t &width = 200.0f)
+    static void create_slider(const char *name, int const *value,
+                              const float &width = 200.0f)
     {
         std::string id_sharps = "##";
         id_sharps.append(name);
-
-        static int i27 = 42;
-        ImGui::Text(name);
+        
+        static int i27 = *value;
+        ImGui::Text("%s", name);
         imgui_subsdk::center_next_element_horizontally(200.0f);
-        ImGui::PushItemWidth(200.0f);
+        ImGui::PushItemWidth(width);
         ImGui::DragInt(id_sharps.data(), &i27, 1, 0, 100, "%d%%",
                        ImGuiSliderFlags_AlwaysClamp);
         ImGui::PopItemWidth();
     }
 
-    void create_time_allocation_bar(const std::string_view &id)
+    static void create_time_allocation_bar(const std::string_view &id)
     {
 
         const float &window_width = ImGui::GetWindowSize().x;
@@ -620,7 +614,7 @@ private:
         ImGui::EndChild();
     }
 
-    [[nodiscard]] bool create_ok_button()
+    [[nodiscard]] static bool create_ok_button()
     {
         imgui_subsdk::center_next_element_horizontally(70.0f);
 
@@ -647,8 +641,8 @@ private:
         {
 
             ImGui::PushItemWidth(200); // NOTE: (Push/Pop)ItemWidth is optional
-            static char str2[128] = "Game #1";
-            ImGui::InputText("##", str2, IM_ARRAYSIZE(str2));
+            static std::string str2 = "Game #1";
+            ImGui::InputText("##", str2.data(), str2.size());
             ImGui::PopItemWidth();
 
             ImGui::SameLine();
