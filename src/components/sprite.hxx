@@ -1,10 +1,12 @@
 #pragma once
 
+#include <SDL3/SDL.h>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
 
+#include "SDL_rwops.h"
 #include "opengl_shader.hxx"
 #include "opengl_texture.hxx"
 #include "transform.hxx"
@@ -25,20 +27,29 @@ get_file_json_content(std::filesystem::path file_path)
                                     std::filesystem::current_path().string());
     }
 
-    std::ifstream input_file(file_path);
-    if (!input_file.is_open())
+    SDL_RWops *rw = SDL_RWFromFile(file_path.string().data(), "rb");
+    if (rw == nullptr)
     {
-        throw std::invalid_argument("Could not open file: " +
-                                    file_path.string());
+        throw std::invalid_argument(
+            "Unable to open file: " + file_path.string() +
+            ", SDL says: " + SDL_GetError());
+    }
+    
+    static constexpr uint16_t buffer_size = 2048;
+    char buffer[buffer_size];
+    const size_t read_count = SDL_RWread(rw, buffer, buffer_size - 1);
+    if (read_count == 0)
+    {
+        throw std::invalid_argument(
+            "Error reading from file: " + file_path.string() +
+            ", SDL says: " + SDL_GetError());
     }
 
-    nlohmann::json json_content;
+    buffer[read_count] = '\0';
 
-    input_file >> json_content;
+    SDL_RWclose(rw);
 
-    input_file.close();
-
-    return json_content;
+    return nlohmann::json::parse(buffer);
 }
 } // namespace sdk::suppl
 

@@ -9,7 +9,7 @@
 namespace sdk
 {
 #ifdef __ANDROID__
-constexpr std::filesystem::path resources_path = "sprites";
+const std::filesystem::path resources_path = "sprites";
 #else // __ANDROID__
 const std::filesystem::path resources_path = "../assets/sprites";
 #endif
