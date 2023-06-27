@@ -20,12 +20,14 @@ get_file_json_content(std::filesystem::path file_path)
 
     file_path.replace_extension(properties_extension);
 
+#ifndef __ANDROID__
     if (!std::filesystem::exists(file_path))
     {
         throw std::invalid_argument("Json file '" + file_path.string() +
                                     "' was not found, looking for it in: " +
                                     std::filesystem::current_path().string());
     }
+#endif
 
     SDL_RWops *rw = SDL_RWFromFile(file_path.string().data(), "rb");
     if (rw == nullptr)
@@ -34,7 +36,7 @@ get_file_json_content(std::filesystem::path file_path)
             "Unable to open file: " + file_path.string() +
             ", SDL says: " + SDL_GetError());
     }
-    
+
     static constexpr uint16_t buffer_size = 2048;
     char buffer[buffer_size];
     const size_t read_count = SDL_RWread(rw, buffer, buffer_size - 1);
@@ -111,11 +113,9 @@ struct sprite
         output_file.close();
     }
 
-    [[nodiscard]] static sprite get_sprite_from_file(
-        const std::string_view &json_parameters_file_name,
-        const std::filesystem::path &resources_path = "../assets/sprites")
+    [[nodiscard]] static sprite
+    get_sprite_from_file(const std::string_view &json_parameters_file_name)
     {
-
         const std::filesystem::path texture_path =
             resources_path / json_parameters_file_name;
 
