@@ -7,20 +7,13 @@ else {
     apply plugin: 'com.android.library'
 }
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-def sdl3Dir = properties.getProperty('sdl3.dir')
-if (sdl3Dir == null)
-{
-    throw new IllegalArgumentException("no [sdl3.dir] property in [local.properties] file")
-}
 android {
     compileSdkVersion 33
     ndkVersion '25.2.9519653'
 
     defaultConfig {
         if (buildAsApplication) {
-            applicationId "org.libsdl.app"
+            applicationId "mil.eugene.gamedev"
         }
         minSdkVersion 24
         targetSdkVersion 33
@@ -28,7 +21,7 @@ android {
         versionName "1.0"
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_STL=c++_shared", "-DSDL3_SRC_DIR=$sdl3Dir"
+                arguments "-DANDROID_STL=c++_shared"
                 // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
                 // abiFilters 'arm64-v8a'
             }
@@ -61,7 +54,7 @@ android {
     lintOptions {
         abortOnError false
     }
-    namespace 'org.libsdl.app'
+    namespace 'mil.eugene.gamedev'
 
     if (buildAsLibrary) {
         libraryVariants.all { variant ->
