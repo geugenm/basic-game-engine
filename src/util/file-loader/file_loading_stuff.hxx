@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL_rwops.h>
 #include <nlohmann/json.hpp>
+#include <sstream>
 #include <streambuf>
 
 namespace sdk::suppl
