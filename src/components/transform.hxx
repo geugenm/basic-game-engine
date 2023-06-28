@@ -23,9 +23,7 @@ struct transform
     glm::vec3 _scale{1.0f, 1.0f, 1.0f};
     float _current_rotation_angle = 0.0f;
 
-    [[nodiscard]] static transform deserialize(
-        const nlohmann::json &input_json,
-        const std::filesystem::path &resources_path = "../assets/sprites")
+    [[nodiscard]] static transform deserialize(const nlohmann::json &input_json)
     {
 
         return {

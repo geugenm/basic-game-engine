@@ -39,7 +39,8 @@ public:
         m_player_system.init(registry);
     }
 
-    void init_on(entt::registry &registry, entt::entity const &window_entity)
+    static void init_on(entt::registry &registry,
+                        entt::entity const &window_entity)
     {
         auto sdl_context = registry.get<sdl_render_context>(window_entity);
 
@@ -62,7 +63,7 @@ public:
             auto const &ent_sprite = view.get<sprite>(entity);
             glUseProgram(ent_sprite._shader._program_id);
 
-            glUniform1i(ent_sprite._shader.get_uniform_location("texture"),
+            glUniform1i(ent_sprite._shader.get_uniform_location("texture1"),
                         ent_sprite._texture._number);
             glUseProgram(0);
         }
@@ -75,11 +76,11 @@ public:
         }
     }
 
-    struct RenderableComparator
+    struct sprite_comparator
     {
         entt::registry &registry;
 
-        explicit RenderableComparator(entt::registry &registry)
+        explicit sprite_comparator(entt::registry &registry)
             : registry(registry)
         {
         }
@@ -107,7 +108,7 @@ public:
             static_cast<float>(sdl_context.get_width()) /
             static_cast<float>(sdl_context.get_height());
 
-        registry.sort<sprite>(RenderableComparator{registry});
+        registry.sort<sprite>(sprite_comparator{registry});
 
         auto view = registry.view<sprite>();
 
@@ -122,9 +123,6 @@ public:
         for (auto entity : view)
         {
             auto const &entity_sprite = view.get<sprite>(entity);
-
-            const float texture_aspect =
-                entity_sprite._texture.get_image_aspect_ratio();
 
             // Translate to origin
             const glm::mat4 projection_matrix =
@@ -202,20 +200,29 @@ private:
     [[nodiscard]] static std::vector<unsigned char>
     get_png_data(opengl_texture &texture)
     {
-        if (!std::filesystem::exists(texture._image_path))
+        //        if (!std::filesystem::exists(texture._image_path))
+        //        {
+        //            throw std::invalid_argument("Failed to open PNG image: " +
+        //                                        texture._image_path.string());
+        //        }
+
+        std::string file_path_string = texture._image_path.string();
+        if (!file_path_string.empty() && file_path_string[0] == '/')
         {
-            throw std::invalid_argument("Failed to open PNG image: " +
-                                        texture._image_path.string());
+            file_path_string.erase(0, 1); // remove the first character
         }
 
-        int width;
-        int height;
-        int channels;
-        stbi_set_flip_vertically_on_load(1);
-        unsigned char *data = stbi_load(texture._image_path.c_str(), &width,
-                                        &height, &channels, STBI_rgb_alpha);
+        suppl::membuf file_contents = suppl::load_file(file_path_string);
 
-        if (!data)
+        stbi_set_flip_vertically_on_load(true);
+        int width                  = 0;
+        int height                 = 0;
+        int components             = 0;
+        unsigned char *decoded_img = stbi_load_from_memory(
+            reinterpret_cast<unsigned char *>(file_contents.begin()),
+            file_contents.size(), &width, &height, &components, 4);
+
+        if (!decoded_img)
         {
             throw std::invalid_argument("Failed to decode PNG image");
         }
@@ -223,8 +230,9 @@ private:
         texture._width  = static_cast<unsigned long>(width);
         texture._height = static_cast<unsigned long>(height);
 
-        std::vector<unsigned char> png_data(data, data + width * height * 4);
-        stbi_image_free(data);
+        std::vector<unsigned char> png_data(decoded_img,
+                                            decoded_img + width * height * 4);
+        stbi_image_free(decoded_img);
 
         if (png_data.empty())
         {

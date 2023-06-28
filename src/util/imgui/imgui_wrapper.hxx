@@ -13,7 +13,7 @@ namespace imgui_subsdk
 {
 constexpr bool k_use_dark_style             = true;
 constexpr float k_window_alpha              = 0.8f;
-constexpr std::string_view k_opengl_version = "#version 150 core";
+constexpr std::string_view k_opengl_version = "#version 300 es";
 
 void setup_style(const bool &is_dark, const float &alpha);
 

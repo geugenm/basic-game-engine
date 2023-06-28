@@ -4,12 +4,15 @@
 #include <iostream>
 #include <stdexcept>
 
-#ifndef OPENGL_MAJOR_VERSION
-#define OPENGL_MAJOR_VERSION 3
-#endif
+#ifdef __ANDROID__
 
-#ifndef OPENGL_MINOR_VERSION
-#define OPENGL_MINOR_VERSION 2
+#include <GLES3/gl3.h>
+#include <SDL3/SDL_main.h>
+
+#else
+
+#include <glad/glad.h>
+
 #endif
 
 namespace sdl_subsdk

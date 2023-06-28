@@ -1,10 +1,13 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <SDL3/SDL.h>
+#include <opengl_functions.hxx>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
+#include <sstream>
 
+#include "SDL_rwops.h"
 #include "opengl_shader.hxx"
 #include "opengl_texture.hxx"
 #include "transform.hxx"
@@ -18,27 +21,141 @@ get_file_json_content(std::filesystem::path file_path)
 
     file_path.replace_extension(properties_extension);
 
-    if (!std::filesystem::exists(file_path))
+    std::string file_path_string = file_path;
+
+    if (!file_path_string.empty() && file_path_string[0] == '/')
     {
-        throw std::invalid_argument("Json file '" + file_path.string() +
-                                    "' was not found, looking for it in: " +
-                                    std::filesystem::current_path().string());
+        file_path_string.erase(0, 1); // remove the first character
     }
 
-    std::ifstream input_file(file_path);
-    if (!input_file.is_open())
+    // if (!std::filesystem::exists(file_path))
+    // {
+    //     throw std::invalid_argument("Json file '" + file_path.string() +
+    //                                 "' was not found, looking for it in: " +
+    //                                 std::filesystem::current_path().string());
+    // }
+
+    SDL_RWops *rw = SDL_RWFromFile(file_path_string.c_str(), "rb");
+    if (rw == nullptr)
     {
-        throw std::invalid_argument("Could not open file: " +
-                                    file_path.string());
+        throw std::invalid_argument("Unable to open file: " + file_path_string +
+                                    ", SDL says: " + SDL_GetError());
     }
 
-    nlohmann::json json_content;
+    static constexpr uint16_t buffer_size = 2048;
+    char buffer[buffer_size];
+    const size_t read_count = SDL_RWread(rw, buffer, buffer_size - 1);
+    if (read_count == 0)
+    {
+        throw std::invalid_argument(
+            "Error reading from file: " + file_path_string +
+            ", SDL says: " + SDL_GetError());
+    }
 
-    input_file >> json_content;
+    buffer[read_count] = '\0';
 
-    input_file.close();
+    SDL_RWclose(rw);
 
-    return json_content;
+    return nlohmann::json::parse(buffer);
+}
+
+#include <streambuf>
+
+struct membuf : public std::streambuf
+{
+    membuf() : std::streambuf(), buf(), buf_size(0) {}
+    membuf(std::unique_ptr<char[]> buffer, size_t size)
+        : std::streambuf(), buf(std::move(buffer)), buf_size(size)
+    {
+        char *beg_ptr = buf.get();
+        char *end_ptr = beg_ptr + buf_size;
+        setg(beg_ptr, beg_ptr, end_ptr);
+        setp(beg_ptr, end_ptr);
+    }
+    membuf(membuf &&other)
+    {
+        setp(nullptr, nullptr);
+        setg(nullptr, nullptr, nullptr);
+
+        other.swap(*this);
+
+        buf      = std::move(other.buf);
+        buf_size = other.buf_size;
+
+        other.buf_size = 0;
+    }
+
+    pos_type seekoff(off_type pos, std::ios_base::seekdir seek_dir,
+                     std::ios_base::openmode) override
+    {
+        // TODO implement it in correct way
+        if (seek_dir == std::ios_base::beg)
+        {
+            return 0 + pos;
+        }
+        else if (seek_dir == std::ios_base::end)
+        {
+            return buf_size + pos;
+        }
+        else
+        {
+            return egptr() - gptr();
+        }
+    }
+
+    char *begin() const
+    {
+        return eback();
+    }
+    size_t size() const
+    {
+        return buf_size;
+    }
+
+private:
+    std::unique_ptr<char[]> buf;
+    size_t buf_size;
+};
+
+membuf load_file(std::string_view path);
+
+[[nodiscard]] static std::string
+get_file_content(std::filesystem::path file_path)
+{
+    std::string file_path_string = file_path;
+
+    if (!file_path_string.empty() && file_path_string[0] == '/')
+    {
+        file_path_string.erase(0, 1); // remove the first character
+    }
+
+    SDL_RWops *rw = SDL_RWFromFile(file_path_string.c_str(), "rb");
+    if (rw == nullptr)
+    {
+        throw std::invalid_argument("Unable to open file: " + file_path_string +
+                                    ", SDL says: " + SDL_GetError());
+    }
+
+    static constexpr uint16_t buffer_size = 2048;
+    char buffer[buffer_size];
+    std::stringstream ss; // create a stringstream
+    size_t read_count;
+    while ((read_count = SDL_RWread(rw, buffer, buffer_size - 1)) > 0)
+    {
+        buffer[read_count] = '\0';
+        ss << buffer; // add buffer content to the stringstream
+    }
+
+    if (SDL_RWclose(rw) != 0)
+    {
+        throw std::invalid_argument(
+            "Error reading from file: " + file_path_string +
+            ", SDL says: " + SDL_GetError());
+    }
+
+    std::string file_content = ss.str(); // get the string from the stringstream
+
+    return file_content;
 }
 } // namespace sdk::suppl
 
@@ -100,11 +217,9 @@ struct sprite
         output_file.close();
     }
 
-    [[nodiscard]] static sprite get_sprite_from_file(
-        const std::string_view &json_parameters_file_name,
-        const std::filesystem::path &resources_path = "../assets/sprites")
+    [[nodiscard]] static sprite
+    get_sprite_from_file(const std::string_view &json_parameters_file_name)
     {
-
         const std::filesystem::path texture_path =
             resources_path / json_parameters_file_name;
 

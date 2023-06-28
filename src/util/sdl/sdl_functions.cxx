@@ -1,6 +1,5 @@
 #include "sdl_functions.hxx"
 
-#include <glad/glad.h>
 #include <opengl_functions.hxx>
 
 namespace sdl_subsdk
@@ -19,10 +18,9 @@ SDL_Window *get_new_sdl_window(const char *window_title,
                                const int &window_width,
                                const int &window_height)
 {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, OPENGL_MAJOR_VERSION);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, OPENGL_MINOR_VERSION);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                        SDL_GL_CONTEXT_PROFILE_CORE);
 
     constexpr Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
@@ -57,12 +55,14 @@ SDL_GLContext get_new_sdl_gl_context(SDL_Window *window)
 
 void load_opengl_functions()
 {
+#ifndef __ANDROID__
     if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress))
     {
         std::cerr << "Failed to load OpenGL functions with glad: "
                   << glGetError() << std::endl;
         throw std::runtime_error("Can't load opengl functions.");
     }
+#endif
 }
 void init_opengl()
 {

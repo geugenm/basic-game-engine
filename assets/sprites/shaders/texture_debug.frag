@@ -4,7 +4,7 @@ in vec2 TexCoord;
 
 out vec4 color;
 
-uniform sampler2D texture;
+uniform sampler2D texture1;
 
 bool near_line(vec2 point, vec2 a, vec2 b, float thickness) {
     vec2 ab = b - a;

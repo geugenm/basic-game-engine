@@ -31,8 +31,6 @@ struct opengl_texture
 
     GLint _number{};
 
-    [[nodiscard]] float get_image_aspect_ratio() const;
-
     void render() const
     {
         glBindTexture(GL_TEXTURE_2D, _texture);
@@ -77,13 +75,12 @@ struct opengl_texture
         return index * 8 + 6;
     }
 
-    [[nodiscard]] static opengl_texture deserialize(
-        const nlohmann::json &input_json,
-        const std::filesystem::path &resources_path = "../assets/sprites")
+    [[nodiscard]] static opengl_texture
+    deserialize(const nlohmann::json &input_json)
     {
         return {
             ._image_path =
-                resources_path /
+                resources_path.string() +
                 input_json.value("image_path", "textures/missing_texture.png"),
             ._vertices = input_json.value("vertices", std::vector<GLfloat>{}),
 

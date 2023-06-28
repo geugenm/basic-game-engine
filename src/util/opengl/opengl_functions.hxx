@@ -1,19 +1,29 @@
 #pragma once
 
-#include "glad/glad.h"
-
 #include <filesystem>
 #include <string>
 #include <vector>
 
 #include <fstream>
 
+#ifdef __ANDROID__
+
+#include <android/log.h>
+
+#include <GLES3/gl32.h>
+
+#else
+
+#include "glad/glad.h"
+
+#endif
+
 #ifndef OPENGL_MAJOR_VERSION
 #define OPENGL_MAJOR_VERSION 3
 #endif
 
 #ifndef OPENGL_MINOR_VERSION
-#define OPENGL_MINOR_VERSION 2
+#define OPENGL_MINOR_VERSION 0
 #endif
 
 #ifndef OPENGL_INFO_LOG_SIZE
@@ -27,6 +37,7 @@ bool is_opengl_version_supported();
 
 std::string glenum_to_string(GLenum value);
 
+#ifndef __ANDROID__
 static void GLAPIENTRY
 opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
                       [[maybe_unused]] GLsizei length, const GLchar *message,
@@ -35,6 +46,8 @@ opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
 void enable_debug_mode();
 
 void disable_debug_mode();
+
+#endif
 
 bool file_has_changed(const std::string &file_path,
                       std::time_t &last_modified_time);
