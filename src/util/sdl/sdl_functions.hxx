@@ -15,8 +15,6 @@
 
 #endif
 
-#endif // __ANDROID__
-
 namespace sdl_subsdk
 {
 void init_sdl();
