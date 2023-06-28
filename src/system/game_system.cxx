@@ -52,6 +52,31 @@ void game_system::handle_events(entt::registry &registry)
             m_render_engine.destroy(registry);
         }
 
+        switch (event.type)
+        {
+            case SDL_EVENT_FINGER_DOWN:
+            case SDL_EVENT_FINGER_UP:
+            case SDL_EVENT_FINGER_MOTION: {
+                // Convert the touch coordinates to ImGui coordinates
+                ImGuiIO &io = ImGui::GetIO();
+                int mouseX  = event.tfinger.x * io.DisplaySize.x;
+                int mouseY  = event.tfinger.y * io.DisplaySize.y;
+
+                // Pass the touch event to ImGui
+                if (event.type == SDL_EVENT_FINGER_DOWN)
+                {
+                    io.MouseDown[0] = true;
+                }
+                else if (event.type == SDL_EVENT_FINGER_UP)
+                {
+                    io.MouseDown[0] = false;
+                }
+
+                io.MousePos = ImVec2((float)mouseX, (float)mouseY);
+                break;
+            }
+        }
+
         imgui_subsdk::process_event(event);
         imgui.handle_events(event, registry);
     }

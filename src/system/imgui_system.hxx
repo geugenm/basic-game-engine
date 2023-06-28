@@ -272,6 +272,13 @@ struct imgui_system
             auto const &sprite_editor = registry.get<imgui_sprite_editor>(ent);
             m_sprite_editors.push_back(sprite_editor.get_sprite()._name);
         }
+
+#ifdef __ANDROID__
+        ImGuiIO &io        = ImGui::GetIO();
+        io.FontGlobalScale = 2.0f; // Increase font scale
+        ImGuiStyle &style  = ImGui::GetStyle();
+        style.ScaleAllSizes(2.0f); // Scale all other UI elements
+#endif
     }
 
     void update(entt::registry &registry)
@@ -577,7 +584,7 @@ private:
     {
         std::string id_sharps = "##";
         id_sharps.append(name);
-        
+
         static int i27 = *value;
         ImGui::Text("%s", name);
         imgui_subsdk::center_next_element_horizontally(200.0f);
