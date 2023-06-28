@@ -33,6 +33,7 @@ opengl_shader::get_new_shader(const std::filesystem::path &vertex_source_path,
     opengl_shader shader{._vertex_source_path   = vertex_source_path,
                          ._fragment_source_path = fragment_source_path};
 
+#ifndef __ANDROID__ // Default filesystem is not working on android, use SDL_RW
     if (!exists(shader._vertex_source_path))
     {
         throw std::invalid_argument("Vertex shader file '" +
@@ -46,6 +47,7 @@ opengl_shader::get_new_shader(const std::filesystem::path &vertex_source_path,
                                     shader._fragment_source_path.string() +
                                     "' is not found.");
     }
+#endif // __ANDROID__
 
     const std::string vertex_source   = shader._vertex_source_path.string();
     const std::string fragment_source = shader._fragment_source_path.string();
@@ -57,13 +59,13 @@ opengl_shader::get_new_shader(const std::filesystem::path &vertex_source_path,
 
     shader._program_id = opengl_subsdk::get_new_program();
 
-    opengl_subsdk::attach_shader(shader._program_id, vertex);
-    opengl_subsdk::attach_shader(shader._program_id, fragment);
+    glAttachShader(shader._program_id, vertex);
+    glAttachShader(shader._program_id, fragment);
 
     opengl_subsdk::link_shader_program(shader._program_id);
 
-    opengl_subsdk::delete_shader(vertex);
-    opengl_subsdk::delete_shader(fragment);
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
 
     return shader;
 }

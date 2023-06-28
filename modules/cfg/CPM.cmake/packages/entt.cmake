@@ -10,8 +10,7 @@ CPMAddPackage(
 if (entt_ADDED)
     add_library(entt INTERFACE)
 
-    file(GLOB_RECURSE entt_headers_h "${entt_SOURCE_DIR}/src/*.hpp")
-    file(GLOB_RECURSE entt_headers_hpp "${entt_SOURCE_DIR}/src/*.h")
+    file(GLOB_RECURSE entt_headers_h "${entt_SOURCE_DIR}/src/*.h" "${entt_SOURCE_DIR}/src/*.hpp" "${entt_SOURCE_DIR}/src/*.hxx")
 
     target_include_directories(entt INTERFACE "${entt_SOURCE_DIR}/src")
 

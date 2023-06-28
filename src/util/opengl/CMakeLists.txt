@@ -16,7 +16,7 @@ else ()
     add_subdirectory(glad-loader)
 
     target_link_libraries(opengl_utils PUBLIC
-                          glad_loader
+                          glad_utils
                           )
 endif ()
 

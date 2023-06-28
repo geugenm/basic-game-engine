@@ -20,57 +20,19 @@ public:
         for (auto entity : view)
         {
             auto &shader = view.get<opengl_shader>(entity);
-            create_shader_program(shader);
+            shader       = opengl_shader::get_new_shader(
+                shader._vertex_source_path, shader._fragment_source_path);
         }
 
         auto sprite_shader_view = registry.view<sprite>();
 
         for (auto entity : sprite_shader_view)
         {
-            auto &ent_sprite = sprite_shader_view.get<sprite>(entity);
-            create_shader_program(ent_sprite._shader);
+            auto &ent_sprite   = sprite_shader_view.get<sprite>(entity);
+            ent_sprite._shader = opengl_shader::get_new_shader(
+                ent_sprite._shader._vertex_source_path,
+                ent_sprite._shader._fragment_source_path);
         }
-    }
-
-private:
-    static void create_shader_program(opengl_shader &shader)
-    {
-        // if (!exists(shader._vertex_source_path))
-        // {
-        //     throw std::invalid_argument("Vertex shader file '" +
-        //                                 shader._vertex_source_path.string() +
-        //                                 "' is not found.");
-        // }
-        //
-        // if (!exists(shader._fragment_source_path))
-        // {
-        //     throw std::invalid_argument("Fragment shader file '" +
-        //                                 shader._fragment_source_path.string()
-        //                                 +
-        //                                 "' is not found.");
-        // }
-        // get_new_compiled_shader =
-
-        const std::string vertex_source =
-            suppl::get_file_content(shader._vertex_source_path);
-
-        const std::string fragment_source =
-            suppl::get_file_content(shader._fragment_source_path);
-
-        GLuint vertex = opengl_subsdk::get_new_compiled_shader(
-            GL_VERTEX_SHADER, vertex_source.data());
-        GLuint fragment = opengl_subsdk::get_new_compiled_shader(
-            GL_FRAGMENT_SHADER, fragment_source.data());
-
-        shader._program_id = opengl_subsdk::get_new_program();
-
-        opengl_subsdk::attach_shader(shader._program_id, vertex);
-        opengl_subsdk::attach_shader(shader._program_id, fragment);
-
-        opengl_subsdk::link_shader_program(shader._program_id);
-
-        opengl_subsdk::delete_shader(vertex);
-        opengl_subsdk::delete_shader(fragment);
     }
 };
 
