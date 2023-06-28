@@ -1,5 +1,6 @@
-#version 320 es
-precision mediump float;
+#version 300 es
+
+precision mediump float; // Specify medium precision for floats
 
 in vec3 ourColor;
 in vec2 TexCoord;

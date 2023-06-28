@@ -1,4 +1,7 @@
-#version 330 core
+#version 300 es
+
+precision mediump float; // Specify medium precision for floats
+
 
 void main()
 {

@@ -1,10 +1,13 @@
-#version 330 core
+#version 300 es
+
+precision mediump float; // Specify medium precision for floats
+
 in vec3 ourColor;
 in vec2 TexCoord;
 
 out vec4 color;
 
-uniform sampler2D texture1;
+uniform sampler2D texture;
 
 bool near_line(vec2 point, vec2 a, vec2 b, float thickness) {
     vec2 ab = b - a;

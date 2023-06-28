@@ -1,4 +1,6 @@
-#version 330 core
+#version 300 es
+precision mediump float; // Specify medium precision for floats
+
 out vec4 color;
 
 void main()

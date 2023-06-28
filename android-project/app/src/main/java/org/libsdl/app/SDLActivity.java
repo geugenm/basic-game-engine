@@ -282,7 +282,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                 "player_system",
                 "sdk_systems",
                 "engine_sdk",
-                "test_entt",
+                "test_engine_android",
                 // "SDL3_image",
                 // "SDL3_mixer",
                 // "SDL3_net",
