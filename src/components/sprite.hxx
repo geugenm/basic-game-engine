@@ -1,10 +1,10 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-#include <opengl_functions.hxx>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
+#include <opengl_functions.hxx>
 #include <sstream>
 
 #include "SDL_rwops.h"

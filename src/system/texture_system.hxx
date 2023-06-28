@@ -11,8 +11,9 @@
 
 #include <general_components.hxx>
 
-#include <entt/entt.hpp>
 #include <opengl_functions.hxx>
+
+#include <entt/entt.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

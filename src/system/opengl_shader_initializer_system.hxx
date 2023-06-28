@@ -1,7 +1,8 @@
 #pragma once
 
-#include <entt/entt.hpp>
 #include <opengl_functions.hxx>
+
+#include <entt/entt.hpp>
 
 #include "opengl_shader.hxx"
 #include <general_components.hxx>
