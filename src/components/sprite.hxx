@@ -21,36 +21,20 @@ get_file_json_content(std::filesystem::path file_path)
 
     file_path.replace_extension(properties_extension);
 
-    std::string file_path_string = file_path;
-
-    if (!file_path_string.empty() && file_path_string[0] == '/')
+    if (!std::filesystem::exists(file_path))
     {
         file_path_string.erase(0, 1); // remove the first character
     }
+#endif
 
-    // if (!std::filesystem::exists(file_path))
-    // {
-    //     throw std::invalid_argument("Json file '" + file_path.string() +
-    //                                 "' was not found, looking for it in: " +
-    //                                 std::filesystem::current_path().string());
-    // }
-
-    SDL_RWops *rw = SDL_RWFromFile(file_path_string.c_str(), "rb");
-    if (rw == nullptr)
+    std::ifstream input_file(file_path);
+    if (!input_file.is_open())
     {
-        throw std::invalid_argument("Unable to open file: " + file_path_string +
-                                    ", SDL says: " + SDL_GetError());
+        throw std::invalid_argument("Could not open file: " +
+                                    file_path.string());
     }
 
-    static constexpr uint16_t buffer_size = 2048;
-    char buffer[buffer_size];
-    const size_t read_count = SDL_RWread(rw, buffer, buffer_size - 1);
-    if (read_count == 0)
-    {
-        throw std::invalid_argument(
-            "Error reading from file: " + file_path_string +
-            ", SDL says: " + SDL_GetError());
-    }
+    nlohmann::json json_content;
 
     buffer[read_count] = '\0';
 
