@@ -27,7 +27,7 @@ void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     setup_style(k_use_dark_style, k_window_alpha);
-
+    
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(k_opengl_version.data());
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "nlohmann/json_fwd.hpp"
-#include <glad/glad.h>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>

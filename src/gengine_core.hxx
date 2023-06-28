@@ -1,5 +1,3 @@
-#include <logger.hxx>
-
 #include "util/imgui/imgui_wrapper.hxx"
 #include "util/opengl/opengl_functions.hxx"
 

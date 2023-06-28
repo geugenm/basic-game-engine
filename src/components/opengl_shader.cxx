@@ -68,16 +68,14 @@ opengl_shader::get_new_shader(const std::filesystem::path &vertex_source_path,
     return shader;
 }
 
-opengl_shader
-opengl_shader::deserialize(const nlohmann::json &input_json,
-                           const std::filesystem::path &resources_path)
+opengl_shader opengl_shader::deserialize(const nlohmann::json &input_json)
 {
     return {
         ._vertex_source_path =
-            resources_path /
+            resources_path.string() +
             input_json.value("vertex_source_path", "shaders/missing.vert"),
         ._fragment_source_path =
-            resources_path /
+            resources_path.string() +
             input_json.value("fragment_source_path", "shaders/missing.frag"),
         ._program_id = input_json.value("program_id", GLuint{}),
     };

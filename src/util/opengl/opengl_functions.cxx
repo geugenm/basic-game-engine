@@ -8,8 +8,6 @@
 #include <stdexcept>
 #include <sys/stat.h>
 
-#include "glad/glad.h"
-
 bool opengl_subsdk::is_opengl_version_supported()
 {
     int major;
@@ -74,6 +72,7 @@ std::string opengl_subsdk::glenum_to_string(GLenum value)
     }
 }
 
+#ifndef __ANDROID__
 void opengl_subsdk::opengl_debug_callback(
     GLenum source, GLenum type, GLuint id, GLenum severity,
     [[maybe_unused]] GLsizei length, const GLchar *message,
@@ -96,7 +95,9 @@ void opengl_subsdk::opengl_debug_callback(
 
     std::cerr << msg.str() << std::flush;
 }
+#endif
 
+#ifndef __ANDROID__
 void opengl_subsdk::enable_debug_mode()
 {
     glEnable(GL_DEBUG_OUTPUT);
@@ -105,6 +106,7 @@ void opengl_subsdk::enable_debug_mode()
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                           GL_TRUE);
 }
+
 
 void opengl_subsdk::disable_debug_mode()
 {
@@ -117,6 +119,7 @@ void opengl_subsdk::disable_debug_mode()
         glDebugMessageCallback(nullptr, nullptr);
     }
 }
+#endif
 
 bool opengl_subsdk::file_has_changed(const std::string &file_path,
                                      std::time_t &last_modified_time)
@@ -187,11 +190,15 @@ GLuint opengl_subsdk::get_new_compiled_shader(GLenum shader_type,
 
     if (!success)
     {
-        char log[512];
-        glGetShaderInfoLog(result_shader, OPENGL_INFO_LOG_SIZE, nullptr, log);
+        GLint logSize = 0;
+        glGetShaderiv(result_shader, GL_INFO_LOG_LENGTH, &logSize);
+        std::vector<GLchar> log(logSize);
+        glGetShaderInfoLog(result_shader, logSize, nullptr, log.data());
 
-        std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n" << log << std::endl;
-        throw std::domain_error("Failed to compile shader");
+        std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n"
+                  << log.data() << std::endl;
+        throw std::domain_error("Failed to compile shader: " +
+                                std::string(log.data()));
     }
 
     return result_shader;
@@ -211,7 +218,7 @@ void opengl_subsdk::link_shader_program(GLuint program)
 
         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
                   << log << std::endl;
-        throw std::domain_error("Failed to link shader");
+        throw std::domain_error("Failed to link shader" + log);
     }
 }
 
@@ -273,9 +280,10 @@ GLuint opengl_subsdk::get_compiled_shader_from_file(
                                     "' does not exist");
     }
 
-    std::string shader_content = opengl_subsdk::get_file_content(shader_path);
+    const std::string shader_content =
+        opengl_subsdk::get_file_content(shader_path);
 
-    GLuint result = opengl_subsdk::get_new_compiled_shader(
+    const GLuint result = opengl_subsdk::get_new_compiled_shader(
         shader_type, shader_content.data());
 
     return result;
