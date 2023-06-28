@@ -15,3 +15,13 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
                           GLESv3
                           )
 endif ()
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+    target_link_libraries(opengl_utils PUBLIC
+                          android
+                          log
+                          EGL
+                          GLESv2
+                          GLESv3
+                          )
+endif ()

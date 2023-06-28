@@ -27,6 +27,7 @@ get_file_json_content(std::filesystem::path file_path)
     {
         file_path_string.erase(0, 1); // remove the first character
     }
+#endif
 
     // if (!std::filesystem::exists(file_path))
     // {
