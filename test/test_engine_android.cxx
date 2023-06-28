@@ -1,9 +1,8 @@
 #include <gengine_core.hxx>
-#include <gtest/gtest.h>
 
 #include <thread>
 
-TEST(GameSystemTest, UpdateAndHandleEvents)
+int main(int argc, char **argv)
 {
     entt::registry main_registry;
     sdk::game_system system(main_registry, "My Window", 1920, 1080);
@@ -17,11 +16,12 @@ TEST(GameSystemTest, UpdateAndHandleEvents)
         system.handle_events(main_registry);
     }
 
-    assert(system.is_initialized(main_registry) == false);
-}
+    int return_code = EXIT_SUCCESS;
 
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    if (system.is_initialized(main_registry))
+    {
+        return_code = EXIT_FAILURE;
+    }
+
+    return return_code;
 }
