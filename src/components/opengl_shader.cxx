@@ -1,5 +1,7 @@
 #include "opengl_shader.hxx"
 
+#include <file_loading_stuff.hxx>
+
 namespace sdk
 {
 std::string
@@ -33,28 +35,15 @@ opengl_shader::get_new_shader(const std::filesystem::path &vertex_source_path,
     opengl_shader shader{._vertex_source_path   = vertex_source_path,
                          ._fragment_source_path = fragment_source_path};
 
-#ifndef __ANDROID__ // Default filesystem is not working on android, use SDL_RW
-    if (!exists(shader._vertex_source_path))
-    {
-        throw std::invalid_argument("Vertex shader file '" +
-                                    shader._vertex_source_path.string() +
-                                    "' is not found.");
-    }
+    const std::string vertex_source =
+        sdk::suppl::get_file_content(shader._vertex_source_path);
 
-    if (!exists(shader._fragment_source_path))
-    {
-        throw std::invalid_argument("Fragment shader file '" +
-                                    shader._fragment_source_path.string() +
-                                    "' is not found.");
-    }
-#endif // __ANDROID__
+    const std::string fragment_source =
+        sdk::suppl::get_file_content(shader._fragment_source_path);
 
-    const std::string vertex_source   = shader._vertex_source_path.string();
-    const std::string fragment_source = shader._fragment_source_path.string();
-
-    GLuint vertex = opengl_subsdk::get_compiled_shader_from_file(
+    GLuint vertex = opengl_subsdk::get_new_compiled_shader(
         GL_VERTEX_SHADER, vertex_source.data());
-    GLuint fragment = opengl_subsdk::get_compiled_shader_from_file(
+    GLuint fragment = opengl_subsdk::get_new_compiled_shader(
         GL_FRAGMENT_SHADER, fragment_source.data());
 
     shader._program_id = opengl_subsdk::get_new_program();

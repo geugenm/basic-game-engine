@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 add_subdirectory(util)
+add_subdirectory(file-loader)
 add_subdirectory(components)
 add_subdirectory(system)
 

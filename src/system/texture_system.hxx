@@ -4,6 +4,7 @@
 #include "opengl_texture.hxx"
 #include "sdl_render_system.hxx"
 #include "sprite_animation_system.hxx"
+#include <file_loading_stuff.hxx>
 #include <player.hxx>
 
 #include <SDL_events.h>
@@ -201,12 +202,6 @@ private:
     [[nodiscard]] static std::vector<unsigned char>
     get_png_data(opengl_texture &texture)
     {
-        //        if (!std::filesystem::exists(texture._image_path))
-        //        {
-        //            throw std::invalid_argument("Failed to open PNG image: " +
-        //                                        texture._image_path.string());
-        //        }
-
         std::string file_path_string = texture._image_path.string();
         if (!file_path_string.empty() && file_path_string[0] == '/')
         {
