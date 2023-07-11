@@ -52,7 +52,7 @@ public:
         {
             auto &entity_sprite = view.get<sprite>(entity);
             glUseProgram(entity_sprite._shader._program_id);
-            initialize(entity_sprite._texture, sdl_context);
+            initialize(entity_sprite._texture);
             glUseProgram(0);
         }
 
@@ -131,14 +131,14 @@ public:
                 glm::ortho(-window_aspect_ratio, window_aspect_ratio, -1.0f,
                            1.0f, -1.0f, 1.0f);
 
-            const glm::mat4 translation_matrix1 = glm::translate(
-                glm::mat4(1.0f), entity_sprite._transform._position);
-
             // Create the rotation matrix
             const glm::mat4 rotation_matrix1 =
                 glm::rotate(glm::mat4(1.0f),
                             entity_sprite._transform._current_rotation_angle,
                             glm::vec3(0.0f, 0.0f, 1.0f));
+
+            const glm::mat4 translation_matrix1 = glm::translate(
+                glm::mat4(1.0f), entity_sprite._transform._position);
 
             const glm::mat4 scaling_matrix1 =
                 glm::scale(glm::mat4(1.0f), entity_sprite._transform._scale);
@@ -159,10 +159,8 @@ private:
         glDeleteBuffers(1, &texture._element_buffer_object);
     }
 
-    static void initialize(opengl_texture &texture,
-                           const sdl_render_context &context)
+    static void initialize(opengl_texture &texture)
     {
-        // Load image, create texture and generate mipmaps
         const auto png_data = get_png_data(texture);
 
         if (texture._width == 0 || texture._height == 0)
@@ -178,11 +176,8 @@ private:
         enable_attributes();
         glBindVertexArray(0);
 
-        // Load and create a texture
         glGenTextures(1, &texture._texture);
 
-        // All upcoming GL_TEXTURE_2D operations now have an effect on this
-        // texture object
         glBindTexture(GL_TEXTURE_2D, texture._texture);
 
         set_texture_parameters(texture);
@@ -205,7 +200,7 @@ private:
         std::string file_path_string = texture._image_path.string();
         if (!file_path_string.empty() && file_path_string[0] == '/')
         {
-            file_path_string.erase(0, 1); // remove the first character
+            file_path_string.erase(0, 1);
         }
 
         suppl::membuf file_contents = suppl::load_file(file_path_string);
@@ -268,19 +263,16 @@ private:
 
     static void enable_attributes()
     {
-        // Position attribute
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
                               nullptr);
 
         glEnableVertexAttribArray(0);
 
-        // Color attribute
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
                               (GLvoid *)(3 * sizeof(GLfloat)));
 
         glEnableVertexAttribArray(1);
 
-        // TexCoord attribute
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat),
                               (GLvoid *)(6 * sizeof(GLfloat)));
 
@@ -289,11 +281,9 @@ private:
 
     static void set_texture_parameters(opengl_texture const &texture)
     {
-        // Set the texture wrapping parameters
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-        // Set texture filtering parameters
         if (texture._need_generate_mipmaps)
         {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,

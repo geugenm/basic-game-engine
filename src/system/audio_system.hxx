@@ -6,7 +6,7 @@
 namespace sdk
 {
 
-struct audio_system
+struct audio_system final
 {
     sdl_subsdk::audio_mixer sound;
 

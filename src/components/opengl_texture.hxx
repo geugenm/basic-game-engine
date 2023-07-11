@@ -30,7 +30,7 @@ struct opengl_texture
     bool _need_generate_mipmaps = false;
 
     GLint _number{};
-
+    
     void render() const
     {
         glBindTexture(GL_TEXTURE_2D, _texture);

@@ -18,7 +18,7 @@ struct sdl_gl_engine
     {
         sdl_render_context sdl_context;
         SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
-        
+
         sdl_subsdk::init_sdl();
 
         sdl_context._window =

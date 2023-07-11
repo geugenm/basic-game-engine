@@ -1,1 +1,27 @@
-{"json_path":"level1","shader":{"fragment_source_path":"shaders/texture.frag","program_id":21,"vertex_source_path":"shaders/texture.vert"},"texture":{"image_path":"textures/level1.png","indices":[0,1,2,2,3,0],"need_generate_mipmaps":false,"vertices":[-1.0,-0.5,0.20000000298023224,0.0,1.0,0.0,0.0,0.0,1.0,-0.5,0.20000000298023224,0.0,0.0,0.0,1.0,0.0,1.0,0.5,0.20000000298023224,0.0,0.0,1.0,1.0,1.0,-1.0,0.5,0.20000000298023224,0.0,1.0,0.0,0.0,1.0]},"transform":{"position":{"x":0.0,"y":0.0,"z":0.0},"rotation_angle":0.0,"scale":{"x":1.0,"y":1.0,"z":1.0}}}
+{
+  "json_path": "level1",
+  "shader": {
+    "fragment_source_path": "shaders/texture.frag",
+    "program_id": 21,
+    "vertex_source_path": "shaders/texture.vert"
+  },
+  "texture": {
+    "image_path": "textures/level1.png",
+    "indices": [0, 1, 2, 2, 3, 0],
+    "need_generate_mipmaps": false,
+    "vertices": [-1.0, -0.5, 0.20000000298023224, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -0.5, 0.20000000298023224, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.20000000298023224, 0.0, 0.0, 1.0, 1.0, 1.0, -1.0, 0.5, 0.20000000298023224, 0.0, 1.0, 0.0, 0.0, 1.0]
+  },
+  "transform": {
+    "position": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "rotation_angle": 0.0,
+    "scale": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    }
+  }
+}

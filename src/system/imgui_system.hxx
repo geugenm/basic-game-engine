@@ -59,15 +59,19 @@ public:
             return;
         }
 
-        // Normalize mouse position
-        m_mouse_position.x =
-            ImGui::GetMousePos().x / ImGui::GetIO().DisplaySize.x;
-        m_mouse_position.y =
-            ImGui::GetMousePos().y / ImGui::GetIO().DisplaySize.y;
+        // Get mouse position in pixels
+        m_mouse_position.x = ImGui::GetMousePos().x;
+        m_mouse_position.y = ImGui::GetMousePos().y;
 
-        // Convert to NDC
-        m_sprite._transform._position.x = m_mouse_position.x * 2.0f - 1.0f;
-        m_sprite._transform._position.y = 1.0f - m_mouse_position.y * 2.0f;
+        // Convert to NDC for transformations
+        float ndc_x =
+            m_mouse_position.x / ImGui::GetIO().DisplaySize.x * 2.0f - 1.0f;
+        float ndc_y =
+            1.0f - m_mouse_position.y / ImGui::GetIO().DisplaySize.y * 2.0f;
+
+        // Update sprite's position
+        m_sprite._transform._position.x = ndc_x;
+        m_sprite._transform._position.y = ndc_y;
 
         if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
         {
@@ -261,9 +265,9 @@ private:
 
 struct imgui_system
 {
-    void init(entt::registry &registry, entt::entity const &entity)
+    void init(entt::registry &registry, entt::entity const &sdl_window_entity)
     {
-        auto &sdl_context = registry.get<sdl_render_context>(entity);
+        auto &sdl_context = registry.get<sdl_render_context>(sdl_window_entity);
 
         imgui_subsdk::init_imgui(sdl_context._window, sdl_context._context);
 
@@ -292,6 +296,7 @@ struct imgui_system
             if (state == game_states::played)
             {
                 show_sprite_editor(registry);
+                create_pause_button(state);
             }
 
             if (state == game_states::paused)
@@ -337,6 +342,28 @@ struct imgui_system
     }
 
 private:
+    void create_pause_button(game_states &state)
+    {
+        const ImVec2 displaySize = ImGui::GetIO().DisplaySize;
+
+        ImGui::SetNextWindowPos(ImVec2(displaySize.x, 0), ImGuiCond_Once,
+                                ImVec2(1, 0));
+
+        ImGuiWindowFlags windowFlags =
+            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav |
+            ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration;
+
+        ImGui::Begin("Pause Button", nullptr, windowFlags);
+
+        if (ImGui::Button("| |"))
+        {
+            state = game_states::paused;
+        }
+
+        ImGui::End();
+    }
+
     void show_sprite_editor(entt::registry &registry)
     {
         static std::size_t selected_index = 0;

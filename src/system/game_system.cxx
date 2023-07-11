@@ -1,4 +1,5 @@
 #include "game_system.hxx"
+#include "audio_system.hxx"
 #include "imgui_system.hxx"
 
 namespace sdk
@@ -7,7 +8,8 @@ namespace sdk
 game_system::game_system(entt::registry &registry, const char *title,
                          const int &width, const int &height)
     : m_render_engine(registry, title, width, height),
-      m_game_state_entity(registry.create())
+      m_game_state_entity(registry.create()),
+      m_audio_system("../assets/wav/da3m0nsneverstop.caf")
 {
     m_texture_system.test(registry);
     sdk::opengl_shader_initializer_system::init(registry);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "audio_system.hxx"
 #include "imgui_system.hxx"
 #include "opengl_shader_initializer_system.hxx"
 #include "sdl_render_system.hxx"
@@ -29,6 +30,8 @@ private:
 
     sdl_gl_engine m_render_engine;
     entt::entity m_game_state_entity;
+
+    audio_system m_audio_system;
 
     [[no_unique_address]] imgui_system imgui;
 };
