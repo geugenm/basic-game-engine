@@ -1,5 +1,4 @@
 <h1 align="center">basic-game-engine</h1>
-<hr>
 
 <div align="center" style="text-align: center;">
   <div>
@@ -64,8 +63,6 @@ offers a solid foundation on which more functionalities can be built. Future
 improvements could include adding support for multiple audio file loading and
 playback, extending the sprite editor, and implementing more advanced ECS
 features with EnTT.
-
-<hr>
 
 ## Installation
 
