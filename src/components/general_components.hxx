@@ -19,7 +19,7 @@
 
 namespace sdk
 {
-struct sdl_render_context
+struct sdl_render_context final
 {
     SDL_Window *_window    = nullptr;
     SDL_GLContext _context = nullptr;
