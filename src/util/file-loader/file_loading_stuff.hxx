@@ -14,7 +14,7 @@ get_file_json_content(std::filesystem::path file_path)
 
     file_path.replace_extension(properties_extension);
 
-    std::string file_path_string = file_path;
+    std::string file_path_string = file_path.string();
 
     if (!file_path_string.empty() && file_path_string[0] == '/')
     {
@@ -106,7 +106,7 @@ membuf load_file(std::string_view path);
 [[nodiscard]] static std::string
 get_file_content(std::filesystem::path file_path)
 {
-    std::string file_path_string = file_path;
+    std::string file_path_string = file_path.string();
 
     if (!file_path_string.empty() && file_path_string[0] == '/')
     {

@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx")
 
-add_library(glad_utils SHARED ${SOURCES})
+add_library(glad_utils SHARED)
+
+target_sources(glad_utils PUBLIC ${SOURCES})
 
 target_include_directories(glad_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

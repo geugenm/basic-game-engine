@@ -4,6 +4,8 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "*.c" "*.cpp" "*.cxx")
 
 add_library(player_system SHARED)
 
+target_sources(player_system PUBLIC)
+
 target_sources(player_system PUBLIC ${SOURCES})
 
 target_include_directories(player_system PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

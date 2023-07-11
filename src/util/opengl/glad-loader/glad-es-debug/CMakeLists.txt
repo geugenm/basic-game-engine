@@ -10,7 +10,11 @@ endif ()
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.c" "src/*.cpp" "src/*.cxx")
 
-add_library(glad_es_debug_loader SHARED ${SOURCES})
+add_library(glad_es_debug_loader SHARED)
+
+target_sources(glad_es_debug_loader PUBLIC ${SOURCES})
+
+set_target_properties(glad_es_debug_loader PROPERTIES ENABLE_EXPORTS TRUE)
 
 target_include_directories(glad_es_debug_loader PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
 
