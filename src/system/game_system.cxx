@@ -1,6 +1,7 @@
 #include "game_system.hxx"
 #include "audio_system.hxx"
 #include "imgui_system.hxx"
+#include "opengl_shader.hxx"
 
 namespace sdk
 {
@@ -8,9 +9,12 @@ namespace sdk
 game_system::game_system(entt::registry &registry, const char *title,
                          const int &width, const int &height)
     : m_render_engine(registry, title, width, height),
-      m_game_state_entity(registry.create()),
-      m_audio_system("../assets/wav/da3m0nsneverstop.wav")
+      m_game_state_entity(registry.create())
 {
+    const auto music_path =
+        resources_path.string() + "wav/da3m0nsneverstop.wav";
+    m_audio_system = new audio_system(music_path.data());
+
     m_texture_system.test(registry);
     sdk::opengl_shader_initializer_system::init(registry);
     sdk::opengl_texture_system::init_on(registry,
@@ -62,9 +66,9 @@ void game_system::handle_events(entt::registry &registry)
             case SDL_EVENT_FINGER_MOTION: {
                 // Convert the touch coordinates to ImGui coordinates
                 ImGuiIO &io = ImGui::GetIO();
-                int mouseX =
+                auto mouseX =
                     static_cast<int>(event.tfinger.x * io.DisplaySize.x);
-                int mouseY =
+                auto mouseY =
                     static_cast<int>(event.tfinger.y * io.DisplaySize.y);
 
                 // Pass the touch event to ImGui

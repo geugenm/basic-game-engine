@@ -31,7 +31,7 @@ private:
     sdl_gl_engine m_render_engine;
     entt::entity m_game_state_entity;
 
-    audio_system m_audio_system;
+    audio_system *m_audio_system;
 
     [[no_unique_address]] imgui_system imgui;
 };

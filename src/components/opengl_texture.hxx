@@ -30,7 +30,7 @@ struct opengl_texture
     bool _need_generate_mipmaps = false;
 
     GLint _number{};
-    
+
     void render() const
     {
         glBindTexture(GL_TEXTURE_2D, _texture);
@@ -80,7 +80,7 @@ struct opengl_texture
     {
         return {
             ._image_path =
-                resources_path.string() +
+                resources_path.string() + "sprites/" +
                 input_json.value("image_path", "textures/missing_texture.png"),
             ._vertices = input_json.value("vertices", std::vector<GLfloat>{}),
 

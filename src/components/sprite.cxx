@@ -55,7 +55,7 @@ sprite
 sprite::get_sprite_from_file(const std::string_view &json_parameters_file_name)
 {
     const std::filesystem::path texture_path =
-        resources_path / json_parameters_file_name;
+        resources_path / "sprites" / json_parameters_file_name;
 
     const nlohmann::json json_texture_properties =
         suppl::get_file_json_content(texture_path);
