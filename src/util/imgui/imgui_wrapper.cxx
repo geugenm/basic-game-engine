@@ -147,9 +147,7 @@ void setup_style(const bool &is_dark, const float &alpha)
                                     &font_cfg);
 
 #ifdef __ANDROID__
-    ImGuiIO &io        = ImGui::GetIO();
-    io.FontGlobalScale = 2.0f; // Increase font scale
-    ImGuiStyle &style  = ImGui::GetStyle();
+    io->FontGlobalScale = 2.0f; // Increase font scale
     style.ScaleAllSizes(2.0f); // Scale all other UI elements
 #endif
 }
