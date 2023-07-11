@@ -272,19 +272,73 @@ struct imgui_system
             auto const &sprite_editor = registry.get<imgui_sprite_editor>(ent);
             m_sprite_editors.push_back(sprite_editor.get_sprite()._name);
         }
-
-#ifdef __ANDROID__
-        ImGuiIO &io        = ImGui::GetIO();
-        io.FontGlobalScale = 2.0f; // Increase font scale
-        ImGuiStyle &style  = ImGui::GetStyle();
-        style.ScaleAllSizes(2.0f); // Scale all other UI elements
-#endif
     }
 
     void update(entt::registry &registry)
     {
         imgui_subsdk::new_frame();
 
+        for (auto entity : registry.view<game_states>())
+        {
+            using sdk::game_states;
+
+            auto &state = registry.get<game_states>(entity);
+
+            if (state == game_states::in_menu)
+            {
+                on_menu(registry);
+            }
+
+            if (state == game_states::played)
+            {
+                show_sprite_editor(registry);
+            }
+
+            if (state == game_states::paused)
+            {
+                on_pause(registry, state);
+            }
+        }
+
+        imgui_subsdk::render();
+    }
+
+    void handle_events(const SDL_Event &event, entt::registry &registry)
+    {
+        if (event.type == SDL_EVENT_MOUSE_WHEEL)
+        {
+            ImGuiIO &io = ImGui::GetIO();
+            if (event.wheel.y > 0)
+            {
+                io.MouseWheel += 1.0f;
+            }
+            else if (event.wheel.y < 0)
+            {
+                io.MouseWheel -= 1.0f;
+            }
+        }
+
+        if (ImGui::IsKeyDown(ImGuiKey_Escape))
+        {
+
+            for (auto entity : registry.view<game_states>())
+            {
+                auto &state = registry.get<game_states>(entity);
+
+                state = game_states::paused;
+            }
+        }
+
+        for (auto entity : registry.view<imgui_sprite_editor>())
+        {
+            auto &sprite_editor = registry.get<imgui_sprite_editor>(entity);
+            sprite_editor.handle_events();
+        }
+    }
+
+private:
+    void show_sprite_editor(entt::registry &registry)
+    {
         static std::size_t selected_index = 0;
 
         if (ImGui::BeginCombo("List", m_sprite_editors[selected_index].data()))
@@ -324,65 +378,8 @@ struct imgui_system
                 sprite_editor.get_sprite().save_to_file();
             }
         }
-
-        for (auto entity : registry.view<game_states>())
-        {
-            using sdk::game_states;
-
-            auto &state = registry.get<game_states>(entity);
-
-            if (state == game_states::in_menu)
-            {
-                on_menu(registry, state);
-            }
-
-            if (state == game_states::played)
-            {
-            }
-
-            if (state == game_states::paused)
-            {
-                on_pause(registry, state);
-            }
-        }
-
-        imgui_subsdk::render();
     }
 
-    void handle_events(const SDL_Event &event, entt::registry &registry)
-    {
-        if (event.type == SDL_EVENT_MOUSE_WHEEL)
-        {
-            ImGuiIO &io = ImGui::GetIO();
-            if (event.wheel.y > 0)      // Upward scroll
-            {
-                io.MouseWheel += 1.0f;  // Increase mouse wheel value
-            }
-            else if (event.wheel.y < 0) // Downward scroll
-            {
-                io.MouseWheel -= 1.0f;  // Decrease mouse wheel value
-            }
-        }
-
-        if (ImGui::IsKeyDown(ImGuiKey_Escape))
-        {
-
-            for (auto entity : registry.view<game_states>())
-            {
-                auto &state = registry.get<game_states>(entity);
-
-                state = game_states::paused;
-            }
-        }
-
-        for (auto entity : registry.view<imgui_sprite_editor>())
-        {
-            auto &sprite_editor = registry.get<imgui_sprite_editor>(entity);
-            sprite_editor.handle_events();
-        }
-    }
-
-private:
     void on_pause(entt::registry &registry, game_states &current_state)
     {
         ImGui::OpenPopup("Pause");
@@ -391,6 +388,14 @@ private:
                                    ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("Pause menu");
+
+            ImGui::Separator();
+            if (ImGui::Button("Resume", ImVec2(120, 0)))
+            {
+                current_state = game_states::played;
+                ImGui::CloseCurrentPopup();
+            }
+
             ImGui::Separator();
             if (ImGui::Button("Settings", ImVec2(120, 0)))
             {
@@ -399,22 +404,11 @@ private:
 
             ImGui::Separator();
 
-            // Exit button
             if (ImGui::Button("Main menu", ImVec2(120, 0)))
             {
                 current_state = game_states::in_menu;
 
                 ImGui::CloseCurrentPopup();
-                // Do something
-            }
-
-            // Resume button
-            ImGui::SameLine();
-            if (ImGui::Button("Resume", ImVec2(120, 0)))
-            {
-                current_state = game_states::played;
-                ImGui::CloseCurrentPopup();
-                // Do something
             }
 
             for (auto entity : registry.view<sdl_render_context>())
@@ -427,7 +421,7 @@ private:
         }
     }
 
-    void on_menu(entt::registry &registry, game_states const &current_state)
+    void on_menu(entt::registry &registry)
     {
         for (auto entity : registry.view<sdl_render_context>())
         {

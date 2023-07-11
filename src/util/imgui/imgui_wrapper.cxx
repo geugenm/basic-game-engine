@@ -27,7 +27,7 @@ void init_imgui(SDL_Window *window, SDL_GLContext gl_context)
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     setup_style(k_use_dark_style, k_window_alpha);
-    
+
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(k_opengl_version.data());
 }
@@ -145,6 +145,13 @@ void setup_style(const bool &is_dark, const float &alpha)
     font_cfg.FontDataOwnedByAtlas = false;
     io->Fonts->AddFontFromMemoryTTF((void *)tahoma, sizeof(tahoma), 17.f,
                                     &font_cfg);
+
+#ifdef __ANDROID__
+    ImGuiIO &io        = ImGui::GetIO();
+    io.FontGlobalScale = 2.0f; // Increase font scale
+    ImGuiStyle &style  = ImGui::GetStyle();
+    style.ScaleAllSizes(2.0f); // Scale all other UI elements
+#endif
 }
 
 void center_next_element_horizontally(const float &item_width)

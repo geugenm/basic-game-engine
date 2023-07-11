@@ -22,9 +22,9 @@ void game_system::update(entt::registry &registry)
 {
     auto const &state = registry.get<game_states>(m_game_state_entity);
 
-    m_texture_system.update(registry, m_render_engine._window_entity);
     if (state == game_states::played)
     {
+        m_texture_system.update(registry, m_render_engine._window_entity);
     }
 
     if (state == game_states::paused)
