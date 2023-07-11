@@ -9,11 +9,12 @@ game_system::game_system(entt::registry &registry, const char *title,
                          const int &width, const int &height)
     : m_render_engine(registry, title, width, height),
       m_game_state_entity(registry.create()),
-      m_audio_system("../assets/wav/da3m0nsneverstop.caf")
+      m_audio_system("../assets/wav/da3m0nsneverstop.wav")
 {
     m_texture_system.test(registry);
     sdk::opengl_shader_initializer_system::init(registry);
-    m_texture_system.init_on(registry, m_render_engine._window_entity);
+    sdk::opengl_texture_system::init_on(registry,
+                                        m_render_engine._window_entity);
     imgui.init(registry, m_render_engine._window_entity);
 
     game_states state = game_states::in_menu;
@@ -61,8 +62,10 @@ void game_system::handle_events(entt::registry &registry)
             case SDL_EVENT_FINGER_MOTION: {
                 // Convert the touch coordinates to ImGui coordinates
                 ImGuiIO &io = ImGui::GetIO();
-                int mouseX  = event.tfinger.x * io.DisplaySize.x;
-                int mouseY  = event.tfinger.y * io.DisplaySize.y;
+                int mouseX =
+                    static_cast<int>(event.tfinger.x * io.DisplaySize.x);
+                int mouseY =
+                    static_cast<int>(event.tfinger.y * io.DisplaySize.y);
 
                 // Pass the touch event to ImGui
                 if (event.type == SDL_EVENT_FINGER_DOWN)
