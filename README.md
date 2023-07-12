@@ -43,7 +43,7 @@ sprites) which are commonly used in 2D games.
 
 #### Here's an example of the animation played by the engine:
 
-![](https://i.gifer.com/2huh.gif)
+![](https://github.com/geugenm/basic-game-engine/tree/main/assets/scenes/cutscene_preview.gif)
 
 ### Simple Music Player 3.0.0 (beta)
 
@@ -150,4 +150,5 @@ build and test this program. Also,
 thanks to the open-source community for providing resources and support for C++
 development.
 
-Special thanks to [Leonid Chaika](https://github.com/leanid) for his help in mastering the language, architecture and gamedev in general.
+Special thanks to [Leonid Chaika](https://github.com/leanid) for his help in
+mastering the language, architecture and gamedev in general.
