@@ -3,13 +3,18 @@
 <div align="center" style="text-align: center;">
   <div>
     <a href="https://github.com/geugenm/advanced-hello-world/issues">
-      <img src="https://img.shields.io/github/issues-raw/geugenm/advanced-hello-world?style=for-the-badge" alt="GitHub Issues">
+      <img src="https://img.shields.io/github/issues-raw/geugenm/basic-game-engine?style=for-the-badge" alt="GitHub Issues">
     </a>
     <img src="https://img.shields.io/badge/platform-linux%20-informational?style=for-the-badge&amp;logo=appveyor" alt="linux">
     <img src="https://img.shields.io/badge/platform-android%20-informational?style=for-the-badge&amp;logo=android" alt="android">
     <img src="https://img.shields.io/badge/platform-windows%20-informational?style=for-the-badge&amp;logo=windows" alt="windows">
     <a href="https://en.cppreference.com/w/cpp/17">
-      <img src="https://img.shields.io/badge/cpp-17-informational?style=for-the-badge&amp;logo=cplusplus" alt="CPP version">
+      <img src="https://img.shields.io/badge/cpp-20-informational?style=for-the-badge&amp;logo=cplusplus" alt="CPP version">
+    </a>
+  </div>
+   <div>
+    <a href="https://github.com/geugenm/basic-game-engine/actions/workflows/cmake.yml">
+        <img src="https://img.shields.io/github/actions/workflow/status/geugenm/basic-game-engine/cmake.yml?logo=ubuntu&style=for-the-badge" alt="Build status on ubuntu">
     </a>
   </div>
 </div>
