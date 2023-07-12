@@ -149,3 +149,5 @@ Thanks to the developers of CMake and CTest for providing the tools necessary to
 build and test this program. Also,
 thanks to the open-source community for providing resources and support for C++
 development.
+
+Special thanks to [Leonid Chaika](https://github.com/leanid) for his help in mastering the language, architecture and gamedev in general.
