@@ -43,7 +43,11 @@ sprites) which are commonly used in 2D games.
 
 #### Here's an example of the animation played by the engine:
 
-![](https://github.com/geugenm/basic-game-engine/tree/main/assets/scenes/cutscene_preview.gif)
+![](https://raw.githubusercontent.com/geugenm/basic-game-engine/main/assets/scenes/cutscene_preview.gif)
+
+### Its frames:
+
+![](https://raw.githubusercontent.com/geugenm/basic-game-engine/main/assets/scenes/cutscene_preview.png)
 
 ### Simple Music Player 3.0.0 (beta)
 
