@@ -1,6 +1,5 @@
 #include "game_system.hxx"
 #include "imgui_system.hxx"
-#include "opengl_texture.hxx"
 
 namespace sdk
 {

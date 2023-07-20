@@ -10,7 +10,7 @@ TEST(GameSystemTest, UpdateAndHandleEvents)
 
     while (system.is_initialized(main_registry))
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 80));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
 
         system.update(main_registry);
 

@@ -31,11 +31,15 @@ class opengl_texture_system final
 public:
     void test(entt::registry &registry)
     {
-        m_garage = registry.create();
+        entt::entity cutscene = registry.create();
 
-        sprite battlefield = sprite::get_sprite_from_file("level1");
+        sprite cutscene_sprite =
+            sprite::get_sprite_from_file("cutscene_preview");
 
-        registry.emplace<sprite>(m_garage, battlefield);
+        registry.emplace<sprite>(cutscene, cutscene_sprite);
+
+        registry.emplace<sprite_animation>(
+            cutscene, sprite_animation::create_new_animation(5, 3));
     }
 
     static void init(entt::registry &registry)
@@ -297,8 +301,6 @@ private:
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
-
-    entt::entity m_garage{};
 
     [[no_unique_address]] sprite_animation_system m_animation_system{};
 };

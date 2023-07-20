@@ -28,7 +28,7 @@ public:
             "Transform: " + m_sprite._texture._image_path.filename().string();
         ImGui::BeginChild(title.data());
 
-        ImGui::Checkbox("Modify position", &m_dragging_sprite);
+        ImGui::Checkbox("Modify position (Esc to cancel)", &m_dragging_sprite);
 
         ImGui::InputFloat("X position", &m_sprite._transform._position.x);
         ImGui::InputFloat("Y position", &m_sprite._transform._position.y);
@@ -49,7 +49,7 @@ public:
 
     void handle_events()
     {
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+        if (ImGui::IsKeyDown(ImGuiKey_Escape))
         {
             m_dragging_sprite = false;
         }
@@ -59,22 +59,22 @@ public:
             return;
         }
 
-        m_mouse_position.x = ImGui::GetMousePos().x;
-        m_mouse_position.y = ImGui::GetMousePos().y;
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+        {
+            m_mouse_position.x = ImGui::GetMousePos().x;
+            m_mouse_position.y = ImGui::GetMousePos().y;
 
-        // Convert to NDC for transformations
-        float ndc_x =
-            m_mouse_position.x / ImGui::GetIO().DisplaySize.x * 2.0f - 1.0f;
-        float ndc_y =
-            1.0f - m_mouse_position.y / ImGui::GetIO().DisplaySize.y * 2.0f;
+            float ndc_x =
+                m_mouse_position.x / ImGui::GetIO().DisplaySize.x * 2.0f - 1.0f;
+            float ndc_y =
+                1.0f - m_mouse_position.y / ImGui::GetIO().DisplaySize.y * 2.0f;
 
-        // Update sprite's position
-        m_sprite._transform._position.x = ndc_x;
-        m_sprite._transform._position.y = ndc_y;
+            m_sprite._transform._position.x = ndc_x;
+            m_sprite._transform._position.y = ndc_y;
+        }
 
         if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
         {
-            // Handle mouse wheel rotation for scaling
             auto const &wheel_rotation = ImGui::GetIO().MouseWheel;
             if (wheel_rotation != 0.0f)
             {
@@ -83,7 +83,6 @@ public:
             return;
         }
 
-        // Handle mouse wheel rotation for scaling
         auto const &wheel_rotation = ImGui::GetIO().MouseWheel;
         if (wheel_rotation != 0.0f)
         {
@@ -153,17 +152,6 @@ struct imgui_system
             }
         }
 
-        if (ImGui::IsKeyDown(ImGuiKey_Escape))
-        {
-
-            for (auto entity : registry.view<game_states>())
-            {
-                auto &state = registry.get<game_states>(entity);
-
-                state = game_states::paused;
-            }
-        }
-
         for (auto entity : registry.view<imgui_sprite_editor>())
         {
             auto &sprite_editor = registry.get<imgui_sprite_editor>(entity);
@@ -201,16 +189,6 @@ private:
                 sprite_editor.get_sprite()._name)
             {
                 sprite_editor.render();
-            }
-        }
-
-        if (ImGui::Button("Save All"))
-        {
-            for (auto entity : registry.view<imgui_sprite_editor>())
-            {
-                auto const &sprite_editor =
-                    registry.get<imgui_sprite_editor>(entity);
-                sprite_editor.get_sprite().save_to_file();
             }
         }
     }
