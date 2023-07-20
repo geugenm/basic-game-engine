@@ -5,7 +5,6 @@
 #include "sdl_render_system.hxx"
 #include "sprite_animation_system.hxx"
 #include <file_loading_stuff.hxx>
-#include <player.hxx>
 
 #include <SDL_events.h>
 #include <SDL_mouse.h>
@@ -37,15 +36,10 @@ public:
         sprite battlefield = sprite::get_sprite_from_file("level1");
 
         registry.emplace<sprite>(m_garage, battlefield);
-
-        m_player_system.init(registry);
     }
 
-    static void init_on(entt::registry &registry,
-                        entt::entity const &window_entity)
+    static void init(entt::registry &registry)
     {
-        auto sdl_context = registry.get<sdl_render_context>(window_entity);
-
         auto view = registry.view<sprite>();
 
         for (auto entity : view)
@@ -70,7 +64,6 @@ public:
             glUseProgram(0);
         }
 
-        // TODO: remove debug
         for (auto entity : view)
         {
             auto &ent_sprite = view.get<sprite>(entity);
@@ -149,16 +142,25 @@ public:
         }
     } // namespace sdk
 
-private:
-    static void destroy(opengl_texture const &texture)
+    static void destroy(entt::registry &registry)
     {
-        glDeleteVertexArrays(1, &texture._vertex_array_object);
+        auto view = registry.view<sprite>();
 
-        glDeleteBuffers(1, &texture._vertex_buffer_object);
+        for (auto entity : view)
+        {
+            auto const &entity_sprite = view.get<sprite>(entity);
 
-        glDeleteBuffers(1, &texture._element_buffer_object);
+            auto &texture = entity_sprite._texture;
+
+            glDeleteVertexArrays(1, &texture._vertex_array_object);
+
+            glDeleteBuffers(1, &texture._vertex_buffer_object);
+
+            glDeleteBuffers(1, &texture._element_buffer_object);
+        }
     }
 
+private:
     static void initialize(opengl_texture &texture)
     {
         const auto png_data = get_png_data(texture);
@@ -297,8 +299,6 @@ private:
     }
 
     entt::entity m_garage{};
-
-    player_system m_player_system;
 
     [[no_unique_address]] sprite_animation_system m_animation_system{};
 };

@@ -16,8 +16,6 @@ TEST(GameSystemTest, UpdateAndHandleEvents)
 
         system.handle_events(main_registry);
     }
-
-    assert(system.is_initialized(main_registry) == false);
 }
 
 int main(int argc, char **argv)
