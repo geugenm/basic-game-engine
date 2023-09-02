@@ -33,7 +33,7 @@ struct sprite
     void save_to_file() const;
 
     [[nodiscard]] static sprite
-    get_sprite_from_file(const std::string_view &json_parameters_file_name);
+    get_sprite_from_file(std::string_view json_parameters_file_name);
 
     [[nodiscard]] static sprite deserialize(const nlohmann::json &input_json);
 

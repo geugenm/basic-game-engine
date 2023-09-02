@@ -41,8 +41,7 @@ public:
         m_player_system.init(registry);
     }
 
-    static void init_on(entt::registry &registry,
-                        entt::entity const &window_entity)
+    static void init_on(entt::registry &registry, entt::entity window_entity)
     {
         auto sdl_context = registry.get<sdl_render_context>(window_entity);
 
@@ -96,7 +95,7 @@ public:
         }
     };
 
-    void update(entt::registry &registry, entt::entity const &window_entity)
+    void update(entt::registry &registry, entt::entity window_entity)
     {
         m_animation_system.update(registry);
 
@@ -205,7 +204,7 @@ private:
 
         suppl::membuf file_contents = suppl::load_file(file_path_string);
 
-        stbi_set_flip_vertically_on_load(true);
+        stbi_set_flip_vertically_on_load(1);
         int width                  = 0;
         int height                 = 0;
         int components             = 0;

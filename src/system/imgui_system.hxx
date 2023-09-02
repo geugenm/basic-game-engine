@@ -26,7 +26,10 @@ public:
     {
         const std::string title =
             "Transform: " + m_sprite._texture._image_path.filename().string();
-        ImGui::BeginChild(title.data());
+        if (!ImGui::BeginChild(title.data()))
+        {
+            throw std::runtime_error("Could not begin child window.");
+        }
 
         ImGui::Checkbox("Modify position", &m_dragging_sprite);
 
@@ -146,57 +149,72 @@ private:
     void show_window([[maybe_unused]] entt::registry const &registry,
                      sdl_render_context *sdl_window)
     {
-        if (ImGui::Begin("Settings", &m_is_window_opened))
+        if (!ImGui::Begin("Settings", &m_is_window_opened))
         {
-            ImGui::Text("FPS:");
-
-            ImGui::PushItemWidth(200);
-            ImGui::DragInt("##fps", &m_chosen_fps, 1, 25, 700);
-            ImGui::PopItemWidth();
-
-            ImGui::Checkbox("VSync", &m_use_vsync);
-
-            ImGui::SameLine();
-
-            ImGui::Checkbox("Show Debug", &m_is_showing_debug_window);
-
-            ImGui::Text("Resolution:");
-
-            ImGui::PushItemWidth(200);
-            ImGui::ListBox("##resolution_list", &m_chosen_resolution,
-                           m_resolution_items.data(), m_resolution_items.size(),
-                           5);
-            ImGui::PopItemWidth();
-
-            if (ImGui::Button("Apply"))
-            {
-                apply_resolution_settings(sdl_window);
-            }
+            return;
         }
+
+        ImGui::Text("FPS:");
+
+        ImGui::PushItemWidth(200.f);
+        ImGui::DragInt("##fps", &m_chosen_fps, 1.f, 25, 700);
+        ImGui::PopItemWidth();
+
+        ImGui::Checkbox("VSync", &m_use_vsync);
+
+        ImGui::SameLine();
+
+        ImGui::Checkbox("Show Debug", &m_is_showing_debug_window);
+
+        ImGui::Text("Resolution:");
+
+        ImGui::PushItemWidth(200.f);
+        ImGui::ListBox("##resolution_list", &m_chosen_resolution,
+                       m_resolution_items.data(), m_resolution_items.size(), 5);
+        ImGui::PopItemWidth();
+
+        if (ImGui::Button("Apply"))
+        {
+            apply_resolution_settings(sdl_window);
+        }
+
         ImGui::End();
     }
 
     void apply_resolution_settings(sdl_render_context *sdl_window) const
     {
+        std::int32_t new_width  = 0;
+        std::int32_t new_height = 0;
+
         if (m_chosen_resolution == 0)
         {
-            SDL_SetWindowSize(sdl_window->_window, 7680, 4320);
+            new_width  = 7680;
+            new_height = 4320;
         }
         if (m_chosen_resolution == 1)
         {
-            SDL_SetWindowSize(sdl_window->_window, 3840, 2160);
+            new_width  = 3840;
+            new_height = 2160;
         }
         if (m_chosen_resolution == 2)
         {
-            SDL_SetWindowSize(sdl_window->_window, 1920, 1080);
+            new_width  = 1920;
+            new_height = 1080;
         }
         if (m_chosen_resolution == 3)
         {
-            SDL_SetWindowSize(sdl_window->_window, 720, 480);
+            new_width  = 1280;
+            new_height = 720;
         }
         if (m_chosen_resolution == 4)
         {
-            SDL_SetWindowSize(sdl_window->_window, 640, 480);
+            new_width  = 640;
+            new_height = 480;
+        }
+
+        if (SDL_SetWindowSize(sdl_window->_window, new_width, new_height) != 0)
+        {
+            throw std::runtime_error(SDL_GetError());
         }
     }
 
@@ -265,7 +283,7 @@ private:
 
 struct imgui_system
 {
-    void init(entt::registry &registry, entt::entity const &sdl_window_entity)
+    void init(entt::registry &registry, entt::entity sdl_window_entity)
     {
         auto &sdl_context = registry.get<sdl_render_context>(sdl_window_entity);
 
@@ -342,7 +360,7 @@ struct imgui_system
     }
 
 private:
-    void create_pause_button(game_states &state)
+    static void create_pause_button(game_states &state)
     {
         const ImVec2 displaySize = ImGui::GetIO().DisplaySize;
 
@@ -364,19 +382,18 @@ private:
         ImGui::End();
     }
 
-    void show_sprite_editor(entt::registry &registry)
+    void obtain_selected_index()
     {
-        static std::size_t selected_index = 0;
-
-        if (ImGui::BeginCombo("List", m_sprite_editors[selected_index].data()))
+        if (ImGui::BeginCombo("List",
+                              m_sprite_editors[m_selected_index].data()))
         {
             for (size_t i = 0; i < m_sprite_editors.size(); ++i)
             {
                 const std::string &item = m_sprite_editors[i];
-                const bool isSelected   = (selected_index == i);
+                const bool isSelected   = (m_selected_index == i);
                 if (ImGui::Selectable(item.c_str(), isSelected))
                 {
-                    selected_index = i;
+                    m_selected_index = i;
                 }
                 if (isSelected)
                 {
@@ -385,11 +402,16 @@ private:
             }
             ImGui::EndCombo();
         }
+    }
+
+    void show_sprite_editor(entt::registry &registry)
+    {
+        obtain_selected_index();
 
         for (auto entity : registry.view<imgui_sprite_editor>())
         {
             auto &sprite_editor = registry.get<imgui_sprite_editor>(entity);
-            if (m_sprite_editors[selected_index] ==
+            if (m_sprite_editors[m_selected_index] ==
                 sprite_editor.get_sprite()._name)
             {
                 sprite_editor.render();
@@ -460,6 +482,8 @@ private:
     settings_window m_settings_window;
 
     main_menu_window m_main_menu_window;
+
+    std::size_t m_selected_index;
 
     std::vector<std::string> m_sprite_editors;
 };

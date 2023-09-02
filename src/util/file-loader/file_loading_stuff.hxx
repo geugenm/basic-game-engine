@@ -12,13 +12,13 @@ get_file_json_content(std::filesystem::path file_path)
 {
     static constexpr std::string_view properties_extension = ".json";
 
-    file_path.replace_extension(properties_extension);
+    file_path = file_path.replace_extension(properties_extension);
 
     std::string file_path_string = file_path.string();
 
     if (!file_path_string.empty() && file_path_string[0] == '/')
     {
-        file_path_string.erase(0, 1); // remove the first character
+        file_path_string = file_path_string.erase(0, 1);
     }
 
     SDL_RWops *rw = SDL_RWFromFile(file_path_string.c_str(), "rb");
@@ -40,12 +40,15 @@ get_file_json_content(std::filesystem::path file_path)
 
     buffer[read_count] = '\0';
 
-    SDL_RWclose(rw);
+    if (SDL_RWclose(rw) != 0)
+    {
+        throw std::invalid_argument("Error closing file: " + file_path_string);
+    }
 
     return nlohmann::json::parse(buffer);
 }
 
-struct membuf : public std::streambuf
+struct membuf final : public std::streambuf
 {
     membuf() : std::streambuf(), buf(), buf_size(0) {}
     membuf(std::unique_ptr<char[]> buffer, size_t size)
@@ -56,7 +59,7 @@ struct membuf : public std::streambuf
         setg(beg_ptr, beg_ptr, end_ptr);
         setp(beg_ptr, end_ptr);
     }
-    membuf(membuf &&other)
+    membuf(membuf &&other) noexcept
     {
         setp(nullptr, nullptr);
         setg(nullptr, nullptr, nullptr);
@@ -70,50 +73,75 @@ struct membuf : public std::streambuf
     }
 
     pos_type seekoff(off_type pos, std::ios_base::seekdir seek_dir,
-                     std::ios_base::openmode) override
+                     [[maybe_unused]] std::ios_base::openmode) override
     {
         // TODO implement it in correct way
         if (seek_dir == std::ios_base::beg)
         {
             return 0 + pos;
         }
-        else if (seek_dir == std::ios_base::end)
+
+        if (seek_dir == std::ios_base::end)
         {
-            return buf_size + pos;
+            return static_cast<pos_type>(buf_size) + pos;
         }
-        else
-        {
-            return egptr() - gptr();
-        }
+
+        return egptr() - gptr();
     }
 
-    char *begin() const
+    [[nodiscard]] char *begin() const
     {
         return eback();
     }
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         return buf_size;
     }
 
+    membuf &operator=(membuf &&other) noexcept
+    {
+        setp(nullptr, nullptr);
+        setg(nullptr, nullptr, nullptr);
+
+        other.swap(*this);
+
+        buf      = std::move(other.buf);
+        buf_size = other.buf_size;
+
+        other.buf_size = 0;
+
+        return *this;
+    }
+
+    ~membuf() override
+    {
+        buf.reset();
+        buf_size = 0;
+    }
+
 private:
     std::unique_ptr<char[]> buf;
-    size_t buf_size;
+    std::uint64_t buf_size;
 };
 
 membuf load_file(std::string_view path);
 
 [[nodiscard]] static std::string
-get_file_content(std::filesystem::path file_path)
+get_file_content(std::filesystem::path const &file_path)
 {
     std::string file_path_string = file_path.string();
 
     if (!file_path_string.empty() && file_path_string[0] == '/')
     {
-        file_path_string.erase(0, 1); // remove the first character
+        file_path_string =
+            file_path_string.erase(0, 1); // remove the first character
     }
 
-    SDL_RWops *rw = SDL_RWFromFile(file_path_string.c_str(), "rb");
+    constexpr char const *sdl_file_access_mode = "rb";
+
+    SDL_RWops *rw =
+        SDL_RWFromFile(file_path_string.c_str(), sdl_file_access_mode);
+
     if (rw == nullptr)
     {
         throw std::invalid_argument("Unable to open file: " + file_path_string +
@@ -121,13 +149,17 @@ get_file_content(std::filesystem::path file_path)
     }
 
     static constexpr Sint64 buffer_size = 2048;
-    char buffer[buffer_size];
-    std::stringstream ss; // create a stringstream
+
+    char buffer[buffer_size] = {0};
+
+    std::stringstream ss;
+
     size_t read_count;
+
     while ((read_count = SDL_RWread(rw, buffer, buffer_size - 1)) > 0)
     {
         buffer[read_count] = '\0';
-        ss << buffer; // add buffer content to the stringstream
+        ss << buffer;
     }
 
     if (SDL_RWclose(rw) != 0)

@@ -21,8 +21,8 @@ struct opengl_texture
 
     GLuint _texture{};
 
-    unsigned long _width{};
-    unsigned long _height{};
+    std::uint64_t _width{};
+    std::uint64_t _height{};
 
     std::vector<GLfloat> _vertices;
     std::vector<GLuint> _indices;
@@ -70,7 +70,7 @@ struct opengl_texture
     }
 
     [[nodiscard]] static std::size_t
-    get_tex_coordinates_index(const std::size_t &index)
+    get_tex_coordinates_index(std::size_t index)
     {
         return index * 8 + 6;
     }

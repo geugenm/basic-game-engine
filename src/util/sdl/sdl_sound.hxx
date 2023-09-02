@@ -12,15 +12,15 @@ namespace sdl_subsdk
 {
 struct audio_buffer
 {
-    uint8_t *start     = nullptr;
-    size_t size        = 0;
-    size_t current_pos = 0;
+    std::uint8_t *start       = nullptr;
+    std::uint64_t size        = 0;
+    std::uint64_t current_pos = 0;
 
     struct
     {
-        size_t frequency = 0;
-        double time      = 0.0;
-        bool use_note    = false;
+        std::uint64_t frequency = 0;
+        double time             = 0.0;
+        bool use_note           = false;
     } note;
 };
 
@@ -55,9 +55,9 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
     start  = finish;
     finish = std::chrono::high_resolution_clock::now();
 
-    auto stream_len = static_cast<size_t>(len);
+    auto stream_len = static_cast<std::int32_t>(len);
     // silence
-    std::memset(stream, 0, static_cast<size_t>(len));
+    std::memset(stream, 0, len);
 
     auto audio_buff_data = static_cast<audio_buffer *>(userdata);
 
@@ -68,8 +68,8 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
 
     if (audio_buff_data->note.frequency != 0)
     {
-        size_t num_samples = stream_len / 2 / 2;
-        double dt          = 1.0 / 48000.0;
+        auto num_samples = stream_len / 2 / 2;
+        double dt        = 1.0 / 48000.0;
 
         auto output = reinterpret_cast<int16_t *>(stream);
 
@@ -106,7 +106,8 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
                     break;
                 }
                 default:
-                    break;
+                    throw std::invalid_argument(
+                        "Invalid stereo audio channel (Not right/left/both).");
             }
 
             audio_buff_data->note.time += dt;
@@ -125,16 +126,23 @@ static void audio_callback(void *userdata, uint8_t *stream, int len)
 
             if (left_in_buffer > stream_len)
             {
-                SDL_MixAudioFormat(stream, current_sound_pos, AUDIO_FORMAT,
-                                   static_cast<Uint32>(len), 128);
+                if (SDL_MixAudioFormat(stream, current_sound_pos, AUDIO_FORMAT,
+                                       static_cast<Uint32>(len), 128) != 0)
+                {
+                    throw std::invalid_argument("Failed to mix audio.");
+                }
                 audio_buff_data->current_pos += stream_len;
                 break;
             }
             else
             {
                 // first copy rest from buffer and repeat sound from beginning
-                SDL_MixAudioFormat(stream, current_sound_pos, AUDIO_FORMAT,
-                                   static_cast<Uint32>(left_in_buffer), 128);
+                if (SDL_MixAudioFormat(stream, current_sound_pos, AUDIO_FORMAT,
+                                       static_cast<Uint32>(left_in_buffer),
+                                       128) != 0)
+                {
+                    throw std::invalid_argument("Failed to mix audio.");
+                }
                 // start buffer from beginning
                 audio_buff_data->current_pos = 0;
                 stream_len -= left_in_buffer;
@@ -216,16 +224,18 @@ public:
             .current_pos = 0,
             .note        = {.frequency = 0, .time = 0, .use_note = false}};
 
+        constexpr double bytes_to_mb_multiplier = 1024.0 * 1024.0;
+
         std::cout << "Audio buffer from file size: "
                   << sample_buffer_len_from_file_ << " B ("
-                  << sample_buffer_len_from_file_ / double(1024 * 1024)
+                  << sample_buffer_len_from_file_ / bytes_to_mb_multiplier
                   << ") MB";
 
         const char *device_name         = nullptr; // device name or nullptr
         const int32_t is_capture_device = 0; // 0 - play device, 1 - microphone
         SDL_AudioSpec desired{.freq     = 48000,
                               .format   = AUDIO_FORMAT,
-                              .channels = 2,    // stereo
+                              .channels = 2, // stereo
                               .silence  = 0,
                               .samples  = 4096, // must be power of 2
                               .padding  = 0,
@@ -257,7 +267,10 @@ public:
 
         // start playing audio thread
         // now callback is firing
-        SDL_PlayAudioDevice(audio_device_id_);
+        if (SDL_PlayAudioDevice(audio_device_id_) != 0)
+        {
+            throw std::invalid_argument("Failed to play audio device");
+        }
 
         std::cout << "Audio device started";
     }
@@ -266,7 +279,10 @@ public:
     {
         std::cout << "Pause audio device (stop audio thread)";
 
-        SDL_PauseAudioDevice(audio_device_id_);
+        if (SDL_PauseAudioDevice(audio_device_id_) == 0)
+        {
+            throw std::invalid_argument("Failed to pause audio device");
+        }
 
         std::cout << "Close audio device";
 

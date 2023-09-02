@@ -2,15 +2,17 @@
 
 #include <thread>
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp)
 {
+    std::cout << "Launched with " << argc << " arguments." << std::endl;
+    std::cout << "Parameters: " << argv[0] << std::endl;
+    std::cout << "Set environment: " << envp[0] << std::endl;
+
     entt::registry main_registry;
     sdk::game_system system(main_registry, "My Window", 1920, 1080);
 
     while (system.is_initialized(main_registry))
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
-
         system.update(main_registry);
 
         system.handle_events(main_registry);
