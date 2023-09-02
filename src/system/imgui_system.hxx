@@ -163,7 +163,7 @@ struct imgui_system
     }
 
 private:
-    void show_sprite_editor(entt::registry &registry)
+    void obtain_selected_index()
     {
         if (ImGui::BeginCombo("List",
                               m_sprite_editors[m_selected_index].data()))
@@ -201,6 +201,8 @@ private:
     }
 
     std::vector<std::string> m_sprite_editors;
+
+    std::size_t m_selected_index = 0;
 };
 
 } // namespace sdk
