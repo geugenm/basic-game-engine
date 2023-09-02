@@ -26,7 +26,10 @@ public:
     {
         const std::string title =
             "Transform: " + m_sprite._texture._image_path.filename().string();
-        ImGui::BeginChild(title.data());
+        if (!ImGui::BeginChild(title.data()))
+        {
+            throw std::runtime_error("Could not begin child window.");
+        }
 
         ImGui::Checkbox("Modify position (Esc to cancel)", &m_dragging_sprite);
 
@@ -115,7 +118,7 @@ private:
 
 struct imgui_system
 {
-    void init(entt::registry &registry, entt::entity const &sdl_window_entity)
+    void init(entt::registry &registry, entt::entity sdl_window_entity)
     {
         auto &sdl_context = registry.get<sdl_render_context>(sdl_window_entity);
 
@@ -162,17 +165,16 @@ struct imgui_system
 private:
     void show_sprite_editor(entt::registry &registry)
     {
-        static std::size_t selected_index = 0;
-
-        if (ImGui::BeginCombo("List", m_sprite_editors[selected_index].data()))
+        if (ImGui::BeginCombo("List",
+                              m_sprite_editors[m_selected_index].data()))
         {
             for (size_t i = 0; i < m_sprite_editors.size(); ++i)
             {
                 const std::string &item = m_sprite_editors[i];
-                const bool isSelected   = (selected_index == i);
+                const bool isSelected   = (m_selected_index == i);
                 if (ImGui::Selectable(item.c_str(), isSelected))
                 {
-                    selected_index = i;
+                    m_selected_index = i;
                 }
                 if (isSelected)
                 {
@@ -181,11 +183,16 @@ private:
             }
             ImGui::EndCombo();
         }
+    }
+
+    void show_sprite_editor(entt::registry &registry)
+    {
+        obtain_selected_index();
 
         for (auto entity : registry.view<imgui_sprite_editor>())
         {
             auto &sprite_editor = registry.get<imgui_sprite_editor>(entity);
-            if (m_sprite_editors[selected_index] ==
+            if (m_sprite_editors[m_selected_index] ==
                 sprite_editor.get_sprite()._name)
             {
                 sprite_editor.render();

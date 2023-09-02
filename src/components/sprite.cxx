@@ -9,8 +9,9 @@ void sprite::apply_transform(const glm::mat4 &transform) const
 {
     glUseProgram(_shader._program_id);
 
-    glUniformMatrix4fv(_shader.get_uniform_location("transform"), 1, GL_FALSE,
-                       glm::value_ptr(transform));
+    constexpr char const *attribute_name = "transform";
+    glUniformMatrix4fv(_shader.get_uniform_location(attribute_name), 1,
+                       GL_FALSE, glm::value_ptr(transform));
     glUseProgram(0);
 }
 
@@ -51,8 +52,7 @@ void sprite::save_to_file() const
     output_file.close();
 }
 
-sprite
-sprite::get_sprite_from_file(const std::string_view &json_parameters_file_name)
+sprite sprite::get_sprite_from_file(std::string_view json_parameters_file_name)
 {
     const std::filesystem::path texture_path =
         resources_path / "sprites" / json_parameters_file_name;

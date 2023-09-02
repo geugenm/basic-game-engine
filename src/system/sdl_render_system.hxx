@@ -13,11 +13,16 @@ struct sdl_gl_engine
 {
     entt::entity _window_entity;
 
-    sdl_gl_engine(entt::registry &registry, const char *window_title,
-                  const int &width, const int &height)
+    sdl_gl_engine(entt::registry &registry, const char *window_title, int width,
+                  int height)
     {
         sdl_render_context sdl_context;
-        SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+        if (SDL_SetHint(SDL_HINT_ORIENTATIONS,
+                        "LandscapeLeft LandscapeRight") == SDL_FALSE)
+        {
+            std::cout << "WARNING: Failed to set SDL_HINT_ORIENTATIONS"
+                      << std::endl;
+        }
 
         sdl_subsdk::init_sdl();
 
@@ -63,7 +68,10 @@ struct sdl_gl_engine
 
         glViewport(0, 0, sdl_context.get_width(), sdl_context.get_height());
 
-        SDL_GL_SwapWindow(sdl_context._window);
+        if (SDL_GL_SwapWindow(sdl_context._window) != 0)
+        {
+            throw sdk::engine_error(SDL_GetError());
+        }
     }
 
     void destroy(entt::registry &registry) const
@@ -71,7 +79,10 @@ struct sdl_gl_engine
         auto view         = registry.view<sdl_render_context>();
         auto &sdl_context = view.get<sdl_render_context>(_window_entity);
 
-        SDL_GL_DeleteContext(sdl_context._context);
+        if (SDL_GL_DeleteContext(sdl_context._context) != 0)
+        {
+            throw sdk::engine_error(SDL_GetError());
+        }
         SDL_DestroyWindow(sdl_context._window);
         SDL_Quit();
 
